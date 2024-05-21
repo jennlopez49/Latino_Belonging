@@ -21,18 +21,18 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q808, Q809, Q812, Q813, Q814, Q816, 
                                 Q560r1, Q560r2, Q560r3, Q560r4, 
                                 Q560r5, Q560r6, Q560r7, Q560r8, weight, Q271, 
-                                Q478_Q483r4, Q197A1, Q197B1, Q31).   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
+                                Q478_Q483r4, Q197A1, Q197B1, Q31)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
 
 ## excluding MENA, AI/NA, NH, PI
 
 cmps_sub <- cmps_sub %>% filter(!c(S2_Race_Prime == 5 | S2_Race_Prime == 6 | S2_Race_Prime == 7 | S2_Race_Prime == 8))
 # table(cmps_sub$S2_Race_Prime)
-
-### Making the Survey Weights Representative -- checking proportions
-
-svydes <- svydesign(id = ~ 1, weights = ~weight, data = cmps_sub)
-# checking 
-prop.table(svytable(~cmps_sub$S2_Race_Prime, svydes))
+# 
+# ### Making the Survey Weights Representative -- checking proportions
+# 
+# svydes <- svydesign(id = ~ 1, weights = ~weight, data = cmps_sub)
+# # checking 
+# prop.table(svytable(~cmps_sub$S2_Race_Prime, svydes))
 
 # adjusting weight based on 2021 ACS estimates
 # 60.6% White non-Hispanic
@@ -166,5 +166,97 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                                         Q271 == 3 ~ 3,
                                                                         Q271 == 4 ~ 2,
                                                                         Q271 == 5 ~ 1),
-                                  Full_Citizen = Q478_Q483r4
+                                  Full_Citizen = Q478_Q483r4,
+                                  # Parents_Born = ifelse(cmps_sub$Parents_Born == 88, NA, 
+                                  #                       cmps_sub$Parents_Born),
+                                  # Grandparents_Born = ifelse(cmps_sub$Grandparents_Born == 88, NA,
+                                                             # cmps_sub$Grandparents_Born),
+                                  Parents_Born_Recoded = case_when(Parents_Born == 1 ~ 3,                       # Recoded so 3 - All in US, 2 - 1 in US, 1 - None in US
+                                                                   Parents_Born == 2 ~ 2,
+                                                                   Parents_Born == 4 ~ 1),
+                                  Grandparents_Born_Recoded = case_when(Grandparents_Born == 1 ~ 5,
+                                                                        Grandparents_Born == 2 ~ 4,
+                                                                        Grandparents_Born == 3 ~ 3,
+                                                                        Grandparents_Born == 4 ~ 2,
+                                                                        Grandparents_Born == 5 ~ 1),
+                                  Psych_Distance = Parents_Born_Recoded + Grandparents_Born_Recoded,
+                                  Increase_Border_Spending = case_when(Increase_BorderSpend_Wall == 1 ~ 1,      # Recoded - 1 is Support, 0 is Oppose 
+                                                                       Increase_BorderSpend_Wall == 2 ~ 0),
+                                  # Under_200_Miles = ifelse(distance_km < 321.869, 1, 0),
+                                  # Under_100_Miles = ifelse(distance_km < 160.934, 1, 0),
+                                  linked_simp = case_when(Linked_Fate == 1 ~ 1,
+                                                          Linked_Fate == 2 ~ 1,
+                                                          Linked_Fate == 3 ~ 1,
+                                                          Linked_Fate == 4 ~ 2,
+                                                          Linked_Fate == 5 ~ 2),
+                                  id_simp = case_when(identity_strength == 1 ~ 1,
+                                                      identity_strength == 2 ~ 1,
+                                                      identity_strength == 3 ~ 0,
+                                                      identity_strength == 4 ~ 0,
+                                                      identity_strength == 5 ~ 0),
+                                  psych_dist_imm = Psych_Distance + Imm_Comm,
+                                  # dist_sqd = distance_km^2,
+                                  California = ifelse(State == 5, 1 ,0),
+                                  Texas = ifelse(State == 44, 1 ,0),
+                                  Arizona = ifelse(State == 3, 1, 0),
+                                  New_Mexico = ifelse(State == 32, 1, 0),
+                                  border_state = ifelse(State == 5, 1, 
+                                                        ifelse(State == 44, 1 ,
+                                                               ifelse(State == 3, 1,
+                                                                      ifelse(State == 32, 1, 0)))),
+                                  border_security_recoded = case_when(border_sec_first == 1 ~ 5,
+                                                                      border_sec_first == 2 ~ 4,
+                                                                      border_sec_first == 3 ~ 3,
+                                                                      border_sec_first == 4 ~ 2,
+                                                                      border_sec_first == 5 ~ 1),
+                                  psych_dist_lang = psych_dist_imm + Spanish,
+                                  Belong_US = case_when(Belong_USSociety == 1 ~ 3,
+                                                        Belong_USSociety == 2 ~ 2,
+                                                        Belong_USSociety == 3 ~ 1),
+                                  Accepted_US = case_when(Accepted_Included_USSoc == 1 ~ 3,
+                                                          Accepted_Included_USSoc == 2 ~ 2,
+                                                          Accepted_Included_USSoc == 3 ~ 1),
+                                  Value_US = case_when(Value_Respect_inUSSoc == 1 ~ 3,
+                                                       Value_Respect_inUSSoc == 2 ~ 2,
+                                                       Value_Respect_inUSSoc == 3 ~ 1),
+                                  Full_Cit = case_when(Full_Citizen == 1 ~ 3,
+                                                       Full_Citizen == 2 ~ 3,
+                                                       Full_Citizen == 3 ~ 3,
+                                                       Full_Citizen == 4 ~ 2,
+                                                       Full_Citizen == 5 ~ 1,
+                                                       Full_Citizen == 6 ~ 1,
+                                                       Full_Citizen == 7 ~ 1),
+                                  citizenship_exp = Belong_US + Accepted_US + Value_US,
+                                  citizenship_ext = citizenship_exp + Full_Cit, 
+                                  Type_Border = case_when(State == 3 ~ 1, 
+                                                          Texas == 1 ~ 1,
+                                                          State == 32 ~ 2,                                      
+                                                          California == 1 ~ 2, 
+                                                          border_state == 0 ~ 3                                 #Least Inclusive -- 1, More Inclusive --  2, Non-border -- 3
+                                  ),
+                                  Inclusive = case_when(State == 3 ~ 0,                                         #Least Inclusive -- 0, More Inclusive --  1, Non-border -- 
+                                                        Texas == 1 ~ 0,
+                                                        State == 32 ~ 1,                                      
+                                                        California == 1 ~ 1),
+                                  Remittances_Index <- ifelse(cmps_sub$Remit_Children == 1 |
+                                                                cmps_sub$Remit_Friends == 1 |
+                                                                cmps_sub$Remit_Grandparents == 1 |
+                                                                cmps_sub$Remit_OtherFam == 1 | 
+                                                                cmps_sub$Remit_Parents == 1, 1,
+                                                                             0),
+                                    Remittances_Scale = (Remit_Children + Remit_Friends + Remit_Grandparents +
+                                                           Remit_OtherFam + Remit_Parents)
 ) 
+
+party_maj <- read.csv("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/party_majority.csv")
+
+# merging 
+
+full_cmps <- left_join(cmps_clean, party_maj, by = "State")
+state_abb <- full_cmps$State_abb
+## Inclusivity 
+# write.csv(unique(state_abb), "state_abb.csv")
+inclusivity <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusive.xlsx")
+colnames(inclusivity) <- c("State_abb","inclusivity")
+full_cmps_2020 <- left_join(full_cmps, inclusivity, by = "State_abb")
+full_cmps_2020$inclusivity <- as.numeric(full_cmps_2020$inclusivity)
