@@ -249,7 +249,37 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                                 cmps_sub$Remit_Parents == 1, 1,
                                                                              0),
                                     Remittances_Scale = (Remit_Children + Remit_Friends + Remit_Grandparents +
-                                                           Remit_OtherFam + Remit_Parents)
+                                                           Remit_OtherFam + Remit_Parents),
+                                  Fear_Imm = Q504r8,
+                                  Susp_You = Q505_Q508r1, 
+                                  Insult_You = Q505_Q508r2,
+                                  Graffiti_Target = Q505_Q508r4, 
+                                  Govt_Disc = Q509_Q511r1, 
+                                  Govt_Off = Q509_Q511r2, 
+                                  Neg_Exec = Q509_Q511r3,                       ## all 505-508 go from never (1) to very often (4) 
+                                  Assume_NotAmerican = case_when(Q630_Q632r3 ~ 1 == 1,
+                                                                 Q630_Q632r3 ~ 2 == 0), ### recoded yes 1 no 0 
+                                  Disc_Affect = case_when(Q633 == 1 ~ 6,
+                                                          Q633 == 2 ~ 5,
+                                                          Q633 == 3 ~ 4,
+                                                          Q633 == 4 ~ 3,
+                                                          Q633 == 5 ~ 2,
+                                                          Q633 == 6 ~ 1),       # recoded, 1 is refused, 2 is IDK, 3 is not at all - 6 a lot 
+                                  Pers_Disc = case_when(Q627 == 1 ~ 1,
+                                                        Q627 == 2 ~ 0),                             ####Experienced Disc yes 1 no 0, recoded
+                                  Disc_Where = case_when(Q628 == 1 ~ 1, 
+                                                         Q628 == 3 ~ .5,
+                                                         Q628 == 2 ~ 0),         ##### Experienced Disc In the US = 1 & both in and out of US = .5, neither 0
+                                  Imm_Disc = case_when(Q619_Q626r5 ~ 1 == 5,
+                                                       Q619_Q626r5 ~ 2 == 4,
+                                                       Q619_Q626r5 ~ 3 == 3,
+                                                       Q619_Q626r5 ~ 4 == 2,
+                                                       Q619_Q626r5 ~ 5 == 1),    ### 1 is don't know, 2 is none at all, 5 is a lot  
+                                  Q619_Q626r6 = case_when(Q619_Q626r6 ~ 1 == 5,
+                                                          Q619_Q626r6 ~ 2 == 4,
+                                                          Q619_Q626r6 ~ 3 == 3,
+                                                          Q619_Q626r6 ~ 4 == 2,
+                                                          Q619_Q626r6 ~ 5 == 1) ## 1 is IDK, 2 is none, 5 is a lot
 ) 
 
 party_maj <- read.csv("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/party_majority.csv")
