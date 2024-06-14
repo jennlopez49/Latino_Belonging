@@ -21,7 +21,11 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q808, Q809, Q812, Q813, Q814, Q816, 
                                 Q560r1, Q560r2, Q560r3, Q560r4, 
                                 Q560r5, Q560r6, Q560r7, Q560r8, weight, Q271, 
-                                Q478_Q483r4, Q197A1, Q197B1, Q31)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
+                                Q478_Q483r4, Q197A1, Q197B1, Q31,
+                                Q12, Q31, Q504r8, Q505_Q508r1, Q505_Q508r2,
+                                Q505_Q508r4, Q509_Q511r1, Q509_Q511r2, 
+                                Q509_Q511r3, Q630_Q632r3, Q633, Q627, Q628,
+                                Q619_Q626r5, Q619_Q626r6)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
 
 ## excluding MENA, AI/NA, NH, PI
 
