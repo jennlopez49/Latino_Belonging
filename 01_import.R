@@ -21,7 +21,7 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q808, Q809, Q812, Q813, Q814, Q816, 
                                 Q560r1, Q560r2, Q560r3, Q560r4, 
                                 Q560r5, Q560r6, Q560r7, Q560r8, weight, Q271, 
-                                Q478_Q483r4, Q197A1, Q197B1, Q31,
+                                Q478_Q483r4, Q197A1, Q197B1,
                                 Q12, Q31, Q504r8, Q505_Q508r1, Q505_Q508r2,
                                 Q505_Q508r4, Q509_Q511r1, Q509_Q511r2, 
                                 Q509_Q511r3, Q630_Q632r3, Q633, Q627, Q628,
@@ -183,7 +183,7 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                                         Grandparents_Born == 3 ~ 3,
                                                                         Grandparents_Born == 4 ~ 2,
                                                                         Grandparents_Born == 5 ~ 1),
-                                  Psych_Distance = Parents_Born_Recoded + Grandparents_Born_Recoded,
+                                  Accult = Parents_Born_Recoded + Grandparents_Born_Recoded,
                                   Increase_Border_Spending = case_when(Increase_BorderSpend_Wall == 1 ~ 1,      # Recoded - 1 is Support, 0 is Oppose 
                                                                        Increase_BorderSpend_Wall == 2 ~ 0),
                                   # Under_200_Miles = ifelse(distance_km < 321.869, 1, 0),
@@ -198,7 +198,7 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                       identity_strength == 3 ~ 0,
                                                       identity_strength == 4 ~ 0,
                                                       identity_strength == 5 ~ 0),
-                                  psych_dist_imm = Psych_Distance + Imm_Comm,
+                                  psych_dist_imm = Accult + Imm_Comm,
                                   # dist_sqd = distance_km^2,
                                   California = ifelse(State == 5, 1 ,0),
                                   Texas = ifelse(State == 44, 1 ,0),
@@ -214,7 +214,7 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                                       border_sec_first == 4 ~ 2,
                                                                       border_sec_first == 5 ~ 1),
                                   psych_dist_lang = psych_dist_imm + Spanish,
-                                  Belong_US = case_when(Belong_USSociety == 1 ~ 3,
+                                  Belong_US = case_when(Belong_USSociety == 1 ~ 3,  ### 1 - Not at all, 3 - A lot 
                                                         Belong_USSociety == 2 ~ 2,
                                                         Belong_USSociety == 3 ~ 1),
                                   Accepted_US = case_when(Accepted_Included_USSoc == 1 ~ 3,
@@ -236,20 +236,19 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                           Texas == 1 ~ 1,
                                                           State == 32 ~ 2,                                      
                                                           California == 1 ~ 2, 
-                                                          border_state == 0 ~ 3                                 #Least Inclusive -- 1, More Inclusive --  2, Non-border -- 3
-                                  ),
+                                                          border_state == 0 ~ 3),                                 #Least Inclusive -- 1, More Inclusive --  2, Non-border -- 3
                                   Inclusive = case_when(State == 3 ~ 0,                                         #Least Inclusive -- 0, More Inclusive --  1, Non-border -- 
                                                         Texas == 1 ~ 0,
                                                         State == 32 ~ 1,                                      
                                                         California == 1 ~ 1),
-                                  Remittances_Index <- ifelse(cmps_sub$Remit_Children == 1 |
-                                                                cmps_sub$Remit_Friends == 1 |
-                                                                cmps_sub$Remit_Grandparents == 1 |
-                                                                cmps_sub$Remit_OtherFam == 1 | 
-                                                                cmps_sub$Remit_Parents == 1, 1,
-                                                                             0),
-                                    Remittances_Scale = (Remit_Children + Remit_Friends + Remit_Grandparents +
-                                                           Remit_OtherFam + Remit_Parents),
+                                  # Remittances_Index <- ifelse(cmps_sub$Remit_Children == 1 |
+                                  #                               cmps_sub$Remit_Friends == 1 |
+                                  #                               cmps_sub$Remit_Grandparents == 1 |
+                                  #                               cmps_sub$Remit_OtherFam == 1 | 
+                                  #                               cmps_sub$Remit_Parents == 1, 1,
+                                  #                                            0),
+                                  # Remittances_Scale = (Remit_Children + Remit_Friends + Remit_Grandparents +
+                                  #                          Remit_OtherFam + Remit_Parents),
                                   Fear_Imm = Q504r8,
                                   Susp_You = Q505_Q508r1, 
                                   Insult_You = Q505_Q508r2,
@@ -257,8 +256,8 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                   Govt_Disc = Q509_Q511r1, 
                                   Govt_Off = Q509_Q511r2, 
                                   Neg_Exec = Q509_Q511r3,                       ## all 505-508 go from never (1) to very often (4) 
-                                  Assume_NotAmerican = case_when(Q630_Q632r3 ~ 1 == 1,
-                                                                 Q630_Q632r3 ~ 2 == 0), ### recoded yes 1 no 0 
+                                  Assume_NotAmerican = case_when(Q630_Q632r3 == 1 ~ 1,
+                                                                 Q630_Q632r3 == 2 ~ 0), ### recoded yes 1 no 0 
                                   Disc_Affect = case_when(Q633 == 1 ~ 6,
                                                           Q633 == 2 ~ 5,
                                                           Q633 == 3 ~ 4,
@@ -270,17 +269,26 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                   Disc_Where = case_when(Q628 == 1 ~ 1, 
                                                          Q628 == 3 ~ .5,
                                                          Q628 == 2 ~ 0),         ##### Experienced Disc In the US = 1 & both in and out of US = .5, neither 0
-                                  Imm_Disc = case_when(Q619_Q626r5 ~ 1 == 5,
-                                                       Q619_Q626r5 ~ 2 == 4,
-                                                       Q619_Q626r5 ~ 3 == 3,
-                                                       Q619_Q626r5 ~ 4 == 2,
-                                                       Q619_Q626r5 ~ 5 == 1),    ### 1 is don't know, 2 is none at all, 5 is a lot  
-                                  Q619_Q626r6 = case_when(Q619_Q626r6 ~ 1 == 5,
-                                                          Q619_Q626r6 ~ 2 == 4,
-                                                          Q619_Q626r6 ~ 3 == 3,
-                                                          Q619_Q626r6 ~ 4 == 2,
-                                                          Q619_Q626r6 ~ 5 == 1) ## 1 is IDK, 2 is none, 5 is a lot
-) 
+                                  Imm_Disc = case_when(Q619_Q626r5 == 1 ~ 5,
+                                                       Q619_Q626r5 == 2 ~ 4,
+                                                       Q619_Q626r5 == 3 ~ 3,
+                                                       Q619_Q626r5 == 4 ~ 2,
+                                                       Q619_Q626r5 == 5 ~ 1),    ### 1 is don't know, 2 is none at all, 5 is a lot  
+                                  Latino_Disc = case_when(Q619_Q626r6 == 1 ~ 5,
+                                                          Q619_Q626r6 == 2 ~ 4,
+                                                          Q619_Q626r6 == 3 ~ 3,
+                                                          Q619_Q626r6 == 4 ~ 2,
+                                                          Q619_Q626r6 == 5 ~ 1), ## 1 is IDK, 2 is none, 5 is a lot
+                                  Ext_Pol_Efficacy = ifelse(cmps_sub$Q31 == 1, 1, 0),
+                                  Int_Pol_Efficacy = ifelse(cmps_sub$Q31 == 2, 1, 0),
+                                  Low_Pol_Efficacy = ifelse(cmps_sub$Q31 == 1 | cmps_sub$Q31 == 1, 1, 0),
+                                  Voted = case_when(Q12 == 1 ~ 1,
+                                                    Q12 == 2 ~ 1,
+                                                    Q12 == 3 ~ 0,
+                                                    Q12 == 4 ~ 0),              ### Voted 1 did not 0, 
+                                  Experienced_Disc = ifelse(cmps_sub$Q627 == 2 & cmps_sub$Q628 == 2, 0,
+                                                            ifelse(cmps_sub$Q627 == 2, 0, 1)) ### reverse coding - marking those that did not experience disc or only experienced disc in their home countries as 0 all others as 1
+                                  ) 
 
 party_maj <- read.csv("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/party_majority.csv")
 
@@ -294,3 +302,12 @@ inclusivity <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj
 colnames(inclusivity) <- c("State_abb","inclusivity")
 full_cmps_2020 <- left_join(full_cmps, inclusivity, by = "State_abb")
 full_cmps_2020$inclusivity <- as.numeric(full_cmps_2020$inclusivity)
+
+
+#### Making Indexes 
+
+full_cmps_2020 <- full_cmps_2020 %>% mutate( 
+  ### Perceived Index 
+  Full_Perceived_Index = (Disc_Affect + Latino_Disc + Imm_Disc),
+  Perceived_Index_Groups = Latino_Disc + Imm_Disc
+  )
