@@ -309,5 +309,11 @@ full_cmps_2020$inclusivity <- as.numeric(full_cmps_2020$inclusivity)
 full_cmps_2020 <- full_cmps_2020 %>% mutate( 
   ### Perceived Index 
   Full_Perceived_Index = (Disc_Affect + Latino_Disc + Imm_Disc),
-  Perceived_Index_Groups = Latino_Disc + Imm_Disc
+  Perceived_Index_Groups = Latino_Disc + Imm_Disc,
+  age_sqd = Age^2,
+  #Parents_Born_NO_NA = ifelse(is.na(full_cmps_2020$Parents_Born) == TRUE, 
+                                             #99, full_cmps_2020$Parents_Born),
+  #Grandparents_Born_NO_NA = ifelse(is.na(full_cmps_2020$Grandparents_Born) == TRUE, 
+                                                  #99, full_cmps_2020$Grandparents_Born),
+  missing_birth = ifelse(is.na(full_cmps_2020$Parents_Born) == TRUE | is.na(full_cmps_2020$Grandparents_Born) == TRUE, 1, 0)
   )
