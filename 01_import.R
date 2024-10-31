@@ -5,7 +5,8 @@ cmps2020 <- read_dta("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/CMPS 2020 f
 cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 S2_Hispanicr3, S2_Hispanicr4, S3b,
                                 S4, S5_Age, S7, S10, S10_Mex, S13, S15,
-                                Q21, Q22, Q22, Q29, Q145, Q146, Q147, Q183,
+                                Q21, Q22, Q22, Q29, Q145, Q146, Q147, Q151, Q152,
+                                Q153, Q183,
                                 Q184r1, Q184r2, Q184r3, Q352, Q467_Q469r1, 
                                 Q467_Q469r2, Q467_Q469r3, 
                                 Q470, Q471r1, Q471r2, Q471r3, Q471r4, Q471r5, 
@@ -25,8 +26,10 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q12, Q31, Q504r8, Q505_Q508r1, Q505_Q508r2,
                                 Q505_Q508r4, Q509_Q511r1, Q509_Q511r2, 
                                 Q509_Q511r3, Q630_Q632r3, Q633, Q627, Q628,
-                                Q619_Q626r5, Q619_Q626r6)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
-
+                                Q619_Q626r5, Q619_Q626r6,
+                                Q411, Q412, Q413, Q414, Q415, Q416,
+                                Q308)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
+### 308 is feeling thermometer on undoc immigrants
 ## excluding MENA, AI/NA, NH, PI
 
 cmps_sub <- cmps_sub %>% filter(!c(S2_Race_Prime == 5 | S2_Race_Prime == 6 | S2_Race_Prime == 7 | S2_Race_Prime == 8))
@@ -249,7 +252,7 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                   #                                            0),
                                   # Remittances_Scale = (Remit_Children + Remit_Friends + Remit_Grandparents +
                                   #                          Remit_OtherFam + Remit_Parents),
-                                  Fear_Imm = Q504r8,
+                                  Anxiety_Imm = Q504r8,
                                   Susp_You = Q505_Q508r1, 
                                   Insult_You = Q505_Q508r2,
                                   Graffiti_Target = Q505_Q508r4, 
@@ -287,7 +290,7 @@ cmps_clean <- cmps_sub %>% mutate(Hispanic = ifelse(cmps_sub$S2_Racer2 == 1, 1,
                                                     Q12 == 3 ~ 0,
                                                     Q12 == 4 ~ 0),              ### Voted 1 did not 0, 
                                   Experienced_Disc = ifelse(cmps_sub$Q627 == 2 & cmps_sub$Q628 == 2, 0,
-                                                            ifelse(cmps_sub$Q627 == 2, 0, 1)) ### reverse coding - marking those that did not experience disc or only experienced disc in their home countries as 0 all others as 1
+                                                            ifelse(cmps_sub$Q627 == 2, 0, 1)), ### reverse coding - marking those that did not experience disc or only experienced disc in their home countries as 0 all others as 1
                                   ) 
 
 party_maj <- read.csv("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/party_majority.csv")
@@ -315,5 +318,12 @@ full_cmps_2020 <- full_cmps_2020 %>% mutate(
                                              #99, full_cmps_2020$Parents_Born),
   #Grandparents_Born_NO_NA = ifelse(is.na(full_cmps_2020$Grandparents_Born) == TRUE, 
                                                   #99, full_cmps_2020$Grandparents_Born),
-  missing_birth = ifelse(is.na(full_cmps_2020$Parents_Born) == TRUE | is.na(full_cmps_2020$Grandparents_Born) == TRUE, 1, 0)
+  missing_birth = ifelse(is.na(full_cmps_2020$Parents_Born) == TRUE | is.na(full_cmps_2020$Grandparents_Born) == TRUE, 1, 0),
+  ## mental health indicators
+  little_interest = Q411,
+  depressed = Q412,
+  anxious = Q413,
+  foreboding = Q414,
+  anxious_no_plan = Q415,
+  uncertainty_anxious = Q416
   )
