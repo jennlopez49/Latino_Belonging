@@ -27,8 +27,9 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q505_Q508r4, Q509_Q511r1, Q509_Q511r2, 
                                 Q509_Q511r3, Q630_Q632r3, Q633, Q627, Q628,
                                 Q619_Q626r5, Q619_Q626r6,
-                                Q411, Q412, Q413, Q414, Q415, Q416,
-                                Q308)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
+                                Q411_Q416r4,Q411_Q416r3, 
+                                #Q412, Q413, Q414, Q415, Q416, ### emotions
+                                Q308r1)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
 ### 308 is feeling thermometer on undoc immigrants
 ## excluding MENA, AI/NA, NH, PI
 
@@ -302,9 +303,9 @@ state_abb <- full_cmps$State_abb
 ## Inclusivity 
 # write.csv(unique(state_abb), "state_abb.csv")
 inclusivity <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusive.xlsx")
-colnames(inclusivity) <- c("State_abb","inclusivity")
+colnames(inclusivity) <- c("State_abb","inclusivity", "inclusivity_varied")
 full_cmps_2020 <- left_join(full_cmps, inclusivity, by = "State_abb")
-full_cmps_2020$inclusivity <- as.numeric(full_cmps_2020$inclusivity)
+full_cmps_2020$inclusivity_varied <- as.numeric(full_cmps_2020$inclusivity_varied)
 
 
 #### Making Indexes 
