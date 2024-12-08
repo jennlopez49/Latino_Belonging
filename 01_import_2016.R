@@ -19,7 +19,10 @@ cmps2016 <- cmps2016 %>% mutate(
   State = S4,
   Birthyear = paste0("19", S6),
   Age = (2016 - as.numeric(Birthyear)),
-  NativeBorn = ifelse(cmps2016$S7 == 1, 1, 0),
+  Native = as.character(S7),
+  NativeBorn = case_when(S7 == "(1) United States" ~ 1,
+                      S7 == "(3) Puerto Rico" ~ .5,
+                      S7 == "(2) Another country" ~ 0),
   Origin = S10,
   Voted = case_when(S10 == "(1) Yes, I voted" ~ 1,
                     S10 == "(2) No, I did NOT vote"  ~ 0),
@@ -53,6 +56,13 @@ cmps2016 <- cmps2016 %>% mutate(
                                  C379 == "(01) All 4 grandparents born in U.S." ~ 4,
                                  C379 == "(88) Don't know" ~ 9),
   Generation = Parents + Grandparents, 
+  More_Than_SecondGen = case_when(NativeBorn == 0 ~ 0,
+                                  Parents == 0 ~ 1,
+                                  Parents == 1 ~ 1,
+                                  Parents == 2 ~ 1,
+                                  Parents == 3 ~ 2, 
+                                  Parents == 9 ~ NA_real_, #####collapsing so any US-born with US-born Parents is marked as "above 2nd gen) and 1 is 2nd gen
+                                  is.na(Parents) & NativeBorn == 1 ~ NA_real_),
   Gender = case_when(S3 == "(1) Female" ~ 1,
                      S3 == "(2) Male" ~ 2), ## excluded "other" only 18 respondents  
   Income = case_when(C383 == "(01) Less than $20,000" ~ 1,
@@ -89,11 +99,17 @@ cmps2016 <- cmps2016 %>% mutate(
   Mexican = ifelse(cmps2016$S10 == "(12) Mexico", 1, 0),
   Cuban = ifelse(cmps2016$S10 == "(06) Cuba", 1, 0),
   Puerto_Rican = ifelse(cmps2016$S10 == "(17) Puerto Rico", 1, 0),
-  Imm_Church = A134,
+  Imm_Church = A134
   )
   
-#cmps2016$Generation <- ifelse(cmps2016$Generation < 0, NA, cmps2016$Generation)
+#### CHECKING NAs IN GENERATION VAR ------
+  na_immigrants <- cmps2016 %>%
+    filter(is.na(Parents) & NativeBorn == 0) %>%
+    count()
+  na_immigrants
+  
 
+######### Adding ICI Index ---------
 inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
 full_cmps2016<- left_join(cmps2016, inclusivity_2016, by = "State")
 
@@ -102,6 +118,17 @@ full_cmps2016 <- full_cmps2016 %>% mutate(
   ICI_collapsed = ifelse(full_cmps2016$ICI_Score_2016 < -86, 0, 
                          ifelse(full_cmps2016$ICI_Score_2016 > -86 & full_cmps2016$ICI_Score_2016 <= -1, .5, 
                                 ifelse(full_cmps2016$ICI_Score_2016 > -1, 1, NA))) 
+)
+
+full_cmps2016 <- full_cmps2016 %>% mutate(
+  ICI_collapsed_alt <- case_when(
+   ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ -1,
+   ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
+   ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
+   ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ .5,
+   ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ 1,
+    TRUE ~ NA_real_ # Handle unexpected values
+  )
 )
 
 #### Adding in Latino Pop &&& Election Vote Margin Results ------
@@ -122,7 +149,11 @@ data_2016_votes <- data_2016_votes %>%
   pivot_wider(names_from = party_detailed, values_from = candidatevotes)
 
 data_2016_votes <- data_2016_votes %>% mutate(
-  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100
+  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
+  vote_pp_d = (DEMOCRAT/totalvotes)*100,
+  vote_pp_r = (REPUBLICAN/totalvotes)*100,
+  vote_diff_pp = vote_pp_d - vote_pp_r 
+  
 )
 
 data_2020_votes <- data_2020_votes %>%
@@ -130,7 +161,10 @@ data_2020_votes <- data_2020_votes %>%
   pivot_wider(names_from = party_detailed, values_from = candidatevotes)
 
 data_2020_votes <- data_2020_votes %>% mutate(
-  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100
+  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
+  vote_pp_d = (DEMOCRAT/totalvotes)*100,
+  vote_pp_r = (REPUBLICAN/totalvotes)*100,
+  vote_diff_pp = vote_pp_d - vote_pp_r 
 )
 
 votemargin_16 <- data_2016_votes %>% mutate(state = str_to_title(state),
@@ -143,10 +177,15 @@ latino.pop.data_16 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
   select(State, percent.latino.2016)
 
 ### adding in the 2016 pieces to the CMPS data ----------
-cmps2016 <- left_join(cmps2016, latino.pop.data_16, by = "State")
+full_cmps2016 <- left_join(full_cmps2016, latino.pop.data_16, by = "State")
 ### adding vote margins ------
-cmps2016 <- left_join(cmps2016, votemargin_16, by = "State")
+full_cmps2016 <- left_join(full_cmps2016, votemargin_16, by = "State")
+
+full_cmps2016 <- full_cmps2016 %>% mutate(vote_margin = -vote_margin)
+
+full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2016$vote_margin < 6, 1, 0)
+
 #### subsetting to just latinos --------
 latinos_2016 <- full_cmps2016 %>% filter(Latino == 1)
 
-##### Variables of Interest -------
+
