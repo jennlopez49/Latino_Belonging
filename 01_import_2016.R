@@ -56,11 +56,9 @@ cmps2016 <- cmps2016 %>% mutate(
                                  C379 == "(01) All 4 grandparents born in U.S." ~ 4,
                                  C379 == "(88) Don't know" ~ 9),
   Generation = Parents + Grandparents, 
-  More_Than_SecondGen = case_when(NativeBorn == 0 ~ 0,
-                                  Parents == 0 ~ 1,
-                                  Parents == 1 ~ 1,
-                                  Parents == 2 ~ 1,
-                                  Parents == 3 ~ 2, 
+  More_Than_SecondGen = case_when(NativeBorn == 0 ~ 0,                          # Immigrant respondent, first gen 
+                                  NativeBorn == 1 & Parents < 3 ~ 1,            # At least one immigrant parent, second gen
+                                  NativeBorn == 1 & Parents == 3 ~ 2,           # Both are born in the US, at least third gen
                                   Parents == 9 ~ NA_real_, #####collapsing so any US-born with US-born Parents is marked as "above 2nd gen) and 1 is 2nd gen
                                   is.na(Parents) & NativeBorn == 1 ~ NA_real_),
   Gender = case_when(S3 == "(1) Female" ~ 1,
@@ -121,7 +119,7 @@ full_cmps2016 <- full_cmps2016 %>% mutate(
 )
 
 full_cmps2016 <- full_cmps2016 %>% mutate(
-  ICI_collapsed_alt <- case_when(
+  ICI_collapsed_alt = case_when(
    ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ -1,
    ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
    ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
@@ -169,7 +167,7 @@ data_2020_votes <- data_2020_votes %>% mutate(
 
 votemargin_16 <- data_2016_votes %>% mutate(state = str_to_title(state),
                                             State = state.abb[match(state, state.name)]) %>%
-  select(State, vote_margin)
+  select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
 
 # adding in latino pop data 
 latino.pop.data_16 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
