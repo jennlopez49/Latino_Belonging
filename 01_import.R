@@ -29,7 +29,9 @@ cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 Q619_Q626r5, Q619_Q626r6,
                                 Q411_Q416r4,Q411_Q416r3, 
                                 #Q412, Q413, Q414, Q415, Q416, ### emotions
-                                Q308r1)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
+                                Q308r1, Q411_Q416r1, Q411_Q416r2, Q154r1,
+                                Q154r2, Q154r3, Q154r4, Q154r5, Q159r1,
+                                Q159r2, Q159r3, Q411_Q416r6, Q411_Q416r5)   ############## 197 A1 and B1 are if election was today, 31 is internal efficacy (no external on CMPS)
 ### 308 is feeling thermometer on undoc immigrants
 ## excluding MENA, AI/NA, NH, PI
 
@@ -321,10 +323,54 @@ full_cmps_2020 <- full_cmps_2020 %>% mutate(
                                                   #99, full_cmps_2020$Grandparents_Born),
   missing_birth = ifelse(is.na(full_cmps_2020$Parents_Born) == TRUE | is.na(full_cmps_2020$Grandparents_Born) == TRUE, 1, 0),
   ## mental health indicators
-  little_interest = Q411,
-  depressed = Q412,
-  anxious = Q413,
-  foreboding = Q414,
-  anxious_no_plan = Q415,
-  uncertainty_anxious = Q416
+  little_interest = Q411_Q416r1,
+  depressed = Q411_Q416r2,
+  anxious = Q411_Q416r3,
+  foreboding = Q411_Q416r4, ### like something might happen suddenly
+  anxious_no_plan = Q411_Q416r5,
+  uncertainty_anxious = Q411_Q416r6,
+  NativeBorn = case_when(S7 == 1 ~ 1, 
+                         S7 == 2 ~ 0,
+                         S7 == 3 ~ .5), ### PR is .5
+  MoreThanSecondGen = case_when(NativeBorn == 0 ~ 0,
+                                NativeBorn == 1 & Parents_Born_Recoded < 3 ~ 1,
+                                NativeBorn == 1 & Parents_Born_Recoded == 3 ~ 2, 
+                                is.na(Parents_Born_Recoded) & NativeBorn == 1 ~ NA_real_,
+                                TRUE ~ NA_real_),
+  state_relations_race_hope = Q151, 
+  state_relations_race_angry = Q152,
+  state_relations_race_afraid = Q153, 
+  pride_amflag = Q154r1,
+  pride_participation = Q154r2,
+  pride_protests_race = Q154r3,
+  pride_milestone_race = Q154r4,
+  pride_electedoff_race = Q154r5,
+  pub_off_respond_race = Q159r1,
+  say_in_govt_race = Q159r2
   )
+
+#### Adding in 2020 pop and votes --------------
+
+
+votemargin_20<- data_2020_votes %>% mutate(state = str_to_title(state),
+                                            State = state.abb[match(state, state.name)]) %>%
+  select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
+
+# adding in latino pop data 
+latino.pop.data_20 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
+                                                            State = state.abb[match(State, state.name)]) %>% 
+  select(State, percent.latino.2020)
+## matching state to # in CMPS ----------
+states <- cbind(c(state.abb[c(1:8)], "DC", state.abb[c(9:50)]), c(1:51)) ### CMPS includes DC 
+setNames(states, c("State_Abb", "State.num"))
+
+### adding in 
+cmps_clean <- left_join(cmps_clean, latino.pop.data_20, by = "State")
+
+### adding vote margins ------
+cmps_clean <- left_join(cmps_clean, votemargin_20, by = "State")
+
+
+
+
+                
