@@ -97,7 +97,27 @@ cmps2016 <- cmps2016 %>% mutate(
   Mexican = ifelse(cmps2016$S10 == "(12) Mexico", 1, 0),
   Cuban = ifelse(cmps2016$S10 == "(06) Cuba", 1, 0),
   Puerto_Rican = ifelse(cmps2016$S10 == "(17) Puerto Rico", 1, 0),
-  Imm_Church = A134
+  Imm_Church = A134,
+  Angry_Election = case_when(C112 == "(1) All the time" ~ 4, 
+                             C112 == "(2) Often" ~ 3,
+                             C112 == "(3) Sometimes" ~ 2,
+                             C112 == "(4) Never" ~ 1),
+  Fear_Election = case_when(C111 == "(1) All the time" ~ 4, 
+                            C111 == "(2) Often" ~ 3,
+                            C111 == "(3) Sometimes" ~ 2,
+                            C111 == "(4) Never" ~ 1),
+  Hope_Election = case_when(C113 == "(1) All the time" ~ 4, 
+                            C113 == "(2) Often" ~ 3,
+                            C113 == "(3) Sometimes" ~ 2,
+                            C113 == "(4) Never" ~ 1),
+  Pride_Election = case_when(C114 == "(1) All the time" ~ 4, 
+                             C114 == "(2) Often" ~ 3,
+                             C114 == "(3) Sometimes" ~ 2,
+                             C114 == "(4) Never" ~ 1),
+  Sad_Election = case_when(C115 == "(1) All the time" ~ 4, 
+                           C115 == "(2) Often" ~ 3,
+                           C115 == "(3) Sometimes" ~ 2,
+                           C115 == "(4) Never" ~ 1)
   )
   
 #### CHECKING NAs IN GENERATION VAR ------
