@@ -1,4 +1,4 @@
-###### 2016 LINKED FATE REGRESSIONS ###############
+###### 2016 LINKED FATE REGRESSIONS ############### -----
 ## making ICI collapsed reference as 1 instead of 0 
 latinos_2016$ICI_collapsed_fac <- relevel(as.factor(latinos_2016$ICI_collapsed_alt), ref = "1")
 basemodel <- lm(Linked_Fate ~ Age + Gender + Education + Income + More_Than_SecondGen + 
@@ -105,3 +105,26 @@ s_full_noint <- lm(lf_s ~ age_s + gender_s + educ_s + income_s + gen_s +
                    data = latinos_2016_clean)
 stargazer(s_full_ind, type = "text", out = "scaled.html")
 stargazer(s_full_noint, s_full_vote, s_full_voted, type = "text", out = "votes.html")
+
+############ 2020 LF Regressions -----------------------------------------------
+
+base <- lm(Linked_Fate ~ Age + Gender + Education + Income + MoreThanSecondGen + 
+             Mexican  + Econ_Hope + Disc_Affect, 
+           data = latinos_cmps_2020)
+base_incl <- lm(Linked_Fate ~ Age + Gender + Education + Income + MoreThanSecondGen + 
+             Mexican  + Econ_Hope + Disc_Affect + inclusivity_varied, 
+           data = latinos_cmps_2020)
+pop_vote_incl <- lm(Linked_Fate ~ Age + Gender + Education + Income + MoreThanSecondGen + 
+                  Mexican  + Econ_Hope + Disc_Affect + vote_margin + percent.latino.2020 +
+                    inclusivity_varied, 
+                data = latinos_cmps_2020)
+pop.vote <- lm(Linked_Fate ~ Age + Gender + Education + Income + MoreThanSecondGen + 
+                 Mexican + Econ_Hope + Disc_Affect + 
+                 vote_margin + percent.latino.2020, 
+               data = latinos_cmps_2020)
+full_cont <- lm(Linked_Fate ~ Age + Gender + Education + Income + MoreThanSecondGen + 
+                  Mexican + Econ_Hope + Disc_Affect + 
+                  vote_margin*percent.latino.2020 + inclusivity_varied, 
+                data = latinos_cmps_2020)
+stargazer(base, base_incl, pop.vote, pop_vote_incl, full_cont, type = "text")
+

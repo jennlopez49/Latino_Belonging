@@ -355,21 +355,25 @@ full_cmps_2020 <- full_cmps_2020 %>% mutate(
 votemargin_20<- data_2020_votes %>% mutate(state = str_to_title(state),
                                             State = state.abb[match(state, state.name)]) %>%
   select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
-
+votemargin_20$state_abb <- votemargin_20$State
 # adding in latino pop data 
 latino.pop.data_20 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
                                                             State = state.abb[match(State, state.name)]) %>% 
   select(State, percent.latino.2020)
+latino.pop.data_20$state_abb <- latino.pop.data_20$State
 ## matching state to # in CMPS ----------
 states <- cbind(c(state.abb[c(1:8)], "DC", state.abb[c(9:50)]), c(1:51)) ### CMPS includes DC 
-setNames(states, c("State_Abb", "State.num"))
-
+colnames(states) <- c("state_abb", "State")
+states <- as.data.frame(states) %>% mutate(State = as.numeric(State))
+full_cmps_2020 <- left_join(full_cmps_2020, states, by = "State")
 ### adding in 
-cmps_clean <- left_join(cmps_clean, latino.pop.data_20, by = "State")
+full_cmps_2020 <- left_join(full_cmps_2020, latino.pop.data_20, by = "state_abb")
 
 ### adding vote margins ------
-cmps_clean <- left_join(cmps_clean, votemargin_20, by = "State")
+full_cmps_2020 <- left_join(full_cmps_2020, votemargin_20, by = "state_abb")
 
+### Restricting to Latinos -------
+latinos_cmps_2020 <- full_cmps_2020 %>% filter(Hispanic == 1)
 
 
 

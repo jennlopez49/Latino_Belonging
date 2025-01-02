@@ -1,6 +1,6 @@
 ### Setting Up Survey Design -------
-full_cmps_lat <- full_cmps_2020 %>% filter(Grandparents_Born != 3 | Parents_Born != 3)
-cmps_des <- svydesign(id = ~ 1, weights = ~race_weight, data = full_cmps_lat)
+#full_cmps_lat <- full_cmps_2020 %>% filter(Grandparents_Born != 3 | Parents_Born != 3)
+cmps_des <- svydesign(id = ~ 1, weights = ~race_weight, data = full_cmps_2020)
 
 
 ### Filtering to Latinos ------
@@ -10,28 +10,36 @@ cmps_lat <- subset(cmps_des, subset = cmps_des$variables$Hispanic == 1)
 ### Full Sample Models -----
 
 full_sample_belong <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                        inclusivity + Linked_Fate + Accult + Fear_Imm,
+                        inclusivity + Linked_Fate + MoreThanSecondGen + foreboding,
                       design = cmps_lat, 
                       family = "gaussian")
+full_sample_belong_int <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 
+                               inclusivity + Linked_Fate + MoreThanSecondGen + inclusivity*foreboding,
+                             design = cmps_lat, 
+                             family = "gaussian")
 full_sample_belong_sp <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                               inclusivity + Linked_Fate + Spanish + Fear_Imm,
+                               inclusivity + Linked_Fate + Spanish + foreboding,
                              design = cmps_lat, 
                              family = "gaussian")
 full_sample_fullcit <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                               inclusivity + Linked_Fate + Accult +  Fear_Imm,
+                               inclusivity + Linked_Fate + MoreThanSecondGen +  foreboding,
                              design = cmps_lat, 
                              family = "gaussian")
+full_sample_fullcit_int <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
+                                inclusivity + Linked_Fate + MoreThanSecondGen +  inclusivity*foreboding,
+                              design = cmps_lat, 
+                              family = "gaussian")
 full_sample_fullcit_sp <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                                inclusivity + Linked_Fate + Spanish +  Fear_Imm,
+                                inclusivity + Linked_Fate + Spanish +  foreboding,
                               design = cmps_lat, 
                               family = "gaussian")
 ### Tables ---- 
-stargazer(full_sample_belong, full_sample_belong_sp, full_sample_fullcit, full_sample_fullcit_sp, type = "latex", 
+stargazer(full_sample_belong, full_sample_belong_int, 
+          full_sample_fullcit, full_sample_fullcit_int, type = "latex", 
           dep.var.labels = c("Belong in the US", "Same Rights and Protections as Others"),
           covariate.labels = c("Party", "Age", "Gender", "Education",
-                               "Income", "Inclusivity", "Linked Fate", "Acculturation",
-                               "Spanish",
-                               "Fear - Immigration",
+                               "Income", "Inclusivity", "Linked Fate", "Generation",
+                               "Foreboding", "Interaction",
                                "Constant")
           )
 #### Alternate Measures ------
