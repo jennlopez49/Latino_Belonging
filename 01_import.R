@@ -375,6 +375,8 @@ full_cmps_2020 <- left_join(full_cmps_2020, votemargin_20, by = "state_abb")
 ### Restricting to Latinos -------
 latinos_cmps_2020 <- full_cmps_2020 %>% filter(Hispanic == 1)
 
-
+latinos_cmps_2020 <- latinos_cmps_2020 %>% mutate(
+  fear 
+)
 
                 

@@ -1,7 +1,8 @@
 ### 2016 Import ##### 
 load("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/cmps_2016.rda")
 ### Selecting vars ########
-cmps2016 <- da38040.0001 %>% select(S2_2, S4, S6, S7, S10, C12, C25, C26, L29,
+cmps2016 <- da38040.0001 %>% select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_6, S2_7, S4,
+                                    S6, S7, S10, C12, C25, C26, L29,
                                     C31,C33, C35_1, C35_2, C35_3, C35_4, C35_5,
                                     C35_OTHER,
                                     C38, C39, C41, L46, C108, C109,
@@ -12,7 +13,7 @@ cmps2016 <- da38040.0001 %>% select(S2_2, S4, S6, S7, S10, C12, C25, C26, L29,
                                     C252, C256, L268, L270, L271, L300, L301, 
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
-                                    S3, C390, C23, A134)
+                                    S3, C390, C23, A134, NAT_WEIGHT)
 
 cmps2016 <- cmps2016 %>% mutate(
   Latino = S2_2, 
@@ -117,8 +118,30 @@ cmps2016 <- cmps2016 %>% mutate(
   Sad_Election = case_when(C115 == "(1) All the time" ~ 4, 
                            C115 == "(2) Often" ~ 3,
                            C115 == "(3) Sometimes" ~ 2,
-                           C115 == "(4) Never" ~ 1)
+                           C115 == "(4) Never" ~ 1),
+  WhiteNonHisp = S2_1,
+  Black = S2_3,
+  Asian = S2_4, 
+  MiddleEast = S2_5,
+  NativeAm = S2_6,
+  OtherRace = S2_7,
+  Race_Combined = case_when(WhiteNonHisp == 1 ~ 1, 
+                            )
   )
+  
+### Making the Survey Weights Representative -- checking proportions
+  
+  svydes <- svydesign(id = ~ 1, weights = ~NAT_WEIGHT, data = cmps2016)
+  # checking 
+  prop.table(svytable(~cmps2016$S2_Race_Prime, svydes))
+  
+  # adjusting weight based on 2016 ACS estimates
+  # 60.6% White non-Hispanic
+  # 11.6% Black non-Hispanic
+  # 6.02% Asian non-Hispanic
+  # 0.511% AI/AN
+  # 17.2% Hispanic or Latino
+  # 4.09% Other or multiracial
   
 #### CHECKING NAs IN GENERATION VAR ------
   na_immigrants <- cmps2016 %>%

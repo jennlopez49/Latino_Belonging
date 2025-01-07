@@ -17,10 +17,10 @@ full_sample_belong_int <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Educ
                                inclusivity + Linked_Fate + MoreThanSecondGen + inclusivity*foreboding,
                              design = cmps_lat, 
                              family = "gaussian")
-full_sample_belong_sp <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                               inclusivity + Linked_Fate + Spanish + foreboding,
-                             design = cmps_lat, 
-                             family = "gaussian")
+# #full_sample_belong_sp <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 
+#                                inclusivity + Linked_Fate + Spanish + foreboding,
+#                              design = cmps_lat, 
+#                              family = "gaussian")
 full_sample_fullcit <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
                                inclusivity + Linked_Fate + MoreThanSecondGen +  foreboding,
                              design = cmps_lat, 
@@ -29,10 +29,10 @@ full_sample_fullcit_int <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Educ
                                 inclusivity + Linked_Fate + MoreThanSecondGen +  inclusivity*foreboding,
                               design = cmps_lat, 
                               family = "gaussian")
-full_sample_fullcit_sp <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
-                                inclusivity + Linked_Fate + Spanish +  foreboding,
-                              design = cmps_lat, 
-                              family = "gaussian")
+# #full_sample_fullcit_sp <- svyglm(Full_Cit ~ Party_5pt + age_sqd + Gender + Education + Income + 
+#                                 inclusivity + Linked_Fate + Spanish +  foreboding,
+#                               design = cmps_lat, 
+#                               family = "gaussian")
 ### Tables ---- 
 stargazer(full_sample_belong, full_sample_belong_int, 
           full_sample_fullcit, full_sample_fullcit_int, type = "latex", 
