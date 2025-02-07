@@ -1,11 +1,11 @@
 ### 2016 Import ##### 
 load("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/cmps_2016.rda")
 ### Selecting vars ########
-cmps2016 <- da38040.0001 %>% select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_6, S2_7, S4,
+cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_6, S2_7, S4,
                                     S6, S7, S10, C12, C25, C26, L29,
                                     C31,C33, C35_1, C35_2, C35_3, C35_4, C35_5,
                                     C35_OTHER,
-                                    C38, C39, C41, L46, C108, C109,
+                                    C38, C39, C41, L46,C107, C108, C109,
                                     C110, C111, C112, C113, C114, C115, A116, A117,
                                     C118, C119, C120, C121, C129, BLA190,
                                     BLA191, L192, LA193, C194,L195_1, L195_2,
@@ -13,13 +13,14 @@ cmps2016 <- da38040.0001 %>% select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_6, S2_7, S4,
                                     C252, C256, L268, L270, L271, L300, L301, 
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
-                                    S3, C390, C23, A134, NAT_WEIGHT)
+                                    S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA)
 
-cmps2016 <- cmps2016 %>% mutate(
+cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
   State = S4,
   Birthyear = paste0("19", S6),
   Age = (2016 - as.numeric(Birthyear)),
+  age_sqd = Age^2,
   Native = as.character(S7),
   NativeBorn = case_when(S7 == "(1) United States" ~ 1,
                       S7 == "(3) Puerto Rico" ~ .5,
@@ -42,7 +43,7 @@ cmps2016 <- cmps2016 %>% mutate(
                         S7 == "(3) Puerto Rico " ~ 2)
 )
   
-  cmps2016 <- cmps2016 %>% mutate( ### Reverse coding so acculturation will be from least (0) to most (1)
+  cmps.add.2016 <- cmps.clean.2016 %>% mutate( ### Reverse coding so acculturation will be from least (0) to most (1)
     C377 = str_trim(C377),
     C379 = str_trim(C379),
   Parents = case_when(C377 == "(02) Both parents born in another country" ~ 0,
@@ -125,23 +126,51 @@ cmps2016 <- cmps2016 %>% mutate(
   MiddleEast = S2_5,
   NativeAm = S2_6,
   OtherRace = S2_7,
-  Race_Combined = case_when(WhiteNonHisp == 1 ~ 1, 
-                            )
+  #Race_Combined = case_when(WhiteNonHisp == 1 ~ 1, 
+                            #)
+  Weight = NAT_WEIGHT,
+  Race_Prime = ETHNIC_QUOTA,
+  Race_num = case_when(cmps2016$Race_Prime == "(1) White Non Hispanic" ~ 1,
+                        cmps2016$Race_Prime == "(2) Hispanic or Latino" ~ 2,
+                        cmps2016$Race_Prime == "(3) Black or African American" ~ 3,
+                        cmps2016$Race_Prime == "(4) Asian American" ~ 4),
+  Belong_US = case_when(C107 == "(1) Strongly belong" ~ 4,                      # recoded - 1 is not at all belong, 4 is strongly belong now
+                        C107 == "(2) Moderately belong" ~ 3,
+                        C107 == "(3) Slightly belong" ~ 2,
+                        C107 == "(4) Not at all belong" ~ 1
+                        ),
+  Valued_Respected_US = case_when(C108 == "(4) Strongly disagree" ~ 1,        # Statement is "Most Americans value and respect your presence in the US." Agree or disagree
+                        C108 == "(3) Somewhat disagree" ~ 2,                  # Coded so higher numbers --> more perceived external cues for belonging
+                        C108 == "(2) Somewhat agree" ~ 3,
+                        C108 == "(1) Strongly agree" ~ 4
+                        ),
+  Outsider_US = case_when(C109 == "(1) Strongly as an outsider" ~ 1,        # Question is - "How much do you feel you are an outsider in the US?"
+                                  C109 == "(2) Moderately as an outsider" ~ 2,                  # Coded so higher numbers --> more belonging
+                                  C109 == "(3) Slightly as an outsider" ~ 3,
+                                  C109 == "(4) Not at all as an outsider" ~ 4
+                          ),
+  Excluded_US_Soc = case_when(C109 == "(1) Always" ~ 1,        # Question is - "How often do ppl try to exclude you in the US?"
+                              C109 == "(2) Very often" ~ 2,                  # Coded so higher numbers --> less exclusion
+                              C109 == "(3) Rarely" ~ 3,
+                              C109 == "(4) Never" ~ 4
+                              )
   )
+######## Belonging Index ------------------------------------------------------
+  # Reverse-code the Outsider_US and Excluded_US_Soc to make higher values reflect inclusion
+  cmps.add.2016$Outsider_US_rev <- 5 - cmps.add.2016$Outsider_US  # reverse scale for Outsider_US
+  cmps.add.2016$Excluded_US_Soc_rev <- 5 - cmps.add.2016$Excluded_US_Soc  # reverse scale for Excluded_US_Soc
   
-### Making the Survey Weights Representative -- checking proportions
+  # Standardize the variables (mean=0, sd=1) to combine them
+  cmps.add.2016$Belong_US_z <- scale(cmps.add.2016$Belong_US)
+  cmps.add.2016$Valued_Respected_US_z <- scale(cmps.add.2016$Valued_Respected_US)
+  cmps.add.2016$Outsider_US_rev_z <- scale(cmps.add.2016$Outsider_US_rev)
+  cmps.add.2016$Excluded_US_Soc_rev_z <- scale(cmps.add.2016$Excluded_US_Soc_rev)
   
-  svydes <- svydesign(id = ~ 1, weights = ~NAT_WEIGHT, data = cmps2016)
-  # checking 
-  prop.table(svytable(~cmps2016$S2_Race_Prime, svydes))
+  # Construct the inclusion index by averaging the standardized variables
+  cmps.add.2016$Inclusion_Index <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Valued_Respected_US_z", "Outsider_US_rev_z", "Excluded_US_Soc_rev_z")], na.rm = TRUE)
   
-  # adjusting weight based on 2016 ACS estimates
-  # 60.6% White non-Hispanic
-  # 11.6% Black non-Hispanic
-  # 6.02% Asian non-Hispanic
-  # 0.511% AI/AN
-  # 17.2% Hispanic or Latino
-  # 4.09% Other or multiracial
+  # Check the index
+  summary(cmps.add.2016$Inclusion_Index)
   
 #### CHECKING NAs IN GENERATION VAR ------
   na_immigrants <- cmps2016 %>%
@@ -152,7 +181,7 @@ cmps2016 <- cmps2016 %>% mutate(
 
 ######### Adding ICI Index ---------
 inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
-full_cmps2016<- left_join(cmps2016, inclusivity_2016, by = "State")
+full_cmps2016<- left_join(cmps.add.2016, inclusivity_2016, by = "State")
 
 full_cmps2016 <- full_cmps2016 %>% mutate(
   ICI_Score_2016 = as.numeric(full_cmps2016$ICI_Score_2016),
@@ -186,7 +215,7 @@ data_2020_votes <- data_votes %>% filter(party_detailed == "REPUBLICAN" |
 
 ## switching to wide format 
 data_2016_votes <- data_2016_votes %>%
-  select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
+  dplyr::select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
   pivot_wider(names_from = party_detailed, values_from = candidatevotes)
 
 data_2016_votes <- data_2016_votes %>% mutate(
@@ -196,26 +225,26 @@ data_2016_votes <- data_2016_votes %>% mutate(
   vote_diff_pp = vote_pp_d - vote_pp_r 
   
 )
-
-data_2020_votes <- data_2020_votes %>%
-  select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
-  pivot_wider(names_from = party_detailed, values_from = candidatevotes)
-
-data_2020_votes <- data_2020_votes %>% mutate(
-  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
-  vote_pp_d = (DEMOCRAT/totalvotes)*100,
-  vote_pp_r = (REPUBLICAN/totalvotes)*100,
-  vote_diff_pp = vote_pp_d - vote_pp_r 
-)
+# 
+# data_2020_votes <- data_2020_votes %>%
+#   select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
+#   pivot_wider(names_from = party_detailed, values_from = candidatevotes)
+# 
+# data_2020_votes <- data_2020_votes %>% mutate(
+#   vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
+#   vote_pp_d = (DEMOCRAT/totalvotes)*100,
+#   vote_pp_r = (REPUBLICAN/totalvotes)*100,
+#   vote_diff_pp = vote_pp_d - vote_pp_r 
+# )
 
 votemargin_16 <- data_2016_votes %>% mutate(state = str_to_title(state),
                                             State = state.abb[match(state, state.name)]) %>%
-  select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
+  dplyr::select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
 
 # adding in latino pop data 
 latino.pop.data_16 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
                     State = state.abb[match(State, state.name)]) %>% 
-  select(State, percent.latino.2016)
+  dplyr::select(State, percent.latino.2016)
 
 ### adding in the 2016 pieces to the CMPS data ----------
 full_cmps2016 <- left_join(full_cmps2016, latino.pop.data_16, by = "State")
@@ -227,6 +256,43 @@ full_cmps2016 <- full_cmps2016 %>% mutate(vote_margin = -vote_margin)
 full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2016$vote_margin < 6, 1, 0)
 
 #### subsetting to just latinos --------
-latinos_2016 <- full_cmps2016 %>% filter(Latino == 1)
+#latinos_2016 <- full_cmps2016 %>% filter(Latino == 1)
 
+#### Making the survey design ----------------------------
+
+### Making the Survey Weights Representative -- checking proportions
+# 
+svydes <- svydesign(id = ~ 1, weights = ~NAT_WEIGHT, data = full_cmps2016)
+# # checking 
+prop.table(svytable(~full_cmps2016$Race_Prime, svydes))
+
+
+acs_margins <- list(
+  Race_Prime = c("(1) White Non Hispanic" = 0.62, 
+                 "(2) Hispanic or Latino" = 0.173, 
+                 "(3) Black or African American" = 0.123, 
+                 "(4) Asian American" = 0.052, 
+                 "(6) American Indian/Native American" = 0.007)
+)
+
+# Apply Post-stratification & raking
+cmps_design <- svydesign(ids = ~1, data = full_cmps2016, weights = ~Weight)
+
+pop_table <- data.frame(
+  Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", "(3) Black or African American", 
+                 "(4) Asian American", "(6) American Indian/Native American"),
+  Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)  # ACS proportions
+)
+
+acs_margins <- list(
+  data.frame(Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", 
+                            "(3) Black or African American", "(4) Asian American", 
+                            "(6) American Indian/Native American"),
+             Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)) # Proportions
+)
+
+# Post-stratify the weights
+cmps_design_adj <- postStratify(cmps_design, ~Race_Prime, pop_table, partial = TRUE)
+svytable(~Race_Prime, cmps_design_adj) / sum(weights(cmps_design_adj))
+prop.table(svytable(~Race_Prime, cmps_design_adj))
 

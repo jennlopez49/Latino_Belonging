@@ -1,10 +1,9 @@
 ### prelim emotions and sense of belonging ### 
 ##
-cmps_des_16 <- svydesign(id = ~ 1, weights = ~race_weight, data = cmps2016)
-
+#cmps_des_16 <- svydesign(id = ~ 1, weights = ~race_weight, data = cmps2016) ######## this is the CMPS weight, which is slightly off
 
 ### Filtering to Latinos ------
-cmps_lat_16 <- subset(cmps_des, subset = cmps_des$variables$Hispanic == 1)
+cmps_lat_16 <- subset(cmps_design_adj, subset = cmps_design_adj$variables$Hispanic == 1)
 ##
 
 full_sample_belong <- svyglm(Belong_US ~ Party_5pt + age_sqd + Gender + Education + Income + 

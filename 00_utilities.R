@@ -1,4 +1,6 @@
 ### Necessary Pkgs 
+install.packages(c("haven", "survey", "sjPlot", "stargazer", "patchwork",
+                 "tidycensus", "tigris", "sf"))
 library(tidyverse)
 library(haven)
 library(survey)
@@ -8,3 +10,7 @@ library(patchwork)
 library(tidycensus)
 library(tigris)
 library(sf)
+#install.packages("mediation")
+library(mediation)
+#install.packages("tidyverse", repos = "https://cloud.r-project.org/")
+library(dplyr)
