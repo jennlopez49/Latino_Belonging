@@ -168,6 +168,8 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   
   # Construct the inclusion index by averaging the standardized variables
   cmps.add.2016$Inclusion_Index <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Valued_Respected_US_z", "Outsider_US_rev_z", "Excluded_US_Soc_rev_z")], na.rm = TRUE)
+  cmps.add.2016$Inclusion_Internal <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Outsider_US_rev_z")], na.rm = TRUE)
+  cmps.add.2016$Inclusion_External <- rowMeans(cmps.add.2016[, c( "Valued_Respected_US_z", "Excluded_US_Soc_rev_z")], na.rm = TRUE)
   
   # Check the index
   summary(cmps.add.2016$Inclusion_Index)
