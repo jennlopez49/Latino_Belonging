@@ -1,6 +1,4 @@
 ### Mediation analysis ---------------------------------------------------------
-cmps_lat_16 <- subset(cmps_design_adj, subset = cmps_design_adj$variables$Latino == 1)
-
 ############ Fear --------------------------------------------------------------
 # Fit the mediator model (Model 1: M ~ X + controls)
 fear_mediator <- svyglm(Fear_Election ~ ICI_collapsed_alt + age_sqd + Gender + 

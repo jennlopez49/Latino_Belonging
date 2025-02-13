@@ -13,7 +13,8 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     C252, C256, L268, L270, L271, L300, L301, 
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
-                                    S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA)
+                                    S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
+                                    C253)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
@@ -85,7 +86,7 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                         C381 == "(5) 4-year college graduate" ~ 5,
                         C381 == "(6) Post-graduate education" ~ 6),
   Discrim = as.character(L268),
-  Discrimination = case_when(Discrim == "(1) The primary problem" ~ 5,
+  Discrimination_National_Perc = case_when(Discrim == "(1) The primary problem" ~ 5,
                              Discrim == "(2) A major problem" ~ 4,
                              Discrim == "(3) A moderate problem" ~ 3,
                              Discrim == "(4) A minor problem" ~ 2,
@@ -153,23 +154,35 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                               C109 == "(2) Very often" ~ 2,                  # Coded so higher numbers --> less exclusion
                               C109 == "(3) Rarely" ~ 3,
                               C109 == "(4) Never" ~ 4
-                              )
+                              ),
+  Personal_Discrimination = case_when(C251 == "(2) No" ~ 0,                      # Have you ever been treated unfairly or personally experienced discrimination 
+                                      C251 == "(1) Yes" ~ 1                      #because of your race, ethnicity, gender, sexuality,
+                                      ),                                           # being an immigrant, religious heritage or having an accent?
+  Place_of_Disc = case_when(C252 == "(2) In my country of origin" ~ 0,
+                            C252 == "(1) In the United States" ~ 1,
+                            C252 == "(3) In both places" ~ 1),
+  Race_Ethnicity_Disc = case_when(C253 == "(2) No" ~ 0,
+                                  C253 == "(1) Yes" ~ 1),
+  Immigration_Status_Disc = case_when(C256 == "(2) No" ~ 0,
+                                      C256 == "(1) Yes" ~ 1),
+  Discrimination_Scale = case_when(
+    Personal_Discrimination == 0 | Place_of_Disc == 0 ~ 0, # Did not experience discrimination, not in the US
+    Race_Ethnicity_Disc == 1 & Place_of_Disc == 1 ~ 1, # Experienced discrimination in US due to race/ethnicity 
+    Immigration_Status_Disc == 1 & Place_of_Disc == 1 ~ 1 # or immigration status
+  )
+  
   )
 ######## Belonging Index ------------------------------------------------------
-  # Reverse-code the Outsider_US and Excluded_US_Soc to make higher values reflect inclusion
-  cmps.add.2016$Outsider_US_rev <- 5 - cmps.add.2016$Outsider_US  # reverse scale for Outsider_US
-  cmps.add.2016$Excluded_US_Soc_rev <- 5 - cmps.add.2016$Excluded_US_Soc  # reverse scale for Excluded_US_Soc
-  
   # Standardize the variables (mean=0, sd=1) to combine them
   cmps.add.2016$Belong_US_z <- scale(cmps.add.2016$Belong_US)
   cmps.add.2016$Valued_Respected_US_z <- scale(cmps.add.2016$Valued_Respected_US)
-  cmps.add.2016$Outsider_US_rev_z <- scale(cmps.add.2016$Outsider_US_rev)
-  cmps.add.2016$Excluded_US_Soc_rev_z <- scale(cmps.add.2016$Excluded_US_Soc_rev)
+  cmps.add.2016$Outsider_US_z <- scale(cmps.add.2016$Outsider_US)
+  cmps.add.2016$Excluded_US_Soc_z <- scale(cmps.add.2016$Excluded_US_Soc)
   
   # Construct the inclusion index by averaging the standardized variables
-  cmps.add.2016$Inclusion_Index <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Valued_Respected_US_z", "Outsider_US_rev_z", "Excluded_US_Soc_rev_z")], na.rm = TRUE)
-  cmps.add.2016$Inclusion_Internal <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Outsider_US_rev_z")], na.rm = TRUE)
-  cmps.add.2016$Inclusion_External <- rowMeans(cmps.add.2016[, c( "Valued_Respected_US_z", "Excluded_US_Soc_rev_z")], na.rm = TRUE)
+  cmps.add.2016$Inclusion_Index <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Valued_Respected_US_z", "Outsider_US_z", "Excluded_US_Soc_z")], na.rm = TRUE)
+  cmps.add.2016$Inclusion_Internal <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Outsider_US_z")], na.rm = TRUE)
+  cmps.add.2016$Inclusion_External <- rowMeans(cmps.add.2016[, c( "Valued_Respected_US_z", "Excluded_US_Soc_z")], na.rm = TRUE)
   
   # Check the index
   summary(cmps.add.2016$Inclusion_Index)
@@ -194,11 +207,11 @@ full_cmps2016 <- full_cmps2016 %>% mutate(
 
 full_cmps2016 <- full_cmps2016 %>% mutate(
   ICI_collapsed_alt = case_when(
-   ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ -1,
+   ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ 1,
    ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
    ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
-   ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ .5,
-   ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ 1,
+   ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ -.5,
+   ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ -1,
     TRUE ~ NA_real_ # Handle unexpected values
   )
 )
@@ -297,4 +310,8 @@ acs_margins <- list(
 cmps_design_adj <- postStratify(cmps_design, ~Race_Prime, pop_table, partial = TRUE)
 svytable(~Race_Prime, cmps_design_adj) / sum(weights(cmps_design_adj))
 prop.table(svytable(~Race_Prime, cmps_design_adj))
+
+### Subsetting to just Latinos
+cmps_lat_16 <- subset(cmps_design_adj, subset = cmps_design_adj$variables$Latino == 1)
+
 

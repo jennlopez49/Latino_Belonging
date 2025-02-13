@@ -4,28 +4,28 @@ ivs <- list("ICI_Score_2016", "ICI_collapsed_alt")  # List of IVs (X)
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election")  # List of Mediators (M)
 controls <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-              "More_Than_SecondGen", "Discrimination") 
+              "More_Than_SecondGen", "Discrimination_Scale_Scale", "Discrimination_National_Perc") 
 
 ################ No interaction/ Basic Models -------------------------------------
 ## List of Models
 no_int_list <- list()
 
 no_int_list[[1]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination")
+                      "More_Than_SecondGen", "Discrimination_Scale")
 no_int_list[[2]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt")
+                      "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc", "ICI_collapsed_alt")
 no_int_list[[3]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_Score_2016")
+                      "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc", "ICI_collapsed_alt")
 no_int_list[[4]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt", "Fear_Election")
+                      "More_Than_SecondGen", "Discrimination_Scale","Discrimination_National_Perc", "ICI_collapsed_alt", "Fear_Election")
 no_int_list[[5]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt", "Angry_Election")
+                      "More_Than_SecondGen", "Discrimination_Scale","Discrimination_National_Perc", "ICI_collapsed_alt", "Angry_Election")
 no_int_list[[6]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt", "Sad_Election")
+                      "More_Than_SecondGen", "Discrimination_Scale","Discrimination_National_Perc", "ICI_collapsed_alt", "Sad_Election")
 no_int_list[[7]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt", "Pride_Election")
+                      "More_Than_SecondGen", "Discrimination_Scale","Discrimination_National_Perc", "ICI_collapsed_alt", "Pride_Election")
 no_int_list[[8]] <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-  "More_Than_SecondGen", "Discrimination", "ICI_collapsed_alt", "Hope_Election")
+  "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc","ICI_collapsed_alt", "Hope_Election")
 
 ## Run the models
 
