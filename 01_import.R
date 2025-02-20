@@ -2,7 +2,7 @@
 cmps2020 <- read_dta("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/CMPS 2020 full adult sample weighted STATA.dta",
                      encoding = "UTF-8")
 ### Subsetting to specific vars ########
-cmps_sub <- cmps2020 %>% select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
+cmps_sub <- cmps2020 %>% dplyr::select(uuid, S2_Racer2, S2_Race_Prime, S2_Hispanicr2,
                                 S2_Hispanicr3, S2_Hispanicr4, S3b,
                                 S4, S5_Age, S7, S10, S10_Mex, S13, S15,
                                 Q21, Q22, Q22, Q29, Q145, Q146, Q147, Q151, Q152,
@@ -351,15 +351,33 @@ full_cmps_2020 <- full_cmps_2020 %>% mutate(
 
 #### Adding in 2020 pop and votes --------------
 
+data_president <- read_csv("dataverse_files/1976-2020-president.csv")
+data_votes <- data_president %>% filter(year == 2020 | year == 2016)
+
+data_2020_votes <- data_votes %>% filter(party_detailed == "REPUBLICAN" | 
+                                           party_detailed == "DEMOCRAT") %>% 
+  filter(year == 2020) %>% filter(writein == FALSE) 
+
+data_2020_votes <- data_2020_votes %>% mutate(
+  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
+  vote_pp_d = (DEMOCRAT/totalvotes)*100,
+  vote_pp_r = (REPUBLICAN/totalvotes)*100,
+  vote_diff_pp = vote_pp_d - vote_pp_r
+)
+# 
+# 
+# data_2020_votes <- data_2020_votes %>%
+#   dplyr::select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
+#   pivot_wider(names_from = party_detailed, values_from = candidatevotes)
 
 votemargin_20<- data_2020_votes %>% mutate(state = str_to_title(state),
                                             State = state.abb[match(state, state.name)]) %>%
-  select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
+  dplyr::select(State, vote_margin, REPUBLICAN, DEMOCRAT, totalvotes)
 votemargin_20$state_abb <- votemargin_20$State
 # adding in latino pop data 
 latino.pop.data_20 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
                                                             State = state.abb[match(State, state.name)]) %>% 
-  select(State, percent.latino.2020)
+  dplyr::select(State, percent.latino.2020)
 latino.pop.data_20$state_abb <- latino.pop.data_20$State
 ## matching state to # in CMPS ----------
 states <- cbind(c(state.abb[c(1:8)], "DC", state.abb[c(9:50)]), c(1:51)) ### CMPS includes DC 
@@ -372,11 +390,14 @@ full_cmps_2020 <- left_join(full_cmps_2020, latino.pop.data_20, by = "state_abb"
 ### adding vote margins ------
 full_cmps_2020 <- left_join(full_cmps_2020, votemargin_20, by = "state_abb")
 
-### Restricting to Latinos -------
-latinos_cmps_2020 <- full_cmps_2020 %>% filter(Hispanic == 1)
+######## SURVEY DESIGN--------------------------
+# checking manual proportions
+svydes_2020 <- svydesign(id = ~ 1, weights = ~race_weight, data = full_cmps_2020)
+# # checking proportions --- gets close
+prop.table(svytable(~full_cmps_2020$S2_Race_Prime, svydes_2020))
 
-latinos_cmps_2020 <- latinos_cmps_2020 %>% mutate(
-  fear 
-)
+###### Restricting to Latinos -------
+latinos_cmps_2020 <- subset(svydes_2020, subset = svydes_2020$variables$S2_Race_Prime == 2)
 
+length(latinos_cmps_2020$variables$uuid)
                 
