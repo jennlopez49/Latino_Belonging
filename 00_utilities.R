@@ -138,3 +138,47 @@ ols_function_standard <- function(dvs, vars_list, des, dat, out = NULL) {
     return(ols_models)
   }
 }
+
+####### Interaction with Standardized Data -----------
+interaction_function_standard <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
+  standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
+  
+  # Standardize IVs, mediators, and controls (but not DVs)
+  dat_std <- dat  # Copy of dataset
+  vars_to_standardize <- unique(c(ivs, mediators, controls))
+  
+  for (var in vars_to_standardize) {
+    if (var %in% names(dat_std)) {
+      dat_std[[var]] <- standardize(dat_std[[var]])
+    }
+  }
+  
+  interaction_results <- list()
+  
+  for (Y in dvs) {  # Loop through each dependent variable
+    results_Y <- list()  # Store results for this dependent variable
+    
+    for (X in ivs) {  # Loop through each IV
+      for (M in mediators) {  # Loop through each mediator
+        
+        # Fit survey-weighted OLS model with interaction (Y ~ X * M + controls)
+        form_interaction <- as.formula(paste(Y, " ~ ", X, " * ", M, " + ", paste(controls, collapse = " + ")))
+        interaction_model <- svyglm(form_interaction, design = des, family = gaussian(), data = dat_std)
+        
+        # Store results
+        results_Y[[paste0("IV_", X, "_Med_", M)]] <- interaction_model
+      }
+    }
+    
+    interaction_results[[Y]] <- results_Y  # Store results 
+  }
+  
+  # Assign to global environment 
+  if (!is.null(out)) {
+    if (!is.character(out)) stop("Argument 'out' must be a character string")
+    assign(out, interaction_results, envir = .GlobalEnv)
+  } else {
+    return(interaction_results)
+  }
+}
+

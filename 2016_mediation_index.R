@@ -112,5 +112,6 @@ controls <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party"
 med_results <- mediation_function(dvs, ivs, mediators, controls, des = cmps_lat_16, dat = cmps_lat_16)
 
 # View Summary of a Mediation Result
-summary(med_results$Inclusion_External$IV_ICI_collapsed_alt_Med_Angry_Election$mediation_result)
+summary(med_results$Inclusion_Internal$IV_ICI_collapsed_alt_Med_Hope_Election$mediation_result)
+summary(med_results$Inclusion_Internal$IV_ICI_Score_2016_Med_Angry_Election$mediation_result)
 

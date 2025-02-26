@@ -97,9 +97,9 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                       C23 == "(5) Staying about the same" ~ 3,
                       C23 == "(3) Getting a little worse" ~ 2,
                       C23 == "(4) Getting a lot worse" ~ 1), ### changed so worse is negative, about the same is middle
-  Mexican = ifelse(cmps2016$S10 == "(12) Mexico", 1, 0),
-  Cuban = ifelse(cmps2016$S10 == "(06) Cuba", 1, 0),
-  Puerto_Rican = ifelse(cmps2016$S10 == "(17) Puerto Rico", 1, 0),
+  Mexican = ifelse(cmps.clean.2016$S10 == "(12) Mexico", 1, 0),
+  Cuban = ifelse(cmps.clean.2016$S10 == "(06) Cuba", 1, 0),
+  Puerto_Rican = ifelse(cmps.clean.2016$S10 == "(17) Puerto Rico", 1, 0),
   Imm_Church = A134,
   Angry_Election = case_when(C112 == "(1) All the time" ~ 4, 
                              C112 == "(2) Often" ~ 3,
@@ -131,10 +131,10 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                             #)
   Weight = NAT_WEIGHT,
   Race_Prime = ETHNIC_QUOTA,
-  Race_num = case_when(cmps2016$Race_Prime == "(1) White Non Hispanic" ~ 1,
-                        cmps2016$Race_Prime == "(2) Hispanic or Latino" ~ 2,
-                        cmps2016$Race_Prime == "(3) Black or African American" ~ 3,
-                        cmps2016$Race_Prime == "(4) Asian American" ~ 4),
+  #Race_num = case_when(cmps.clean.2016$Race_Prime == "(1) White Non Hispanic" ~ 1,
+                      # cmps.clean.2016$Race_Prime == "(2) Hispanic or Latino" ~ 2,
+                      # cmps.clean.2016$Race_Prime == "(3) Black or African American" ~ 3,
+                      # cmps.clean.2016$Race_Prime == "(4) Asian American" ~ 4),
   Belong_US = case_when(C107 == "(1) Strongly belong" ~ 4,                      # recoded - 1 is not at all belong, 4 is strongly belong now
                         C107 == "(2) Moderately belong" ~ 3,
                         C107 == "(3) Slightly belong" ~ 2,
@@ -169,7 +169,11 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
     Personal_Discrimination == 0 | Place_of_Disc == 0 ~ 0, # Did not experience discrimination, not in the US
     Race_Ethnicity_Disc == 1 & Place_of_Disc == 1 ~ 1, # Experienced discrimination in US due to race/ethnicity 
     Immigration_Status_Disc == 1 & Place_of_Disc == 1 ~ 1 # or immigration status
-  )
+  ),
+  Pol_Interest = case_when(C33 == "(1) Very interested in politics" ~ 4,
+                           C33 == "(2) Somewhat interested" ~ 3,
+                           C33 == "(3) Not that interested in politics" ~ 2,
+                           C33 == "(4) Not at all interested in politics" ~ 1) ### reverse-coded 1 - not at all, 4 - very interested
   
   )
 ######## Belonging Index ------------------------------------------------------
@@ -188,11 +192,11 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   summary(cmps.add.2016$Inclusion_Index)
   
 #### CHECKING NAs IN GENERATION VAR ------
-  na_immigrants <- cmps2016 %>%
-    filter(is.na(Parents) & NativeBorn == 0) %>%
-    count()
-  na_immigrants
-  
+  # na_immigrants <- cmps.add.2016 %>%
+  #   filter(is.na(Parents) & NativeBorn == 0) %>%
+  #   count()
+  # na_immigrants
+  # 
 
 ######### Adding ICI Index ---------
 inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
