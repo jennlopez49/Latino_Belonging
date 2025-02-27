@@ -100,6 +100,23 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Mexican = ifelse(cmps.clean.2016$S10 == "(12) Mexico", 1, 0),
   Cuban = ifelse(cmps.clean.2016$S10 == "(06) Cuba", 1, 0),
   Puerto_Rican = ifelse(cmps.clean.2016$S10 == "(17) Puerto Rico", 1, 0),
+  Dominican = ifelse(cmps.clean.2016$S10 == "(07) Dominican Republic", 1, 0),
+  Central_American = ifelse(cmps.clean.2016$S10 == "(09) El Salvador", 1, 
+                            ifelse(cmps.clean.2016$S10 == "(10) Guatemala", 1, 
+                                   ifelse(cmps.clean.2016$S10 == "(11) Honduras", 1, 
+                                          ifelse(cmps.clean.2016$S10 == "(05) Costa Rica", 1,  
+                                                 ifelse(cmps.clean.2016$S10 == "(13) Nicaragua", 1, 
+                                                        ifelse(cmps.clean.2016$S10 == "(14) Panama", 1, 0)))))),
+  South_American = ifelse(cmps.clean.2016$S10 == "(01) Argentina", 1, 
+                          ifelse(cmps.clean.2016$S10 == "(02) Bolivia", 1, 
+                                 ifelse(cmps.clean.2016$S10 == "(03) Chile", 1, 
+                                        ifelse(cmps.clean.2016$S10 == "(04) Colombia", 1,
+                                               ifelse(cmps.clean.2016$S10 == "(08) Ecuador", 1, 
+                                                      ifelse(cmps.clean.2016$S10 == "(15) Paraguay", 1, 
+                                                             ifelse(cmps.clean.2016$S10 == "(16) Peru", 1, 
+                                                                    ifelse(cmps.clean.2016$S10 == "(18) Uruguay", 1,
+                                                                           ifelse(cmps.clean.2016$S10 == "(19) Venezuela", 1, 0))))))))),
+  Spanish = ifelse(cmps.clean.2016$S10 == "(20) Spain / Spanish", 1, 0),
   Imm_Church = A134,
   Angry_Election = case_when(C112 == "(1) All the time" ~ 4, 
                              C112 == "(2) Often" ~ 3,
@@ -173,9 +190,21 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Pol_Interest = case_when(C33 == "(1) Very interested in politics" ~ 4,
                            C33 == "(2) Somewhat interested" ~ 3,
                            C33 == "(3) Not that interested in politics" ~ 2,
-                           C33 == "(4) Not at all interested in politics" ~ 1) ### reverse-coded 1 - not at all, 4 - very interested
-  
+                           C33 == "(4) Not at all interested in politics" ~ 1), ### reverse-coded 1 - not at all, 4 - very interested
+  National_Origin = case_when(
+    S10 == "(12) Mexico" ~ "Mexican",
+    S10 == "(06) Cuba" ~ "Cuban",
+    S10 == "(17) Puerto Rico" ~ "Puerto Rican",
+    S10 == "(07) Dominican Republic" ~ "Dominican",
+    S10 %in% c("(09) El Salvador", "(10) Guatemala", "(11) Honduras", "(05) Costa Rica", 
+               "(13) Nicaragua", "(14) Panama") ~ "Central American",
+    S10 %in% c("(01) Argentina", "(02) Bolivia", "(03) Chile", "(04) Colombia", 
+               "(08) Ecuador", "(15) Paraguay", "(16) Peru", "(18) Uruguay", "(19) Venezuela") ~ "South American",
+    S10 == "(20) Spain / Spanish" ~ "Spanish",
+    TRUE ~ "Other"  # Default value for any other cases
   )
+  )
+  
 ######## Belonging Index ------------------------------------------------------
   # Standardize the variables (mean=0, sd=1) to combine them
   cmps.add.2016$Belong_US_z <- scale(cmps.add.2016$Belong_US)
@@ -279,43 +308,78 @@ full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2
 
 #### Making the survey design ----------------------------
 
-### Making the Survey Weights Representative -- checking proportions
+### To make the Survey Weights nationally Representative -- checking proportions
 # 
-svydes <- svydesign(id = ~ 1, weights = ~NAT_WEIGHT, data = full_cmps2016)
-# # checking 
-prop.table(svytable(~full_cmps2016$Race_Prime, svydes))
+# svydes <- svydesign(id = ~ 1, weights = ~NAT_WEIGHT, data = full_cmps2016)
+# # # checking 
+# prop.table(svytable(~full_cmps2016$Race_Prime, svydes))
+# 
+# 
+# acs_margins <- list(
+#   Race_Prime = c("(1) White Non Hispanic" = 0.62, 
+#                  "(2) Hispanic or Latino" = 0.173, 
+#                  "(3) Black or African American" = 0.123, 
+#                  "(4) Asian American" = 0.052, 
+#                  "(6) American Indian/Native American" = 0.007)
+# )
+# 
+# # Apply Post-stratification & raking
+# cmps_design <- svydesign(ids = ~1, data = full_cmps2016, weights = ~Weight)
+# 
+# pop_table <- data.frame(
+#   Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", "(3) Black or African American", 
+#                  "(4) Asian American", "(6) American Indian/Native American"),
+#   Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)  # ACS proportions
+# )
+# 
+# acs_margins <- list(
+#   data.frame(Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", 
+#                             "(3) Black or African American", "(4) Asian American", 
+#                             "(6) American Indian/Native American"),
+#              Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)) # Proportions
+# )
+# 
+# # Post-stratify the weights
+# cmps_design_adj <- postStratify(cmps_design, ~Race_Prime, pop_table, partial = TRUE)
+# svytable(~Race_Prime, cmps_design_adj) / sum(weights(cmps_design_adj))
+# prop.table(svytable(~Race_Prime, cmps_design_adj))
+# 
+# ### Subsetting to just Latinos
+# cmps_lat_16 <- subset(cmps_design_adj, subset = cmps_design_adj$variables$Latino == 1)
+# 
+# ## alternate -- 
+# cmps_lat_16_alt <- subset(cmps_design_adj, Latino == 1)
 
+### Changing ICI to Factor 
+full_cmps2016$ICI_Reverse <- (full_cmps2016$ICI_collapsed_alt * -1)
+full_cmps2016$ICI_Index <- as.factor(full_cmps2016$ICI_Reverse)
+full_cmps2016$ICI_Index <- relevel(full_cmps2016$ICI_Index, ref = "1")
 
-acs_margins <- list(
-  Race_Prime = c("(1) White Non Hispanic" = 0.62, 
-                 "(2) Hispanic or Latino" = 0.173, 
-                 "(3) Black or African American" = 0.123, 
-                 "(4) Asian American" = 0.052, 
-                 "(6) American Indian/Native American" = 0.007)
+### For Latinos ONLY checking Weights and Sample Representativeness among Nat. Origin Groups ---- 
+
+latinos_data <- full_cmps2016 %>% filter(Race_Prime == "(2) Hispanic or Latino")
+
+### Creating Survey Design ---
+cmps_lat_16 <- svydesign(
+  ids = ~1, 
+  data = latinos_data, 
+  weights = ~Weight
 )
 
-# Apply Post-stratification & raking
-cmps_design <- svydesign(ids = ~1, data = full_cmps2016, weights = ~Weight)
 
-pop_table <- data.frame(
-  Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", "(3) Black or African American", 
-                 "(4) Asian American", "(6) American Indian/Native American"),
-  Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)  # ACS proportions
-)
+### Double Checking - Sample Prop Table - 
+prop.table(svytable(~National_Origin, cmps_lat_16))
 
-acs_margins <- list(
-  data.frame(Race_Prime = c("(1) White Non Hispanic", "(2) Hispanic or Latino", 
-                            "(3) Black or African American", "(4) Asian American", 
-                            "(6) American Indian/Native American"),
-             Freq = c(0.62, 0.173, 0.123, 0.052, 0.007)) # Proportions
-)
+##Checking against 2016 ACS by Specific Origin
+total_pop_2016 <- 55199107
 
-# Post-stratify the weights
-cmps_design_adj <- postStratify(cmps_design, ~Race_Prime, pop_table, partial = TRUE)
-svytable(~Race_Prime, cmps_design_adj) / sum(weights(cmps_design_adj))
-prop.table(svytable(~Race_Prime, cmps_design_adj))
+national_origin_acs_2016 <- data.frame(Origins = c("Central American", "Cuban", "Dominican", "Mexican",
+                         "Other", "Puerto Rican", "South American", "Spanish"),
+             Pop = c(5002699, 2077828, 1788697, 35110480, NA, 5275008,3344238, 2600157)
+    )
+national_origin_acs_2016$Pop_Percent <- (national_origin_acs_2016$Pop/total_pop_2016)*100
 
-### Subsetting to just Latinos
-cmps_lat_16 <- subset(cmps_design_adj, subset = cmps_design_adj$variables$Latino == 1)
+## Overall - very small discrepancy, generally representative of Latinos 
+
 
 

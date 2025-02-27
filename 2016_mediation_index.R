@@ -111,7 +111,40 @@ controls <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party"
 # Run Mediation Analysis
 med_results <- mediation_function(dvs, ivs, mediators, controls, des = cmps_lat_16, dat = cmps_lat_16)
 
-# View Summary of a Mediation Result
-summary(med_results$Inclusion_Internal$IV_ICI_collapsed_alt_Med_Hope_Election$mediation_result)
-summary(med_results$Inclusion_Internal$IV_ICI_Score_2016_Med_Angry_Election$mediation_result)
+# View Summary of a Mediation Result Example
+summary(med_results$Inclusion_External$IV_ICI_collapsed_alt_Med_Fear_Election$mediation_result)
+summary(med_results$Inclusion_External$IV_ICI_Score_2016_Med_Fear_Election$mediation_result)
+
+#### Pulling out Results --- 
+
+# Extract mediation results into a clean table
+mediation_summary <- map_df(names(med_results), function(dv) {
+  map_df(names(med_results[[dv]]), function(iv) {
+    map_df(names(med_results[[dv]][[iv]]), function(mediator) {
+      model <- med_results[[dv]][[iv]][[mediator]]
+      
+      # Extract relevant statistics from the model
+      data.frame(
+        DV = dv,  # Dependent Variable
+        IV = iv,  # Independent Variable
+        Mediator = mediator,  # Mediating Variable
+        ACME = model[[1]],  # Average Causal Mediation Effect
+        ADE = model[[2]],   # Average Direct Effect
+        Total_Effect = model[[3]],  # Total Effect
+        Prop_Mediated = model[[1]] / sum(model),  # Proportion Mediated (example calculation)
+        p_ACME = model[[4]],   # p-value for ACME
+        p_ADE = model[[5]],    # p-value for ADE
+        p_Total = model[[6]],  # p-value for Total Effect
+        Sample_Size = model[[7]]  # Sample Size
+      )
+    })
+  })
+})
+
+
+
+
+
+# View the summary table
+print(mediation_summary)
 

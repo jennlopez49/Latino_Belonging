@@ -155,21 +155,20 @@ interaction_function_standard <- function(dvs, ivs, mediators, controls, des, da
   
   interaction_results <- list()
   
-  for (Y in dvs) {  # Loop through each dependent variable
-    results_Y <- list()  # Store results for this dependent variable
-    
-    for (X in ivs) {  # Loop through each IV
-      for (M in mediators) {  # Loop through each mediator
+  for (Y in dvs) {  
+    results_Y <- list() 
+    for (X in ivs) {  
+      for (M in mediators) {  
         
-        # Fit survey-weighted OLS model with interaction (Y ~ X * M + controls)
-        form_interaction <- as.formula(paste(Y, " ~ ", X, " * ", M, " + ", paste(controls, collapse = " + ")))
+        # Model with interaction between Stigma and Linked Fate
+        form_interaction <- as.formula(paste(Y, " ~ ", X, "* Linked_Fate +", M, "+", paste(controls, collapse = " + ")))
+        
         interaction_model <- svyglm(form_interaction, design = des, family = gaussian(), data = dat_std)
         
         # Store results
-        results_Y[[paste0("IV_", X, "_Med_", M)]] <- interaction_model
+        interaction_results[[paste0("DV_", Y, "_IV_", X, "_LF_Interaction_Med_", M)]] <- interaction_model
       }
     }
-    
     interaction_results[[Y]] <- results_Y  # Store results 
   }
   
@@ -181,4 +180,57 @@ interaction_function_standard <- function(dvs, ivs, mediators, controls, des, da
     return(interaction_results)
   }
 }
+
+###### mediation 
+mediation_function_standard <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
+  standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
+  
+  # Standardize IVs, mediators, and controls (but not DVs)
+  dat_std <- dat  # Copy dataset
+  vars_to_standardize <- unique(c(ivs, mediators, controls))
+  
+  for (var in vars_to_standardize) {
+    if (var %in% names(dat_std)) {
+      dat_std[[var]] <- standardize(dat_std[[var]])
+    }
+  }
+  
+  mediation_results <- list()
+  
+  ## Step 1: Predict mediators (M ~ IV + Linked Fate + Controls)
+  mediator_models <- list()
+  for (M in mediators) {  
+    for (X in ivs) {  
+      form_mediator <- as.formula(paste(M, " ~ ", X, "+ Linked_Fate +", paste(controls, collapse = " + ")))
+      mediator_model <- svyglm(form_mediator, design = des, family = gaussian(), data = dat_std)
+      
+      mediator_models[[paste0("IV_", X, "_Med_", M)]] <- mediator_model
+    }
+  }
+  
+  ## Step 2: Predict DV (Y ~ IV + M + Linked Fate + Controls)
+  outcome_models <- list()
+  for (Y in dvs) {  
+    for (M in mediators) {  
+      for (X in ivs) {  
+        form_outcome <- as.formula(paste(Y, " ~ ", X, "+", M, "+ Linked_Fate +", paste(controls, collapse = " + ")))
+        outcome_model <- svyglm(form_outcome, design = des, family = gaussian(), data = dat_std)
+        
+        outcome_models[[paste0("DV_", Y, "_IV_", X, "_Med_", M)]] <- outcome_model
+      }
+    }
+  }
+  
+  mediation_results$mediator_models <- mediator_models
+  mediation_results$outcome_models <- outcome_models
+  
+  # Assign to global environment
+  if (!is.null(out)) {
+    if (!is.character(out)) stop("Argument 'out' must be a character string")
+    assign(out, mediation_results, envir = .GlobalEnv)
+  } else {
+    return(mediation_results)
+  }
+}
+
 
