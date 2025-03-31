@@ -65,7 +65,7 @@ map_2016 <- ggplot(data = states) +
                        limits = c(-1, 1)) +
   theme_minimal() +
   labs(
-    title = "Immigrant Climate by State in 2016",
+    title = "Immigrant Climate by State in 2017",
     caption = "Data Source: Pham and Van (2016)"
   ) +
   theme(
@@ -86,18 +86,71 @@ ggsave(
 )
 
 ### 2020 version 
-inclusivity$STUSPS <- inclusivity$State_abb
-states <- merge(states, inclusivity, by = "STUSPS")
-states$ICI_2020_col <- as.numeric(states$inclusivity_varied)
 
-map_2020 <- ggplot(data = states) +
-  geom_sf(aes(fill = ICI_2020_col)) +
-  scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0,
-                       limits = c(-1, 1)) +
+inclusivity <- readxl::read_xlsx("inclusivity_scores_2009_16.xlsx")
+inclusivity$STUSPS <- inclusivity$State
+
+inclusivity_20 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusive.xlsx")
+colnames(inclusivity_20) <- c("State","inclusivity", "inclusivity_varied")
+inclusive_full <- merge(inclusivity, inclusivity_20, by = "State")
+
+
+inclusive_full <- inclusive_full %>% mutate(
+  bucketed_index_alt_11 = inclusivity_varied,
+  bucketed_index_alt_09 = case_when(
+  inclusive_full$ICI_Score_2009 < -30 ~ -1,
+  inclusive_full$ICI_Score_2009 >= -30 & inclusive_full$ICI_Score_2009 < -10 ~ -0.5,
+  inclusive_full$ICI_Score_2009 >= -10 & inclusive_full$ICI_Score_2009 < 0 ~ 0,
+  inclusive_full$ICI_Score_2009 >= 1 & inclusive_full$ICI_Score_2009 < 10 ~ 0.5,
+  inclusive_full$ICI_Score_2009 >= 10 ~ 1,
+  TRUE ~ NA_real_ ,
+))
+
+inclusive_full <- inclusive_full %>% mutate(
+  index_11 = as.numeric(as.character(inclusive_full$bucketed_index_alt_11)),
+  index_09 = as.numeric(as.character(inclusive_full$bucketed_index_alt_09)),
+  )
+
+
+
+states <- merge(states, inclusive_full, by = "STUSPS")
+# states$ICI_2020_col <- as.numeric(states$inclusivity_varied)
+
+
+
+
+map_2011 <- ggplot(data = states) +
+  geom_sf(aes(fill = index_11)) +
+  scale_fill_gradient2(
+    name = "ICI Index (2007-2011)",  # Set legend title
+    low = "red", mid = "white", high = "blue", midpoint = 0,
+    limits = c(-1, 1)
+  ) +
   theme_minimal() +
   labs(
-    title = "Immigrant Climate by State in 2020",
-    caption = "Data Source: Pham and Van (2020)"
+    title = "Immigrant Climate by State in 2011",
+    caption = "Data Source: Pham and Van (2016)"
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "panel"
+  )
+
+map_2009 <- ggplot(data = states) +
+  geom_sf(aes(fill = index_09)) +
+  scale_fill_gradient2(
+    name = "ICI Index (2007-2019)",  # Set legend title
+    low = "red", mid = "white", high = "blue", midpoint = 0,
+    limits = c(-1, 1)
+  ) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State in 2009",
+    caption = "Data Source: Pham and Van (2013)"
   ) +
   theme(
     axis.text = element_blank(),  # Removes lat/long labels
@@ -109,8 +162,8 @@ map_2020 <- ggplot(data = states) +
   )
 
 ggsave(
-  filename = "state_climate_2020.png",  # File name with extension
-  plot = map_2020,                             # Plot object
+  filename = "state_climate_2011.png",  # File name with extension
+  plot = map_2011,                             # Plot object
   width = 10,                             # Width in inches
   height = 8,                             # Height in inches
   dpi = 300                               # Resolution in dots per inch

@@ -229,24 +229,47 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
 
 ######### Adding ICI Index ---------
 inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
-full_cmps2016<- left_join(cmps.add.2016, inclusivity_2016, by = "State")
+# full_cmps2016<- left_join(cmps.add.2016, inclusivity_2016, by = "State")
+# 
+# full_cmps2016 <- full_cmps2016 %>% mutate(
+#   ICI_Score_2016 = as.numeric(full_cmps2016$ICI_Score_2016),
+#   ICI_collapsed = ifelse(full_cmps2016$ICI_Score_2016 < -86, 0, 
+#                          ifelse(full_cmps2016$ICI_Score_2016 > -86 & full_cmps2016$ICI_Score_2016 <= -1, .5, 
+#                                 ifelse(full_cmps2016$ICI_Score_2016 > -1, 1, NA))) 
+# )
+# 
+# full_cmps2016 <- full_cmps2016 %>% mutate(
+#   ICI_collapsed_alt = case_when(
+#    ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ 1,
+#    ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
+#    ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
+#    ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ -.5,
+#    ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ -1,
+#     TRUE ~ NA_real_ # Handle unexpected values
+#   )
+# )
+  
+  ## Importing original Indicator 
+  
+full_indicators <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/full_indicators_2016.csv")
+  
+full_cmps2016 <- left_join(cmps.add.2016, full_indicators, by = "State")
 
 full_cmps2016 <- full_cmps2016 %>% mutate(
-  ICI_Score_2016 = as.numeric(full_cmps2016$ICI_Score_2016),
-  ICI_collapsed = ifelse(full_cmps2016$ICI_Score_2016 < -86, 0, 
-                         ifelse(full_cmps2016$ICI_Score_2016 > -86 & full_cmps2016$ICI_Score_2016 <= -1, .5, 
-                                ifelse(full_cmps2016$ICI_Score_2016 > -1, 1, NA))) 
-)
-
-full_cmps2016 <- full_cmps2016 %>% mutate(
-  ICI_collapsed_alt = case_when(
-   ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ 1,
-   ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
-   ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
-   ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ -.5,
-   ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ -1,
-    TRUE ~ NA_real_ # Handle unexpected values
-  )
+    Imm_Con_Ind = (Imm_Class_Concrete_2016 - min(Imm_Class_Concrete_2016)) / (max(Imm_Class_Concrete_2016) - min(Imm_Class_Concrete_2016)),
+    Imm_Full_Ind = (Imm_Class_Full_2016 - min(Imm_Class_Full_2016)) / (max(Imm_Class_Full_2016) - min(Imm_Class_Full_2016)),
+    Imm_Con_Index = case_when(
+      Imm_Class_Concrete_2016 <= -5  ~ -1,   # High Anti
+      Imm_Class_Concrete_2016 < 0    ~ -0.5, # Low Anti
+      Imm_Class_Concrete_2016 < 10   ~ 0.5,  # Low Pro
+      Imm_Class_Concrete_2016 >= 10   ~ 1,    # High Pro
+    ),
+    Imm_Sym_Index = case_when(
+      Imm_Class_Full_2016 <= -10 ~ -1,     # High Anti: score <= -10
+      Imm_Class_Full_2016 > -10 & Imm_Class_Full_2016 <= 0 ~ -0.5,  # Low Anti: score between -10 and 0
+      Imm_Class_Full_2016 > 0 & Imm_Class_Full_2016 < 20 ~ 0.5,   # Low Pro: score between 0 and 20
+      Imm_Class_Full_2016 >= 20 ~ 1,        # High Pro: score > 20
+    )
 )
 
 #### Adding in Latino Pop &&& Election Vote Margin Results ------
@@ -351,9 +374,11 @@ full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2
 # cmps_lat_16_alt <- subset(cmps_design_adj, Latino == 1)
 
 ### Changing ICI to Factor 
-full_cmps2016$ICI_Reverse <- (full_cmps2016$ICI_collapsed_alt * -1)
+full_cmps2016$ICI_Reverse <- (full_cmps2016$Imm_Con_Index * -1)
 full_cmps2016$ICI_Index <- as.factor(full_cmps2016$ICI_Reverse)
 full_cmps2016$ICI_Index <- relevel(full_cmps2016$ICI_Index, ref = "1")
+
+
 
 ### For Latinos ONLY checking Weights and Sample Representativeness among Nat. Origin Groups ---- 
 
@@ -380,6 +405,8 @@ national_origin_acs_2016 <- data.frame(Origins = c("Central American", "Cuban", 
 national_origin_acs_2016$Pop_Percent <- (national_origin_acs_2016$Pop/total_pop_2016)*100
 
 ## Overall - very small discrepancy, generally representative of Latinos 
+
+
 
 
 

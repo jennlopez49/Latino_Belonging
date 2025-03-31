@@ -12,7 +12,7 @@ library(tigris)
 library(sf)
 library(mediation)
 library(dplyr)
-
+library(broom)
 
 ###### Custom Function run Multiple Mediation Analyses  -----------------
 mediation_function <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
@@ -105,7 +105,8 @@ ols_function <- function(dvs, vars, des, dat, out){
 
 
 ######## Alternate Custom Function with Standardization ------------------------
-ols_function_standard <- function(dvs, vars_list, des, dat, out = NULL) {
+ols_function_standard <- function(dvs, vars_list, des,
+                                  weight_var, dat, out = NULL) {
   standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
   
   # Standardize all predictors except the DV
@@ -126,7 +127,8 @@ ols_function_standard <- function(dvs, vars_list, des, dat, out = NULL) {
     
     for (i in 1:length(vars_list)) {
       formula <- as.formula(paste(Y, " ~ ", paste(vars_list[[i]], collapse = " + ")))
-      model_list[[i]] <- svyglm(formula, design = des, family = gaussian(), data = dat_std) 
+      model_list[[i]] <- svyglm(formula, design = des, family = gaussian(), 
+                                weights = dat[[weight_var]], data = dat_std) 
     }
     
     ols_models[[Y]] <- model_list
@@ -140,7 +142,9 @@ ols_function_standard <- function(dvs, vars_list, des, dat, out = NULL) {
 }
 
 ####### Interaction with Standardized Data -----------
-interaction_function_standard <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
+interaction_function_standard <- function(dvs, ivs, mediators, controls, 
+                                          weight_var, des, 
+                                          dat, out = NULL) {
   standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
   
   # Standardize IVs, mediators, and controls (but not DVs)
@@ -163,7 +167,8 @@ interaction_function_standard <- function(dvs, ivs, mediators, controls, des, da
         # Model with interaction between Stigma and Linked Fate
         form_interaction <- as.formula(paste(Y, " ~ ", X, "* Linked_Fate +", M, "+", paste(controls, collapse = " + ")))
         
-        interaction_model <- svyglm(form_interaction, design = des, family = gaussian(), data = dat_std)
+        interaction_model <- svyglm(form_interaction, design = des, family = gaussian(), 
+                                    weights = dat[[weight_var]], data = dat_std)
         
         # Store results
         interaction_results[[paste0("DV_", Y, "_IV_", X, "_LF_Interaction_Med_", M)]] <- interaction_model
@@ -182,7 +187,8 @@ interaction_function_standard <- function(dvs, ivs, mediators, controls, des, da
 }
 
 ###### mediation 
-mediation_function_standard <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
+mediation_function_standard <- function(dvs, ivs, mediators, controls, des, 
+                                        weigh_var, dat, out = NULL) {
   standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
   
   # Standardize IVs, mediators, and controls (but not DVs)
@@ -202,7 +208,8 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des, dat,
   for (M in mediators) {  
     for (X in ivs) {  
       form_mediator <- as.formula(paste(M, " ~ ", X, "+ Linked_Fate +", paste(controls, collapse = " + ")))
-      mediator_model <- svyglm(form_mediator, design = des, family = gaussian(), data = dat_std)
+      mediator_model <- svyglm(form_mediator, design = des, family = gaussian(), 
+                               weights = dat[[weight_var]], data = dat_std)
       
       mediator_models[[paste0("IV_", X, "_Med_", M)]] <- mediator_model
     }
@@ -214,7 +221,8 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des, dat,
     for (M in mediators) {  
       for (X in ivs) {  
         form_outcome <- as.formula(paste(Y, " ~ ", X, "+", M, "+ Linked_Fate +", paste(controls, collapse = " + ")))
-        outcome_model <- svyglm(form_outcome, design = des, family = gaussian(), data = dat_std)
+        outcome_model <- svyglm(form_outcome, design = des, family = gaussian(),
+                                weights = dat[[weight_var]], data = dat_std)
         
         outcome_models[[paste0("DV_", Y, "_IV_", X, "_Med_", M)]] <- outcome_model
       }
