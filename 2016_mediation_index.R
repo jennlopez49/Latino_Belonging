@@ -1,18 +1,29 @@
 ### Mediation analysis ---------------------------------------------------------
 ############ Fear --------------------------------------------------------------
 # Fit the mediator model (Model 1: M ~ X + controls)
-fear_mediator <- svyglm(Fear_Election ~ ICI_Reverse + age_sqd + Gender + 
-                           Education + Income + Linked_Fate + percent.latino.2016, 
+lf_mediator <- svyglm(Linked_Fate ~ I(ICI_Reverse^2) + age_sqd + Gender + 
+                        Education + Income + Discrimination_Scale + Discrimination_National_Perc
+                      + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                      design = cmps_lat_16, family = "gaussian")
+fear_mediator <- svyglm(Fear_Election ~ I(ICI_Reverse^2) + age_sqd + Gender + 
+                           Education + Income + Linked_Fate + 
+                          Discrimination_Scale + Discrimination_National_Perc
+                        + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
                          design = cmps_lat_16, family = "gaussian")
 
 # Fit the outcome model (Model 2: Y ~ X + M + controls)
-model_outcome.fear <- svyglm(Inclusion_Index ~ ICI_Reverse + Fear_Election + 
+model_outcome.fear <- svyglm(Inclusion_Index ~ I(ICI_Reverse^2) + Fear_Election + 
                           age_sqd + Gender + Education + Income + Linked_Fate +
-                          percent.latino.2016, 
+                            Discrimination_Scale + Discrimination_National_Perc
+                          + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
                         design = cmps_lat_16, family = "gaussian")
 
 # Run the mediation analysis
-mediation_result.fear <- mediate(fear_mediator, model_outcome.fear, treat = "ICI_Reverse", mediator = "Fear_Election")
+mediation_result.fear <- mediate(fear_mediator, model_outcome.fear, treat = "I(ICI_Reverse^2)", mediator = "Fear_Election")
+mediation_result.lf <- mediate(lf_mediator, model_outcome.fear, treat = "I(ICI_Reverse^2)", mediator = "Linked_Fate")
+summary(mediation_result.lf)
+summary(mediation_result.fear)
+
 
 
 # Summarize the results
@@ -21,22 +32,28 @@ summary(mediation_result.fear)
 #plot(mediation_result.fear)
 ############ Anger -------------------------------------------------------------
 # Fit the mediator model (Model 1: M ~ X + controls)
-anger_med <- svyglm(Angry_Election ~ ICI_collapsed_alt + age_sqd + Gender + 
-                          Education + Income + Linked_Fate + percent.latino.2016, 
+# #lf_mediator <- svyglm(Linked_Fate ~ ICI_Reverse + age_sqd + Gender + 
+#                         Education + Income + Discrimination_Scale + Discrimination_National_Perc
+#                       + Mexican + Cuban + More_Than_SecondGen, 
+#                       design = cmps_lat_16, family = "gaussian")
+anger_mediator <- svyglm(Angry_Election ~ I(ICI_Reverse^2) + age_sqd + Gender + 
+                          Education + Income + Linked_Fate + 
+                          Discrimination_Scale + Discrimination_National_Perc
+                        + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
                         design = cmps_lat_16, family = "gaussian")
 
 # Fit the outcome model (Model 2: Y ~ X + M + controls)
-mod_anger <- svyglm(Inclusion_Index ~ ICI_collapsed_alt + Angry_Election + 
+model_outcome.anger <- svyglm(Inclusion_Index ~ I(ICI_Reverse^2) + Angry_Election + 
                                age_sqd + Gender + Education + Income + Linked_Fate +
-                               percent.latino.2016, 
+                               Discrimination_Scale + Discrimination_National_Perc
+                             + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
                              design = cmps_lat_16, family = "gaussian")
 
 # Run the mediation analysis
-med_anger_res <- mediate(anger_med, mod_anger, treat = "ICI_collapsed_alt", mediator = "Angry_Election")
-
-
-# Summarize the results
-summary(med_anger_res)
+mediation_result.anger <- mediate(anger_mediator, model_outcome.anger, treat = "I(ICI_Reverse^2)", mediator = "Angry_Election")
+mediation_result.lf <- mediate(lf_mediator, model_outcome.anger, treat = "I(ICI_Reverse^2)", mediator = "Linked_Fate")
+summary(mediation_result.lf)
+summary(mediation_result.anger)
 #plot(med_anger_res)
 
 ############ Sad ---------------------------------------------------------------

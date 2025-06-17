@@ -8,108 +8,110 @@ controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest",
               "Mexican", "Cuban",
               "Linked_Fate", "Party",
               "More_Than_SecondGen", "Discrimination_Scale", 
-              "Discrimination_National_Perc") 
-weight_var <- "Weight"
+              "Latino_Disc", "Spanish_Media", "Worry_Deport")
 
-################ No interaction/ Basic Models -------------------------------------
-## List of Models
-no_int_list <- list()
-
-no_int_list[[1]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban", "Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale")
-no_int_list[[2]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale",
-                      "Discrimination_National_Perc", "Imm_Con_Index")
-no_int_list[[3]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale", 
-                      "Discrimination_National_Perc", "ICI_Reverse")
-no_int_list[[4]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale", 
-                      "Discrimination_National_Perc", "ICI_Reverse_Fac")
-no_int_list[[5]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale",
-                      "Discrimination_National_Perc", "ICI_Reverse",
-                      "Fear_Election")
-no_int_list[[6]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale",
-                      "Discrimination_National_Perc", "ICI_Reverse",
-                      "Angry_Election")
-no_int_list[[7]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale",
-                      "Discrimination_National_Perc", "ICI_Reverse",
-                      "Sad_Election")
-no_int_list[[8]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-                      "More_Than_SecondGen", "Discrimination_Scale",
-                      "Discrimination_National_Perc", "ICI_Reverse", 
-                      "Pride_Election")
-no_int_list[[9]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
-                      "Mexican","Cuban","Linked_Fate", "Party",
-  "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc",
-  "ICI_Reverse", "Hope_Election")
-
-## Run the models
-
-ols_function(dvs, no_int_list, cmps_lat_16, cmps_lat_16, "no_int_models")
-
-# Produce Stargazer Tables - 
-
-stargazer(no_int_models$Inclusion_Internal[1:3], type = "text", out = "prelim_general_models.tex")
-
-# Running with Standardization of Vars to ease interpretation - 
-
-ols_function_standard(dvs, no_int_list, cmps_lat_16, weight_var, cmps_lat_16, "no_int_models_standard")
-
-### Producing Tables ----
-
-stargazer(no_int_models_standard$Inclusion_Internal[c(1,2,3, 4:8)], type = "text")
-stargazer(no_int_models_standard$Inclusion_External[c(1,2,3,4:8)], type = "text")
-stargazer(no_int_models_standard$Inclusion_Internal[1:4], 
-          no_int_models_standard$Inclusion_External[1:4], type = "latex", 
-          out = "prelim_general_models.tex")
-
+# ################ No interaction/ Basic Models -------------------------------------
+# ## List of Models
+# no_int_list <- list()
+# 
+# no_int_list[[1]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban", "Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale")
+# no_int_list[[2]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale",
+#                       "Discrimination_National_Perc", "Imm_Con_Index")
+# no_int_list[[3]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale", 
+#                       "Discrimination_National_Perc", "ICI_Reverse")
+# no_int_list[[4]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale", 
+#                       "Discrimination_National_Perc", "ICI_Reverse_Fac")
+# no_int_list[[5]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale",
+#                       "Discrimination_National_Perc", "ICI_Reverse",
+#                       "Fear_Election")
+# no_int_list[[6]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale",
+#                       "Discrimination_National_Perc", "ICI_Reverse",
+#                       "Angry_Election")
+# no_int_list[[7]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale",
+#                       "Discrimination_National_Perc", "ICI_Reverse",
+#                       "Sad_Election")
+# no_int_list[[8]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#                       "More_Than_SecondGen", "Discrimination_Scale",
+#                       "Discrimination_National_Perc", "ICI_Reverse", 
+#                       "Pride_Election")
+# no_int_list[[9]] <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+#                       "Mexican","Cuban","Linked_Fate", "Party",
+#   "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc",
+#   "ICI_Reverse", "Hope_Election")
+# 
+# ## Run the models
+# 
+# ols_function(dvs, no_int_list, cmps_lat_16, cmps_lat_16, "no_int_models")
+# 
+# # Produce Stargazer Tables - 
+# 
+# stargazer(no_int_models$Inclusion_Internal[1:3], type = "text", out = "prelim_general_models.tex")
+# 
+# # Running with Standardization of Vars to ease interpretation - 
+# 
+# ols_function_standard(dvs, no_int_list, cmps_lat_16, weight_var, cmps_lat_16, "no_int_models_standard")
+# 
+# ### Producing Tables ----
+# 
+# stargazer(no_int_models_standard$Inclusion_Internal[c(1,2,3, 4:8)], type = "text")
+# stargazer(no_int_models_standard$Inclusion_External[c(1,2,3,4:8)], type = "text")
+# stargazer(no_int_models_standard$Inclusion_Internal[1:4], 
+#           no_int_models_standard$Inclusion_External[1:4], type = "latex", 
+#           out = "prelim_general_models.tex")
+# 
 
 #### Run function for Mediation models------------------------------------------
 
 
-mediation_function_standard(dvs, ivs, mediators, controls, cmps_lat_16, weight_var, cmps_lat_16, "med_results_ols")
+mediation_function_standard(dvs, ivs, mediators, controls, cmps_lat_16, cmps_lat_16, out ="med_results_ols")
 
 #### PRODUCING TABLES OF STIGMA --> EMOTION ------------------------------------
-list_mods <- med_results_ols$mediator_models[c(2,3,5,6, 14,15)]
+# list_mods <- med_results_ols$mediator_models[c(2,3,5,6, 14,15)]
 
-stargazer(med_results_ols$mediator_models, type = "text",
-          covariate.labels = c("Imm Index", "Imm Score", "Imm Index (-0.5)",
-                               "Imm Index (0.5)", "Imm Index (1)", "Linked Fate", 
-                               "Age", "Gender",
-                               "Education", "Income", "Political Interest",
-                               "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-                               "Second Generation +", "Discrimination Exp.",
-                               "Nat. Discrimination Percep.", "Constant"),
-          dep.var.labels = c("Fear", "Anger", "Sad"), 
-          dep.var.caption = "Dependent variable: Negative Emotions"
-          #,
-          #out = "neg.em.gen.full.tex"
-          )
+# stargazer(med_results_ols$mediator_models, type = "text",
+#           # covariate.labels = c("Imm. Stigma", "Imm. Stigma (-0.5)",
+#           #                      "Imm. Stigma (0.5)", "Imm. Stigma (1)", "Linked Fate", 
+#           #                      "Age", "Gender",
+#           #                      "Education", "Income", "Political Interest",
+#           #                      "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
+#           #                      "Generation", "Discrimination Exp.",
+#           #                      "Group Discrimination Percep.", 
+#           #                      "Spanish Media", "Deportation Worry",
+#           #                      "Constant"),
+#           dep.var.labels = c("Fear", "Anger", "Sad"), 
+#           dep.var.caption = "Dependent variable: Negative Emotions"
+#           #,
+#           #out = "neg.em.gen.full.tex"
+#           )
 listmods <- med_results_ols$mediator_models[c(1,3,4,6,13,15)]
 stargazer(listmods, type = "text",
-          #covariate.labels = c("Imm Index", "Imm Index (-0.5)",
-                               # "Imm Index (0.5)", "Imm Index (1)", "Linked Fate", 
-                               # "Age", "Gender",
-                               # "Education", "Income", "Political Interest",
-                               # "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-                               # "Second Generation +", "Discrimination Exp.",
-                               # "Nat. Discrimination Percep.", "Constant"),
-          #dep.var.labels = c("Fear", "Anger", "Sadness"), 
+          # covariate.labels = c("Imm. Stigma", "Imm. Stigma (-0.5)",
+          # "Imm. Stigma (0.5)", "Imm. Stigma (1)", "Linked Fate",
+          # "Age", "Gender",
+          # "Education", "Income", "Political Interest",
+          # "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
+          # "Generation", "Discrimination Exp.",
+          # "Group Discrimination Percep.","Deportation Worry",
+          # "Constant"),
+          dep.var.labels = c("Fear", "Anger", "Sadness"), 
           dep.var.caption = "Dependent variable: Negative Emotions"
-          #,
-          #out = "neg.em.gen.short.tex"
+          # ,
+          # out = "neg.em.gen.short.tex"
 )
 
 ### Figures ----
@@ -118,21 +120,22 @@ negp <- plot_model(listmods$IV_ICI_Reverse_Fac_Med_Fear_Election, type = "est",
 angp <- plot_model(listmods$IV_ICI_Reverse_Fac_Med_Angry_Election, type = "est",
                    title = "Anger")
                    
-###
+### positive ------
 
 posem <- med_results_ols$mediator_models[c(7,9,10,12)]
 
-stargazer(posem, type = "text",
-          # covariate.labels = c("Imm Index",  "Imm Index (-0.5)",
-          #                      "Imm Index (0.5)", "Imm Index (1)","Linked Fate", "Age", "Gender",
-          #                      "Education", "Income", "Political Interest",
-          #                      "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-          #                      "Second Generation +", "Discrimination Exp.",
-          #                      "Nat. Discrimination Percep.", "Constant"),
-          #dep.var.labels = c("Pride", "Hope"), 
+stargazer(posem, type = "latex",
+          covariate.labels = c("Imm. Stigma", "Imm. Stigma (-0.5)",
+                               "Imm. Stigma (0.5)", "Imm. Stigma (1)", "Linked Fate",
+                               "Age", "Gender",
+                               "Education", "Income", "Political Interest",
+                               "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Discrimination Exp.",
+                               "Group Discrimination Percep.", "Spanish Media", "Deportation Worry",
+                               "Constant"),
           dep.var.caption = "Dependent variable: Positive Emotions"
-          #,
-          #out = "pos.em.gen.tex"
+          ,
+          out = "pos.em.gen.tex"
           )
 
 ## Figures -- pos ------
@@ -174,15 +177,18 @@ reordered_models <- c(
 
 # Display in Stargazer
 stargazer(reordered_models, type = "latex", dep.var.labels = "Internal Inclusion",
-          covariate.labels = c("Imm Index",  "Imm Index (-0.5)",
-                               "Imm Index (0.5)", "Imm Index (1)",
+          covariate.labels = c("Imm Stigma",  "Imm Stigma (-0.5)",
+                               "Imm Stigma (0.5)", "Imm Stigma (1)",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
                                "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-                               "Second Generation +", "Discrimination Exp.",
-                               "Nat. Discrimination Percep.", "Constant"),
-          out = "fullmodel_internal.tex")
+                               "Generation", "Discrimination Exp.",
+                               "Group Discrimination Percep.",
+                               "Spanish Media", "Deportation Worry","Constant")
+          ,
+          out = "fullmodel_internal.tex"
+          )
 
 fearp1 <- plot_model(reordered_models$DV_Inclusion_Internal_IV_ICI_Reverse_Fac_Med_Fear_Election,
                      type = "est", title = "Fear")
@@ -218,15 +224,19 @@ reordered_models_ext <- c(
 )
 
 stargazer(reordered_models_ext, type = "latex", dep.var.labels = "External Inclusion",
-          covariate.labels = c("Imm Index",  "Imm Index (-0.5)",
-                               "Imm Index (0.5)", "Imm Index (1)",
+          covariate.labels = c("Imm Stigma",  "Imm Stigma (-0.5)",
+                               "Imm Stigma (0.5)", "Imm Stigam (1)",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
                                "Mexican", "Cuban", "Party (R $\\longright arrow$ D)",
-                               "Second Generation +", "Discrimination Exp.",
-                               "Nat. Discrimination Percep.", "Constant"),
-          out = "fullmodel_external.tex")
+                               "Generation", "Discrimination Exp.",
+                               "Group Discrimination Percep.", "Spanish Media", 
+                               "Deportation Worry",
+                               "Constant")
+          ,
+          out = "fullmodel_external.tex"
+          )
 ### figures 
 fearext <- plot_model(reordered_models_ext$DV_Inclusion_External_IV_ICI_Reverse_Fac_Med_Fear_Election,
                       type = "est", title = "Fear")
@@ -319,8 +329,12 @@ formula_str_ext <- paste("Inclusion_External ~ ICI_Reverse_Fac +",
 
 all_em <- svyglm(formula_str,
                  design = cmps_lat_16)
+all_em_nospan <- svyglm(formula_str,
+                        design = cmps_lat_16)
 all_em_ext <- svyglm(formula_str_ext,
                  design = cmps_lat_16)
+all_em_ext_nospan <- svyglm(formula_str_ext,
+                     design = cmps_lat_16)
 all_em_p <- plot_model(all_em, type = "est", title = "Internal")
 all_em_ext_p <- plot_model(all_em_ext, type = "est", title = "External")
 
@@ -332,6 +346,25 @@ ggsave(filename = "all_sense.png",
        width = 15,                           
        height = 10,                           
        dpi = 300) 
+
+### table ---
+soc_models <- c(all_em, all_em_ext)
+stargazer(all_em, all_em_ext, type = "latex",
+          covariate.labels = c("Imm. Stigma (-.5)", "Imm. Stigma (.5)",
+                               "Imm. Stigma (1)", "Age", "Gender", "Education",
+                               "Income", "Pol. Interest", "Mexican", "Cuban",
+                               "Linked Fate", "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Discrimination Exp.",
+                               "Group Discrimination Percep.", "Spanish Media",
+                               "Deportation Worry",
+                               "Fear",
+                               "Anger", "Pride", "Hope", "Sad",
+                               "Constant"),
+          dep.var.labels = c("Internal", "External"),
+          dep.var.caption = "Dependent Variable: Sense of Belonging"
+          ,
+          out = "all_social.tex"
+          )
 
 #### Interactions ---- 
 controls_int <- controls[controls != "Linked_Fate"]
@@ -360,6 +393,26 @@ ggsave(filename = "both_int_all.png",
        width = 10,                           
        height = 8,                           
        dpi = 300) 
+### table 
+stargazer(internal_int_all, external_int_all, type = "latex", 
+          dep.var.caption = "Dependent Variable: Sense of Belonging",
+          dep.var.labels = c("Internal", "External"), 
+          covariate.labels = c("Imm. Stigma (-0.5)", "Imm. Stigma (0.5)",
+                               "Imm. Stigma (1)", "Linked Fate",
+                               "Age", "Gender", "Education", "Income",
+                               "Pol. Interest", "Mexican", "Cuban", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Discrimination Exp.",
+                               "Group Discrimination Percp.", "Spanish Media",
+                               "Deportation Worry","Fear", "Anger",
+                               "Pride", "Hope", "Sad", 
+                               "Imm. Stigma (-0.5) x Linked Fate",
+                               "Imm. Stigma (0.5) x Linked Fate",
+                               "Imm. Stigma (1) x Linked Fate",
+                               "Constant"
+                               )
+          , out = "all_int.tex"
+          )
 
 # WRONG SET UP FOR THE THEORY ---------
 # #### Models with Fear ------------------------------

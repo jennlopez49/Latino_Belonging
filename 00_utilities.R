@@ -187,8 +187,8 @@ interaction_function_standard <- function(dvs, ivs, mediators, controls,
 }
 
 ###### mediation 
-mediation_function_standard <- function(dvs, ivs, mediators, controls, des, 
-                                        weigh_var, dat, out = NULL) {
+mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
+                                        dat, out = NULL) {
   standardize <- function(x) (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)  # Standardization function
   
   # Standardize IVs, mediators, and controls (but not DVs)
@@ -208,8 +208,8 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
   for (M in mediators) {  
     for (X in ivs) {  
       form_mediator <- as.formula(paste(M, " ~ ", X, "+ Linked_Fate +", paste(controls, collapse = " + ")))
-      mediator_model <- svyglm(form_mediator, design = des, family = gaussian(), 
-                               weights = dat[[weight_var]], data = dat_std)
+      mediator_model <- svyglm(form_mediator, design = des, family = gaussian(),
+                               data = dat_std)
       
       mediator_models[[paste0("IV_", X, "_Med_", M)]] <- mediator_model
     }
@@ -222,7 +222,7 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
       for (X in ivs) {  
         form_outcome <- as.formula(paste(Y, " ~ ", X, "+", M, "+ Linked_Fate +", paste(controls, collapse = " + ")))
         outcome_model <- svyglm(form_outcome, design = des, family = gaussian(),
-                                weights = dat[[weight_var]], data = dat_std)
+                                data = dat_std)
         
         outcome_models[[paste0("DV_", Y, "_IV_", X, "_Med_", M)]] <- outcome_model
       }

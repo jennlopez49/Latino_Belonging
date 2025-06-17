@@ -14,7 +14,7 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
                                     S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
-                                    C253)
+                                    C253, LA202_6, S1, L24, C262)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
@@ -116,7 +116,7 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                                                              ifelse(cmps.clean.2016$S10 == "(16) Peru", 1, 
                                                                     ifelse(cmps.clean.2016$S10 == "(18) Uruguay", 1,
                                                                            ifelse(cmps.clean.2016$S10 == "(19) Venezuela", 1, 0))))))))),
-  Spanish = ifelse(cmps.clean.2016$S10 == "(20) Spain / Spanish", 1, 0),
+  #Spanish = ifelse(cmps.clean.2016$S10 == "(20) Spain / Spanish", 1, 0),
   Imm_Church = A134,
   Angry_Election = case_when(C112 == "(1) All the time" ~ 4, 
                              C112 == "(2) Often" ~ 3,
@@ -182,11 +182,6 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                                   C253 == "(1) Yes" ~ 1),
   Immigration_Status_Disc = case_when(C256 == "(2) No" ~ 0,
                                       C256 == "(1) Yes" ~ 1),
-  Discrimination_Scale = case_when(
-    Personal_Discrimination == 0 | Place_of_Disc == 0 ~ 0, # Did not experience discrimination, not in the US
-    Race_Ethnicity_Disc == 1 & Place_of_Disc == 1 ~ 1, # Experienced discrimination in US due to race/ethnicity 
-    Immigration_Status_Disc == 1 & Place_of_Disc == 1 ~ 1 # or immigration status
-  ),
   Pol_Interest = case_when(C33 == "(1) Very interested in politics" ~ 4,
                            C33 == "(2) Somewhat interested" ~ 3,
                            C33 == "(3) Not that interested in politics" ~ 2,
@@ -202,7 +197,39 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                "(08) Ecuador", "(15) Paraguay", "(16) Peru", "(18) Uruguay", "(19) Venezuela") ~ "South American",
     S10 == "(20) Spain / Spanish" ~ "Spanish",
     TRUE ~ "Other"  # Default value for any other cases
-  )
+  ),
+  Worry_Deport = case_when(L366 == "(1) Extremely worried" ~ 5,                  # Reverse-coded --> higher numbers, more worry 
+                           L366 == "(2) Very worried" ~ 4,
+                           L366 == "(3) Somewhat worried" ~ 3,
+                           L366 == "(4) A little worried" ~  2,
+                           L366 == "(5) Not at all worried" ~ 1),
+  Know_Undoc = case_when(L364 == "(1) Yes" ~ 1,                                 # Marking DK as 0 -- neutral
+                         L364 == "(2) No" ~ -1,
+                         L364 == "(3) Don't Know" ~ 0),
+  Spanish_Interview = case_when(S1 == "(2) Spanish" ~ 1,
+                                TRUE ~ 0),
+  Spanish_Media = case_when(L24 == "(1) Mostly English-language" ~ 0,
+                            L24 == "(2) More English, but some Spanish" ~ 1,
+                            L24 == "(3) Watch English & Spanish pretty equally" ~ 2, 
+                            L24 == "(4) More Spanish, but some English" ~ 3,
+                            L24 == "(5) Mostly Spanish-language" ~ 4,
+                            L24 == "(6) Never watch TV or online news" ~ NA),
+  Spanish_Est = Spanish_Interview + Spanish_Media,
+  Latino_Disc = case_when(C247 == "(1) A lot" ~ 4,
+                         C247 == "(2) Some" ~ 3,
+                         C247 == "(3) A little" ~ 2,
+                         C247 == "(4) None at all" ~ 1, 
+                         C247 == "(5) Don't know" ~ NA),
+  Skin_Tone = case_when(C262 == "(01) 1" ~ 1, 
+                        C262 == "(02) 2" ~ 2, 
+                        C262 == "(03) 3" ~ 3, 
+                        C262 == "(04) 4" ~ 4, 
+                        C262 == "(05) 5" ~ 5,
+                        C262 == "(06) 6" ~ 6, 
+                        C262 == "(07) 7" ~ 7,
+                        C262 == "(08) 8" ~ 8, 
+                        C262 == "(09) 9" ~ 9,
+                        C262 == "(10) 10" ~ 10)
   )
   
 ######## Belonging Index ------------------------------------------------------
@@ -225,34 +252,34 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   #   filter(is.na(Parents) & NativeBorn == 0) %>%
   #   count()
   # na_immigrants
-  # 
+#   # 
+# 
+# ######### Adding ICI Index ---------
+# inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
+# # full_cmps2016<- left_join(cmps.add.2016, inclusivity_2016, by = "State")
+# # 
+# # full_cmps2016 <- full_cmps2016 %>% mutate(
+# #   ICI_Score_2016 = as.numeric(full_cmps2016$ICI_Score_2016),
+# #   ICI_collapsed = ifelse(full_cmps2016$ICI_Score_2016 < -86, 0, 
+# #                          ifelse(full_cmps2016$ICI_Score_2016 > -86 & full_cmps2016$ICI_Score_2016 <= -1, .5, 
+# #                                 ifelse(full_cmps2016$ICI_Score_2016 > -1, 1, NA))) 
+# # )
+# # 
+# # full_cmps2016 <- full_cmps2016 %>% mutate(
+# #   ICI_collapsed_alt = case_when(
+# #    ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ 1,
+# #    ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
+# #    ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
+# #    ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ -.5,
+# #    ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ -1,
+# #     TRUE ~ NA_real_ # Handle unexpected values
+# #   )
+# # )
+#   
+#   ## Importing original Indicator 
 
-######### Adding ICI Index ---------
-inclusivity_2016 <- readxl::read_xlsx("~/Desktop/COIi work/Latino_Imm_Enf/Latino_Proj/inclusivity_2016.xlsx")
-# full_cmps2016<- left_join(cmps.add.2016, inclusivity_2016, by = "State")
-# 
-# full_cmps2016 <- full_cmps2016 %>% mutate(
-#   ICI_Score_2016 = as.numeric(full_cmps2016$ICI_Score_2016),
-#   ICI_collapsed = ifelse(full_cmps2016$ICI_Score_2016 < -86, 0, 
-#                          ifelse(full_cmps2016$ICI_Score_2016 > -86 & full_cmps2016$ICI_Score_2016 <= -1, .5, 
-#                                 ifelse(full_cmps2016$ICI_Score_2016 > -1, 1, NA))) 
-# )
-# 
-# full_cmps2016 <- full_cmps2016 %>% mutate(
-#   ICI_collapsed_alt = case_when(
-#    ICI_Score_2016 >= -355 & ICI_Score_2016 < -100 ~ 1,
-#    ICI_Score_2016 >= -100 & ICI_Score_2016 < -60 ~ -.5,
-#    ICI_Score_2016 >= -60 & ICI_Score_2016 < 0 ~ 0,
-#    ICI_Score_2016 >= 0 & ICI_Score_2016 < 50 ~ -.5,
-#    ICI_Score_2016 >= 50 & ICI_Score_2016 <= 164 ~ -1,
-#     TRUE ~ NA_real_ # Handle unexpected values
-#   )
-# )
-  
-  ## Importing original Indicator 
-  
 full_indicators <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/full_indicators_2016.csv")
-  
+
 full_cmps2016 <- left_join(cmps.add.2016, full_indicators, by = "State")
 
 full_cmps2016 <- full_cmps2016 %>% mutate(
@@ -384,6 +411,18 @@ full_cmps2016$ICI_Index <- relevel(full_cmps2016$ICI_Index, ref = "1")
 
 latinos_data <- full_cmps2016 %>% filter(Race_Prime == "(2) Hispanic or Latino")
 
+
+#### Discrimination measure --------
+latinos_data <- latinos_data %>% mutate(
+  Discrimination_Scale = ifelse(
+    Personal_Discrimination == 0, 0,  # Did not experience discrimination
+    ifelse(
+      Race_Ethnicity_Disc == 1 | Immigration_Status_Disc == 1 | Personal_Discrimination == 1, 1, NA
+    )
+  )
+)
+
+
 ### Creating Survey Design ---
 cmps_lat_16 <- svydesign(
   ids = ~1, 
@@ -405,6 +444,9 @@ national_origin_acs_2016 <- data.frame(Origins = c("Central American", "Cuban", 
 national_origin_acs_2016$Pop_Percent <- (national_origin_acs_2016$Pop/total_pop_2016)*100
 
 ## Overall - very small discrepancy, generally representative of Latinos 
+
+
+
 
 
 

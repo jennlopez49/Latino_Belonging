@@ -60,3 +60,58 @@ ggsave(
   height = 8,                             # Height in inches
   dpi = 300                               # Resolution in dots per inch
 )
+
+persdic.fig <- ggplot(cmps_lat_16$variables, aes(x = factor(ICI_Reverse), fill = factor(Discrimination_Scale))) +
+  geom_bar() +  # This will show the proportion of 0/1 across context levels
+  scale_y_continuous(labels = scales::percent) +  # Converts y-axis to percentages
+  labs(title = "Personal Discrimination by Policy Context",
+       x = "Anti-Immigrant Policy Context (Reverse ICI)",
+       y = "Proportion of Reported Personal Discrimination") + 
+  theme_minimal()
+
+groupdisc.fig <- ggplot(cmps_lat_16$variables, aes(x = factor(ICI_Reverse), fill = factor(Latino_Disc))) +
+  geom_bar() +  # This will show the proportion of 0/1 across context levels
+  scale_y_continuous() +  # Converts y-axis to percentages
+  labs(title = "Group Discrimination by Policy Context",
+       x = "Anti-Immigrant Stigma Context",
+       y = "Proportion of Freq. of Perception of Discrimination against Latinos") + 
+  scale_fill_manual(name = "Discrimination against Latinos",
+                    values = c("1" = "",
+                               "2" = "lightgreen", 
+                               "3" = "orange", 
+                               "4" = "purple"),
+                    labels = c("None", "A little", 
+                               "Some", "A lot")) +
+  theme_minimal()
+
+
+ggplot(cmps_lat_16$variables, aes(x = factor(Belong_US), fill = factor(More_Than_SecondGen))) +
+  geom_bar() +  # This will show the proportion of 0/1 across context levels
+  scale_y_continuous() +  # Converts y-axis to percentages
+  labs(title = "Internal Inclusion by Generation",
+       x = "Generation",
+       y = "Internal Inclusion (Belonging)") + 
+  # scale_fill_manual(name = "Discrimination against Latinos",
+  #                   values = c("1" = "",
+  #                              "2" = "lightgreen", 
+  #                              "3" = "orange", 
+  #                              "4" = "purple"),
+  #                   labels = c("None", "A little", 
+  #                              "Some", "A lot")) +
+  theme_minimal()
+
+
+ggplot(cmps_lat_16$variables, aes(x = factor(Valued_Respected_US), fill = factor(More_Than_SecondGen))) +
+  geom_bar() +  # This will show the proportion of 0/1 across context levels
+  scale_y_continuous() +  # Converts y-axis to percentages
+  labs(title = "External Inclusion by Generation",
+       x = "Generation",
+       y = "Internal Inclusion (Valued, Respected)") + 
+  # scale_fill_manual(name = "Generation",
+  #                   values = c("1" = "",
+  #                              "2" = "lightgreen", 
+  #                              "3" = "orange", 
+  #                              "4" = "purple"),
+  #                   labels = c("None", "A little", 
+  #                              "Some", "A lot")) +
+  theme_minimal()
