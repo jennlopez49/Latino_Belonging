@@ -2,9 +2,16 @@
 title: "Survey Pilot Data"
 format: pdf
 editor: visual
+execute:
+  echo: false
+  message: false
+  warning: false
+  fig-width: 6
+  fig-height: 4
+  dpi: 300
 ---
 
-## Survey Pilot 1 & 2 
+## Survey Pilot 1 & 2
 
 ```{r}
 library(tidyverse)
@@ -13,16 +20,16 @@ library(broom)
 library(patchwork)
 library(Hmisc)
 library(GGally)
+library(glue)
 
 pilot1 <- read.csv("pilot_1_clean.csv")
 pilot2 <- read.csv("pilot_2_clean.csv")
 
 both_pilots <- bind_rows(pilot1, pilot2)
+both_pilots <- both_pilots %>% filter(!is.na(AttentionCheck2))
 ```
 
-
-
-Average, Min, Max Durations (in minutes) of Pilot 1:
+#Average, Min, Max Durations (in minutes) of Pilot 1:
 
 ```{r}
 pilot1 <- pilot1 %>% filter(!is.na(AttentionCheck2))
@@ -31,10 +38,9 @@ min(pilot1$Duration_Minutes)
 max(pilot1$Duration_Minutes)
 ```
 
-Average, Min, Max Durations (in minutes) of Pilot 2:
+#Average, Min, Max Durations (in minutes) of Pilot 2:
 
-* A respondent took a break and came back to finish the survey (started on the 6th, 
-finished on the 7th), was excluded from these. 
+-   A respondent took a break and came back to finish the survey (started on the 6th, finished on the 7th), was excluded from these.
 
 ```{r}
 pilot2 <- pilot2 %>% filter(!is.na(AttentionCheck2))
@@ -43,8 +49,6 @@ min(pilot2$Duration_Minutes[pilot2$Duration_Minutes < 40])
 max(pilot2$Duration_Minutes[pilot2$Duration_Minutes < 40])
 ```
 
-
-Proxy for Immigration State Climates in 2025 -- Based on Latino Population
 ```{r}
 immstate <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/states_287g_sums.csv")
 
@@ -58,77 +62,7 @@ pilot1 <- pilot1 %>% left_join(immstate, by = c("State_Abb" = "State"))
 pilot2 <- pilot2 %>% left_join(immstate, by = c("State_Abb" = "State"))
 ```
 
-
-Visualizations for Belonging & Participation by Treatment Group
-
-```{r}
-ggplot(pilot1, aes(x = factor(Belonging_State), fill = TreatmentCondition)) +
-  geom_bar(position = "dodge") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Distribution of State Belonging by Treatment Group",
-    x = "Belonging in their State (Pilot 1, May 14th)",
-    y = "Count"
-  ) +
-  theme_minimal()
-
-ggplot(pilot1, aes(x = factor(Belonging_US), fill = TreatmentCondition)) +
-  geom_bar(position = "dodge") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Distribution of US Belonging by Treatment Group",
-    x = "Belonging in the US (Pilot 1, May 14th)",
-    y = "Count"
-  ) +
-  theme_minimal()
-
-
-ggplot(pilot2, aes(x = factor(Belonging_State), fill = TreatmentCondition)) +
-  geom_bar(position = "dodge") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Distribution of State Belonging by Treatment Group",
-    x = "Belonging in their State (Pilot 2, June 8th)",
-    y = "Count"
-  ) +
-  theme_minimal()
-
-ggplot(pilot2, aes(x = factor(Belonging_US), fill = TreatmentCondition)) +
-  geom_bar(position = "dodge") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Distribution of US Belonging by Treatment Group",
-    x = "Belonging in the US (Pilot 2, June 8th)",
-    y = "Count"
-  ) +
-  theme_minimal()
-```
-  ManipCheck_Verif = ifelse(TreatmentCondition == "Control_Policy" & ManipCheck1 == "State symbols", 1,
-                            ifelse((TreatmentCondition %in% c("Treatment-Hypothetical_Anti", "Treatment-Hypothetical_Pro")) & ManipCheck1 == "Immigration", 2,
-                                   ifelse((TreatmentCondition %in% c("Treatment-Hypothetical_Anti", "Treatment-Hypothetical_Pro")) & ManipCheck1 == "Healthcare", 3,
-                                          0))),
-
-Manipulation Check --- What did you just read about?
-0 - Chose "None of these" or "Gun Control" 
-1 - Was in the Control Group and Chose "State Symbols"
-2 - Was in either of the Hypothetical Policy Treatment Groups and Chose "Immigration"
-3 - Was in either of the Hypothetical Policy Treatment Groups and Chose "Healthcare"
-
-```{r}
-ggplot(both_pilots, aes(x = factor(ManipCheck_Verif), fill = TreatmentCondition)) +
-  geom_bar(position = "dodge") +
-  scale_fill_brewer(palette = "Set2") +
-  labs(
-    title = "Distribution of Manipulation Check Answers by Treatment Group",
-    x = "Manipulation Check (Both Pilots)",
-    y = "Count"
-  ) +
-  theme_minimal()
-```
-
-
-
-Emotions & Stigma Measures Post-Treatment by Treatment Group
+# Descriptives
 
 ```{r}
 desc.summary <- both_pilots %>% filter(!is.na(TreatmentCondition)) %>%
@@ -155,8 +89,92 @@ desc.summary <- both_pilots %>% filter(!is.na(TreatmentCondition)) %>%
     mean_LatPoliciesUnfair = mean(PoliciesLatinosUnfair, na.rm = TRUE),
     n = n()
   )
+desc.summary[1:21]
+```
+
+# Treatments & Manipulation Check --- What did you just read about?
+
+Control Policy - Consider the following policy proposal that could be implemented in your state: A recent policy proposal in your state would create a working group to analyze whether the current state flower should be kept, or whether other native flowers should be designated as the state flower. The proposed working group would invite high school students and those who work in botanical gardens to conduct research on native flowers and submit proposals on their recommendations for the state flower designation.
+
+Treatment (Pro-Immigrant) - Consider the following policy proposal that could be implemented in your state: A recent policy proposal in your state would remove the requirement for hospitals to ask their patients about their immigration status. Opponents argue that the policy is necessary to track what is being spent providing undocumented immigrants with medical care. Supporters argue that it would encourage immigrants to seek medical care, and that the policy will help people access public services.
+
+Treatment (Anti-immigrant) - Consider the following policy proposal that could be implemented in your state: This policy proposal would require hospitals to ask their patients about their immigration status. Supporters argue that the policy is necessary to track what is being spent to provide unauthorized immigrants with medical care to prevent them from "cheating the system." Opponents argue that it would discourage immigrants from seeking medical care, and that the policy is an attempt to scare people into not using public services.
+
+*For the question - what did you just read about?*
+
+0 - Chose "None of these" or "Gun Control"
+
+1 - Was in the Control Group and Chose "State Symbols"
+
+2 - Was in either of the Hypothetical Policy Treatment Groups and Chose "Immigration"
+
+3 - Was in either of the Hypothetical Policy Treatment Groups and Chose "Healthcare"
+
+```{r}
+ggplot(both_pilots, aes(x = factor(ManipCheck_Verif), fill = TreatmentCondition)) +
+  geom_bar(position = "dodge") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(
+    title = "Distribution of Manipulation Check Answers by Treatment Group",
+    x = "Manipulation Check (Both Pilots)",
+    y = "Count"
+  ) +
+  theme_minimal()
+```
+
+Would it affect immigrant / latino community / you ?
+
+```{r}
+immcommaffect <- ggplot(both_pilots, aes(x = TreatmentCondition, y = HypAffectImm_Community, 
+                                         fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Immigrant Community Affected by Treatment", y = "Immigrant Community would be affected by Hyp Policy") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+immcommaffect
+
+latcommaffect <- ggplot(both_pilots, aes(x = TreatmentCondition, y = HypAffectLatino_Community, fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Latino Community Affected by Treatment", y = "Latino Community would be affected by Hyp Policy") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+latcommaffect
+persaffect <- ggplot(both_pilots, aes(x = TreatmentCondition, y = HypPersonallyAffect, fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Personally Affected, by Treatment", y = "Personally would be affected by Hyp Policy") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+persaffect
+```
+
+How likely & would you support this policy?
+
+```{r}
+ggplot(both_pilots, aes(x = TreatmentCondition, y = HypPolicy_Likely, fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Policy Likely by Treatment", y = "Likelihood of Hyp Policy") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = HypPolicy_Attitudes, fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Would Support Policy by Treatment", y = "Attitudes on Hyp Policy") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
 
 ```
+
+# Emotions & Stigma Measures Post-Treatment by Treatment Group
 
 ```{r}
 anger <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Anger, fill = TreatmentCondition)) +
@@ -165,7 +183,7 @@ anger <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Anger, fill = Treat
   coord_flip() +
   labs(title = "Reported Anger by Treatment", y = "Anger") +
   scale_fill_brewer(palette = "Set2") +
-  theme_minimal() + theme(legend.position = "right")
+  theme_minimal() + theme(legend.position = "none")
 joy <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Joy, fill = TreatmentCondition)) +
   geom_boxplot(alpha = 0.6) +
   geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
@@ -196,7 +214,7 @@ relief <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Relief, fill = Tre
   coord_flip() +
   labs(title = "Reported Relief by Treatment", y = "Relief") +
   scale_fill_brewer(palette = "Set3") +
-  theme_minimal() + theme(legend.position = "right")
+  theme_minimal() + theme(legend.position = "none")
 
 shame <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Shame, fill = TreatmentCondition)) +
   geom_boxplot(alpha = 0.6) +
@@ -206,7 +224,15 @@ shame <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Shame, fill = Treat
   scale_fill_brewer(palette = "Set2") +
   theme_minimal() + theme(legend.position = "none")
 
-(pride + joy + relief) / (fear + shame + anger)
+# positive
+pride
+joy
+relief
+
+# negative
+fear
+shame
+anger
 
 ```
 
@@ -262,32 +288,127 @@ latpoliciesunfair <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Policie
   scale_fill_brewer(palette = "Set2") +
   theme_minimal() + theme(legend.position = "none")
 
+## immigrant Stigma:
+immcrime
+polimms
+immpoliciesunfair
 
+## Latino Stigma:
+
+latcrime
+polilat
+latpoliciesunfair
 
 ```
 
+Checked whether the items are reliable (they are - immigrant stigma items cronbach alpha is at .8, Latino stigma is at .76)
 
-To check whether the items are reliable (they are - immigrant stigma items cronbach alpha is at .8, Latino stigma is at .76)
 ```{r}
-stigma_imm_vars <- both_pilots %>%
-  dplyr::select(ImmsMajSourceCrime, PoliticiansTalkNegImm, PoliciesImmUnfair)
-
-stigma_latino_vars <- both_pilots %>%
- dplyr::select(LatinosMajSourceCrime, PoliticiansTalkNegLatinos, PoliciesLatinosUnfair)
-
-# Correlation matrix #
-
-cor(stigma_imm_vars, use = "pairwise.complete.obs")
-cor(stigma_latino_vars, use = "pairwise.complete.obs")
-
-# Cronbach's alpha (internal consistency)
-psych::alpha(stigma_imm_vars)
-psych::alpha(stigma_latino_vars)
+# stigma_imm_vars <- both_pilots %>%
+#   dplyr::select(ImmsMajSourceCrime, PoliticiansTalkNegImm, PoliciesImmUnfair)
+# 
+# stigma_latino_vars <- both_pilots %>%
+#  dplyr::select(LatinosMajSourceCrime, PoliticiansTalkNegLatinos, PoliciesLatinosUnfair)
+# 
+# # Correlation matrix #
+# 
+# cor(stigma_imm_vars, use = "pairwise.complete.obs")
+# cor(stigma_latino_vars, use = "pairwise.complete.obs")
+# 
+# # Cronbach's alpha (internal consistency)
+# psych::alpha(stigma_imm_vars)
+# psych::alpha(stigma_latino_vars)
 ```
 
-ANOVA Testing for Treatment --- Belonging 
+Visualization of the Index:
 
 ```{r}
+both_pilots <- both_pilots %>% mutate(
+  Stigma_Imm_Index = ImmsMajSourceCrime + PoliticiansTalkNegImm + PoliciesImmUnfair,
+  Stigma_Latinos_Index = LatinosMajSourceCrime + PoliticiansTalkNegLatinos + PoliciesLatinosUnfair)
+
+
+immstigma_plot <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Stigma_Imm_Index, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Immigrant Stigma Index by Treatment", y = "Stigma Index -- Immigrants") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+latstigma_plot <- ggplot(both_pilots, aes(x = TreatmentCondition, y = Stigma_Latinos_Index, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Latino Stigma Index by Treatment", y = "Stigma Index -- Latinos") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+immstigma_plot
+
+latstigma_plot
+
+```
+
+# Anova Testing -- Emotions & Stigma Measures
+
+Emotions -
+
+```{r, echo = TRUE}
+summary(aov(Relief ~ TreatmentCondition, data = both_pilots))
+summary(aov(Anger ~ TreatmentCondition, data = both_pilots))
+summary(aov(Shame ~ TreatmentCondition, data = both_pilots))
+summary(aov(Fear ~ TreatmentCondition, data = both_pilots))
+summary(aov(Pride ~ TreatmentCondition, data = both_pilots))
+summary(aov(Joy ~ TreatmentCondition, data = both_pilots))
+```
+
+Stigma measures -
+
+```{r, echo = TRUE}
+summary(aov(ImmsMajSourceCrime ~ TreatmentCondition, data = both_pilots))
+summary(aov(PoliticiansTalkNegImm ~ TreatmentCondition, data = both_pilots))
+summary(aov(PoliciesImmUnfair ~ TreatmentCondition, data = both_pilots))
+summary(aov(LatinosMajSourceCrime ~ TreatmentCondition, data = both_pilots))
+summary(aov(PoliticiansTalkNegLatinos ~ TreatmentCondition, data = both_pilots))
+summary(aov(PoliciesLatinosUnfair ~ TreatmentCondition, data = both_pilots))
+summary(aov(Stigma_Imm_Index ~ TreatmentCondition, data = both_pilots))
+summary(aov(Stigma_Latinos_Index ~ TreatmentCondition, data = both_pilots))
+
+## alternate --- perceptions of group discrimination against immigrants / latinos 
+summary(aov(GroupDiscImms_Perc ~ TreatmentCondition, data = both_pilots))
+summary(aov(GroupDiscLatinos_Perc ~ TreatmentCondition, data = both_pilots))
+```
+
+# Outcomes: Visualization and ANOVA Testing by Treatment --- Belonging
+
+Internal Belonging (Feel They Belong in the US & Their State of Residence)
+
+```{r}
+#Visualizations for Belonging & Participation by Treatment Group
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Belonging_State, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Belonging in State by Treatment", y = "Sense of Belonging - State") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Belonging_US, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Belonging in the US by Treatment", y = "Sense of Belonging - US") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+```{r, echo = TRUE}
+
 state_pilots <- aov(Belonging_State ~ TreatmentCondition, data = both_pilots)
 summary(state_pilots)
 
@@ -295,5 +416,244 @@ US_pilots <- aov(Belonging_US ~ TreatmentCondition, data = both_pilots)
 summary(US_pilots)
 ```
 
+External Belonging (feel that others value / respect them) in the US & their state of residence
+
+```{r}
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BelongExternal_1, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Feel Valued/Respected in their State by Treatment", y = "Feel Valued/Respected in their State") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BelongExternal_2, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Feel Valued/Respected in the US by Treatment", y = "Feel Valued/Respected in the US") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+```
+
+```{r, echo = TRUE}
+
+# ANOVA test for difference among groups -- can see in the US graph visually
+summary(aov(BelongExternal_1 ~ TreatmentCondition, data = both_pilots))
+summary(aov(BelongExternal_2 ~ TreatmentCondition, data = both_pilots))
+
+```
+
+# Outcomes: Visualization and ANOVA Testing by Treatment --- Immigration & Border Attitudes
+
+```{r}
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BorderWall, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Border Wall by Treatment", y = "Support for Border Wall") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = DeportAllUndocu, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Mass Deportation by Treatment", y = "Support for Mass Deportation") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = TroopsBorder, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Active Duty Troops at Border by Treatment", y = "Support for Active Duty Troops at Southern Border") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+# Protected Spaces -- Churches / Places of Worship, Hospitals, and Schools
+ggplot(both_pilots, aes(x = TreatmentCondition, y = ProhibitRaidsPlaces, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Opposition to Prohibition of Raids by Treatment", y = "Opposition of Prohibition of Raids in Protected Spaces") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BirthrightCitizenship, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Opposition to Birthright Citizenship by Treatment", y = "Opposition to Birthright Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+Political Efficacy ---
+
+```{r}
+both_pilots <- both_pilots %>% mutate(
+  External_PolEfficacy = ExternalPolEfficacy1 + GovernmentResponsive,
+  Internal_PolEfficacy = InternalPolEfficacy1 + InternalPolEfficacy2
+)
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Internal_PolEfficacy, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Internal Efficacy by Treatment", y = "Internal Efficacy Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = External_PolEfficacy, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "External Efficacy by Treatment", y = "External Efficacy Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
 
 
+```
+
+```{r, echo = TRUE}
+
+summary(aov(Internal_PolEfficacy ~ TreatmentCondition, data = both_pilots))
+summary(aov(External_PolEfficacy ~ TreatmentCondition, data = both_pilots))
+
+
+```
+
+# Second Embedded Survey Experiment
+
+Participation Versions:
+
+1.  Voto Latino works to help individuals register to vote and cast ballots on time. Would you like to receive more information from them about voting and elections in your state?
+
+2.  Voto Latino provides information on voter registration, casting ballots, and issues affecting the ${TermLatinoHispanic /ChoiceGroup/SelectedChoices} community.
+    Would you like to receive more information from them about issues facing the${TermLatinoHispanic /ChoiceGroup/SelectedChoices} community in your state?
+
+```{r}
+ggplot(both_pilots, aes(x = ParticipationVersion, y = Participation_Response, 
+                                          fill = ParticipationVersion)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Want to Receive Pol. Information by Version", y = "Want to Receive More Information") +
+  scale_fill_brewer(palette = "Set3") +
+  theme_minimal() + theme(legend.position = "none")
+
+summary(aov(Participation_Response ~ ParticipationVersion, data = both_pilots))
+```
+
+Some preliminary regressions to make sure its the anti-immigrant treatment moving --
+
+```{r, echo = TRUE}
+model_anger <- lm(Anger ~ TreatmentCondition, data = both_pilots)
+
+summary(model_anger)
+
+model_fear <- lm(Fear ~ TreatmentCondition, data = both_pilots)
+
+summary(model_fear)
+
+
+model_int_polef <- lm(Internal_PolEfficacy ~ TreatmentCondition, data = both_pilots)
+summary(model_int_polef)
+
+
+model_ext_polef <- lm(External_PolEfficacy ~ TreatmentCondition, data = both_pilots)
+summary(model_ext_polef)
+```
+
+Very Early + Preliminary, but could be a good sign of higher negative emotions (anger) --\> higher internal efficacy
+
+### Open-Ended Questions
+
+Pilot 1 had all open ended questions. Pilot 2 only had the open-ended question on state belonging and follow-up on the participation question (no open-ended question on US belonging).
+
+*For Belonging - the scale is 1 (not at all) to 10 (a lot):*
+
+On Belonging (State):
+
+```{r}
+both_pilots <- both_pilots %>% mutate(
+  Age = 2025 - Birth.Year,
+  ParticipationVers = case_when(ParticipationVersion == "Post-Treatment_PolPart" ~ "No Cue",
+                                ParticipationVersion == "PolParticipationVers2" ~ "Latino Issue Cue")
+)
+
+both_pilots$Belonging_Display <- glue(
+  "Response for State Belonging (Rated {both_pilots$Belonging_State}):\n",
+  "'{both_pilots$Belong_State_Open}'\n",
+  "By {both_pilots$Age}-year-old {both_pilots$Sex} in {both_pilots$State}"
+)
+
+both_pilots$Belong_Display_wrapped <- sapply(both_pilots$Belonging_Display, function(txt) {
+  paste(strwrap(txt, width = 80), collapse = "\n")
+}, USE.NAMES = FALSE)
+
+for (txt in both_pilots$Belong_Display_wrapped) {
+  cat(txt, "\n\n")
+}
+```
+
+Belonging in the US (only Pilot 1 was shown this question):
+
+```{r}
+pilot1 <- pilot1 %>% mutate(
+  Age = 2025 -Birth.Year 
+)
+
+pilot1$Belonging_Display_US <- glue(
+  "Response for US Belonging (Rated {pilot1$Belonging_US}):\n",
+  "'{pilot1$Belong_US_Open}'\n",
+  "By {pilot1$Age}-year-old {pilot1$Sex} in {pilot1$State}"
+)
+
+
+pilot1$BelongUSDisplay_wrapped <- sapply(pilot1$Belonging_Display_US, function(txt) {
+  paste(strwrap(txt, width = 80), collapse = "\n")
+}, USE.NAMES = FALSE)
+
+for (txt in pilot1$BelongUSDisplay_wrapped) {
+  cat(txt, "\n\n")
+}
+```
+
+# Whether they would like to be contacted by a civic organization (Voto Latino) -
+
+Current thoughts: The "no cue" version should just say a civic organization (rather than name a specific one)
+
+*Participation Response - 0 (No, would not like to be contacted) or 1 (Yes, would like to be contacted)*
+
+```{r}
+
+both_pilots$Participation_Display <- glue(
+  "Response for wanting (or not wanting) more information ",
+  "(Shown {both_pilots$ParticipationVers} & Chose {both_pilots$Participation_Response}):\n",
+  "'{coalesce(both_pilots$Part_NoCue_Text, both_pilots$Part_LatinoCue_Text)}'\n",
+  "By {both_pilots$Age}-year-old {both_pilots$Sex} in {both_pilots$State}"
+)
+
+both_pilots$Participation_Display_wrapped <- sapply(both_pilots$Participation_Display, function(txt) {
+  paste(strwrap(txt, width = 80), collapse = "\n")
+}, USE.NAMES = FALSE)
+
+for (txt in both_pilots$Participation_Display_wrapped) {
+  cat(txt, "\n\n")
+}
+```
+
+Thoughts on open-ended questions: people provided "real" answers, and for some, it seemed like that the questions were on topics that they wanted to discuss. The questions on belonging to me seemed to be produce more useful or thought-provoking answers that can shed light on that question of how immigration is affecting people psychologically. The participation question did get some good answers reflecting efficacy (worry about the community & wanting to do more or expressing hopelessness), but many were along the vein of "no, already have enough information" or "would like to seek that information on my own."
