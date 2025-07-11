@@ -1,0 +1,160 @@
+---
+title: "draft"
+format: html
+editor: visual
+---
+
+# Outcomes: Visualization and ANOVA Testing by Treatment --- Belonging
+
+Internal Belonging (Feel They Belong in the US & Their State of Residence)
+
+```{r}
+#Visualizations for Belonging & Participation by Treatment Group
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Belonging_State, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Belonging in State by Treatment", y = "Sense of Belonging - State") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Belonging_US, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Belonging in the US by Treatment", y = "Sense of Belonging - US") +
+  scale_fill_brewer(palette = "Set1") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+```{r, echo = TRUE}
+
+state_pilots <- aov(Belonging_State ~ TreatmentCondition, data = both_pilots)
+summary(state_pilots)
+
+US_pilots <- aov(Belonging_US ~ TreatmentCondition, data = both_pilots)
+summary(US_pilots)
+```
+
+External Belonging (feel that others value / respect them) in the US & their state of residence
+
+```{r}
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BelongExternal_1, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Feel Valued/Respected in their State by Treatment", y = "Feel Valued/Respected in their State") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BelongExternal_2, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Feel Valued/Respected in the US by Treatment", y = "Feel Valued/Respected in the US") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+```
+
+```{r, echo = TRUE}
+
+# ANOVA test for difference among groups -- can see in the US graph visually
+summary(aov(BelongExternal_1 ~ TreatmentCondition, data = both_pilots))
+summary(aov(BelongExternal_2 ~ TreatmentCondition, data = both_pilots))
+
+```
+
+# Outcomes: Visualization and ANOVA Testing by Treatment --- Immigration & Border Attitudes
+
+```{r}
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BorderWall, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Border Wall by Treatment", y = "Support for Border Wall") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = DeportAllUndocu, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Mass Deportation by Treatment", y = "Support for Mass Deportation") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = TroopsBorder, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Support for Active Duty Troops at Border by Treatment", y = "Support for Active Duty Troops at Southern Border") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+# Protected Spaces -- Churches / Places of Worship, Hospitals, and Schools
+ggplot(both_pilots, aes(x = TreatmentCondition, y = ProhibitRaidsPlaces, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Opposition to Prohibition of Raids by Treatment", y = "Opposition of Prohibition of Raids in Protected Spaces") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = BirthrightCitizenship, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Opposition to Birthright Citizenship by Treatment", y = "Opposition to Birthright Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+```
+
+Political Efficacy ---
+
+```{r}
+both_pilots <- both_pilots %>% mutate(
+  External_PolEfficacy = ExternalPolEfficacy1 + GovernmentResponsive,
+  Internal_PolEfficacy = InternalPolEfficacy1 + InternalPolEfficacy2
+)
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = Internal_PolEfficacy, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "Internal Efficacy by Treatment", y = "Internal Efficacy Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+ggplot(both_pilots, aes(x = TreatmentCondition, y = External_PolEfficacy, 
+                                          fill = TreatmentCondition)) +
+  geom_boxplot(alpha = 0.6) +
+  geom_jitter(width = 0.2, alpha = 0.3, color = "black") +
+  coord_flip() +
+  labs(title = "External Efficacy by Treatment", y = "External Efficacy Citizenship") +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal() + theme(legend.position = "none")
+
+
+```
+
+```{r, echo = TRUE}
+
+summary(aov(Internal_PolEfficacy ~ TreatmentCondition, data = both_pilots))
+summary(aov(External_PolEfficacy ~ TreatmentCondition, data = both_pilots))
+
+
+```
+
