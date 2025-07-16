@@ -272,6 +272,7 @@ coded_laws_full <- coded_laws %>%
 # )
 
 coded_laws_full <- coded_laws_full %>% mutate(
+  Class = str_trim(Class),
   Class_Int = case_when(Class == "A" ~ -1,
                         Class == "SA" ~ -0.5,
                         Class == "N" ~ 0,
@@ -301,4 +302,83 @@ coded_concrete <- coded_laws_concrete %>%
   summarise(Class_Pts = sum(weighted_class)) %>%
   ungroup()
 
-  
+
+### Adding in 287(g) agreements ------------
+
+state_exp_287g <- read.csv("~/Desktop/COIi work/State_Laws/states_287g_sums.csv")
+
+### 2012-2016 period -----------------------------------------------------------
+
+coded_sym_16 <- coded_sym %>% filter(period == "2012-2016")
+exp_lat_16 <- state_exp_287g %>% select(State, total_exp_lat_2016, total_exp_for_2016)
+
+combined_df_16 <- coded_sym_16 %>%
+  left_join(exp_lat_16, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
+         exp_for_score = replace_na(total_exp_for_2016, 0))
+
+combined_df_16 <- combined_df_16 %>% select(-c(total_exp_lat_2016,total_exp_for_2016)) %>%
+  mutate(class_lat_2016 = Class_Pts + exp_lat_score,
+         class_for_2016 = Class_Pts + exp_for_score)
+
+### Concrete policies only 
+coded_conc_16 <- coded_concrete %>% filter(period == "2012-2016")
+
+conc_df_16 <- coded_conc_16 %>%
+  left_join(exp_lat_16, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
+         exp_for_score = replace_na(total_exp_for_2016, 0))
+
+conc_df_16 <- conc_df_16 %>% select(-c(total_exp_lat_2016,total_exp_for_2016)) %>%
+  mutate(class_lat_2016 = Class_Pts + exp_lat_score,
+         class_for_2016 = Class_Pts + exp_for_score)
+
+### 2016-2020 period -----------------------------------------------------------
+coded_sym_20 <- coded_sym %>% filter(period == "2016-2020")
+coded_conc_20 <- coded_concrete %>% filter(period == "2016-2020")
+exp_lat_20 <- state_exp_287g %>% select(State, total_exp_lat_2020, total_exp_for_2020)
+
+combined_df_20 <- coded_sym_20 %>%
+  left_join(exp_lat_20, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2020, 0),
+         exp_for_score = replace_na(total_exp_for_2020, 0))
+
+combined_df_20 <- combined_df_20 %>% select(-c(total_exp_lat_2020,total_exp_for_2020)) %>%
+  mutate(class_lat_2020 = Class_Pts + exp_lat_score,
+         class_for_2020 = Class_Pts + exp_for_score)
+
+
+conc_df_20 <- coded_conc_20 %>%
+  left_join(exp_lat_20, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2020, 0),
+         exp_for_score = replace_na(total_exp_for_2020, 0))
+
+conc_df_20 <- conc_df_20 %>% select(-c(total_exp_lat_2020,total_exp_for_2020)) %>%
+  mutate(class_lat_2020 = Class_Pts + exp_lat_score,
+         class_for_2020 = Class_Pts + exp_for_score)
+
+### combining into one dataset ------------------------- Keeping only final score ------
+symb_df_16 <- combined_df_16 %>%
+  mutate(latino_sym_16 = class_lat_2016,
+         foreign_sym_16 = class_for_2016)  %>% select(State, latino_sym_16, foreign_sym_16)
+symb_df_20 <- combined_df_20 %>%  
+  mutate(latino_sym_20 = class_lat_2020,
+         foreign_sym_20 = class_for_2020)  %>% 
+  select(State, latino_sym_20, foreign_sym_20)
+
+conc_df_16 <- conc_df_16 %>% mutate(latino_conc_16 = class_lat_2016,
+                                    foreign_conc_16 = class_for_2016)  %>% 
+  select(State, latino_conc_16, foreign_conc_16)
+conc_df_20 <- conc_df_20 %>% mutate(latino_conc_20 = class_lat_2020,
+                                    foreign_conc_20 = class_for_2020)  %>% 
+  select(State, latino_conc_20, foreign_conc_20)
+
+## merging back into one single year-period 
+
+scores_2016 <- merge(symb_df_16, conc_df_16, by = c("State"), all = TRUE)
+scores_2020 <- merge(symb_df_20, conc_df_20, by = c("State"), all = TRUE)
+
+scores_final <- merge(scores_2016, scores_2020, by = "State", all = TRUE)
+
+# saving 
+write.csv(scores_final, "scores_final.csv")
