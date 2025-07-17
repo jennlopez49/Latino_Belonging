@@ -1,5 +1,7 @@
 # Importing Data
-inclusivity <- readxl::read_xlsx("inclusivity_scores_2009_16.xlsx")
+#inclusivity <- readxl::read_xlsx("inclusivity_scores_2009_16.xlsx")
+
+final_scores <- read.csv("scores_final.csv")
 # Load U.S. states shapefile
 states <- tigris::states(cb = TRUE, resolution = "20m", class = "sf")
 
@@ -8,7 +10,7 @@ states <- states[!states$STUSPS %in% c("HI", "AK", "GU", "PR", "VI"), ]
 states$state 
 
 # merge 
-states <- merge(states, inclusivity, by.x = "STUSPS", by.y = "State")
+states <- merge(states, final_scores, by.x = "STUSPS", by.y = "State")
 # states$ICI_Score_2016 <- as.numeric(states$ICI_Score_2016) 
 # states$ICI_2016_col <- ifelse(states$ICI_Score_2016 < -86, 0, 
 #                               ifelse(states$ICI_Score_2016 > -86 & states$ICI_Score_2016 <= -1, .5, 
@@ -43,14 +45,43 @@ states <- merge(states, inclusivity, by.x = "STUSPS", by.y = "State")
 # 
 # states$ICI_2016_col_index <- as.numeric(as.character(states$bucketed_index_alt))
 
-ggplot(data = states) +
-  geom_sf(aes(fill = ICI_Score_2011)) +
-  scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0,
-limits = c(-355, 164)) +
+### Standardizing 
+states <- states %>% mutate(
+  sym_lat_index_16 = case_when(
+  latino_sym_16 < -10 ~ -1,
+  latino_sym_16 >= -10 & latino_sym_16 < -5 ~ -0.5,
+  latino_sym_16 >= -5 & latino_sym_16 <= 5 ~ 0,
+  latino_sym_16 > 5 & latino_sym_16 <= 10 ~ 0.5,
+  latino_sym_16 > 10 ~ 1),
+  conc_lat_index_16 = case_when(
+    latino_conc_16 < -10 ~ -1,
+    latino_conc_16 >= -10 & latino_conc_16 < -5 ~ -0.5,
+    latino_conc_16 >= -5 & latino_conc_16 <= 5 ~ 0,
+    latino_conc_16 > 5 & latino_conc_16 <= 10 ~ 0.5,
+    latino_conc_16 > 10 ~ 1),
+  sym_lat_index_20 = case_when(
+    latino_sym_20 < -10 ~ -1,
+    latino_sym_20 >= -10 & latino_sym_20 < -5 ~ -0.5,
+    latino_sym_20 >= -5 & latino_sym_20 <= 5 ~ 0,
+    latino_sym_20 > 5 & latino_sym_20 <= 10 ~ 0.5,
+    latino_sym_20 > 10 ~ 1),
+  conc_lat_index_20 = case_when(
+    latino_conc_20 < -10 ~ -1,
+    latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
+    latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
+    latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
+    latino_conc_20 > 10 ~ 1),
+)
+
+sym_16_map <- ggplot(data = states) +
+  geom_sf(aes(fill = sym_lat_index_16)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+limits = c(-1, 1)) +
   theme_minimal() +
   labs(
-    title = "Immigrant Climate by State 2007-2011",
-    caption = "Data Source: Pham and Van (2016)"
+    title = "Immigrant Climate by State 2012-2016",
+    subtitle = "All Policies",
+    caption = "Data Source: Original Data."
   ) +
   theme(
     axis.text = element_blank(),  # Removes lat/long labels
@@ -58,8 +89,99 @@ limits = c(-355, 164)) +
     panel.grid = element_blank(), 
     legend.position = "bottom",
     plot.title = element_text(size = 16, face = "bold"),
-    plot.title.position = "panel"
+    plot.title.position = "plot"
   )
+
+conc_16_map <- ggplot(data = states) +
+  geom_sf(aes(fill = conc_lat_index_16)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+                       limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State 2012-2016",
+    subtitle = "Concrete Policies",
+    caption = "Data Source: Original Data."
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "plot"
+  )
+
+sym_20_map <- ggplot(data = states) +
+  geom_sf(aes(fill = sym_lat_index_20)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+                       limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State 2016-2020",
+    subtitle ="All Policies",
+    caption = "Data Source: Original Data."
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "plot"
+  )
+
+conc_20_map <- ggplot(data = states) +
+  geom_sf(aes(fill = conc_lat_index_20)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+                       limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State (2016-2020)",
+    subtitle = "Concrete Policies",
+    caption = "Data Source: Original Data."
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "plot"
+  )
+
+#### Saving the new graphs --------- 
+ggsave(
+  filename = "state_climate_2016_Full.png",  # File name with extension
+  plot = sym_16_map,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
+ggsave(
+  filename = "state_climate_2016_Conc.png",  # File name with extension
+  plot = conc_16_map,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
+ggsave(
+  filename = "state_climate_2020_Full.png",  # File name with extension
+  plot = sym_20_map,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
+ggsave(
+  filename = "state_climate_2020_Conc.png",  # File name with extension
+  plot = conc_20_map,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
 # collapsed version
 map_2016 <- ggplot(data = states) +
   geom_sf(aes(fill = ICI_2016_col_index)) +

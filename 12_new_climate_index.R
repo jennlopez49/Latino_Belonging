@@ -380,5 +380,8 @@ scores_2020 <- merge(symb_df_20, conc_df_20, by = c("State"), all = TRUE)
 
 scores_final <- merge(scores_2016, scores_2020, by = "State", all = TRUE)
 
+## Alabama only had symbolic leg during this period -----> adding in the zero manually
+scores_final$latino_conc_20[scores_final$State == "AL"] <- 0
+scores_final$foreign_conc_20[scores_final$State == "AL"] <- 0
 # saving 
 write.csv(scores_final, "scores_final.csv")

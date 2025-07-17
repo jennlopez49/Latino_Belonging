@@ -277,27 +277,34 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
 # # )
 #   
 #   ## Importing original Indicator 
+# 
+# full_indicators <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/full_indicators_2016.csv")
+# 
+# full_cmps2016 <- left_join(cmps.add.2016, full_indicators, by = "State")
+  
+## New Indicator -----
+  
 
-full_indicators <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/full_indicators_2016.csv")
-
-full_cmps2016 <- left_join(cmps.add.2016, full_indicators, by = "State")
-
-full_cmps2016 <- full_cmps2016 %>% mutate(
-    Imm_Con_Ind = (Imm_Class_Concrete_2016 - min(Imm_Class_Concrete_2016)) / (max(Imm_Class_Concrete_2016) - min(Imm_Class_Concrete_2016)),
-    Imm_Full_Ind = (Imm_Class_Full_2016 - min(Imm_Class_Full_2016)) / (max(Imm_Class_Full_2016) - min(Imm_Class_Full_2016)),
-    Imm_Con_Index = case_when(
-      Imm_Class_Concrete_2016 <= -5  ~ -1,   # High Anti
-      Imm_Class_Concrete_2016 < 0    ~ -0.5, # Low Anti
-      Imm_Class_Concrete_2016 < 10   ~ 0.5,  # Low Pro
-      Imm_Class_Concrete_2016 >= 10   ~ 1,    # High Pro
-    ),
-    Imm_Sym_Index = case_when(
-      Imm_Class_Full_2016 <= -10 ~ -1,     # High Anti: score <= -10
-      Imm_Class_Full_2016 > -10 & Imm_Class_Full_2016 <= 0 ~ -0.5,  # Low Anti: score between -10 and 0
-      Imm_Class_Full_2016 > 0 & Imm_Class_Full_2016 < 20 ~ 0.5,   # Low Pro: score between 0 and 20
-      Imm_Class_Full_2016 >= 20 ~ 1,        # High Pro: score > 20
-    )
-)
+# full_cmps2016 <- full_cmps2016 %>% mutate(
+#     Imm_Con_Ind = (Imm_Class_Concrete_2016 - min(Imm_Class_Concrete_2016)) / (max(Imm_Class_Concrete_2016) - min(Imm_Class_Concrete_2016)),
+#     Imm_Full_Ind = (Imm_Class_Full_2016 - min(Imm_Class_Full_2016)) / (max(Imm_Class_Full_2016) - min(Imm_Class_Full_2016)),
+#     Imm_Con_Index = case_when(
+#       Imm_Class_Concrete_2016 <= -5  ~ -1,   # High Anti
+#       Imm_Class_Concrete_2016 < 0    ~ -0.5, # Low Anti
+#       Imm_Class_Concrete_2016 < 10   ~ 0.5,  # Low Pro
+#       Imm_Class_Concrete_2016 >= 10   ~ 1,    # High Pro
+#     ),
+#     Imm_Sym_Index = case_when(
+#       Imm_Class_Full_2016 <= -10 ~ -1,     # High Anti: score <= -10
+#       Imm_Class_Full_2016 > -10 & Imm_Class_Full_2016 <= 0 ~ -0.5,  # Low Anti: score between -10 and 0
+#       Imm_Class_Full_2016 > 0 & Imm_Class_Full_2016 < 20 ~ 0.5,   # Low Pro: score between 0 and 20
+#       Imm_Class_Full_2016 >= 20 ~ 1,        # High Pro: score > 20
+#     )
+# )
+  
+final_scores <- read.csv("scores_final.csv")
+  
+full_cmps2016 <- left_join(cmps.add.2016, final_scores, by = "State")
 
 #### Adding in Latino Pop &&& Election Vote Margin Results ------
 
@@ -400,11 +407,10 @@ full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2
 # ## alternate -- 
 # cmps_lat_16_alt <- subset(cmps_design_adj, Latino == 1)
 
-### Changing ICI to Factor 
-full_cmps2016$ICI_Reverse <- (full_cmps2016$Imm_Con_Index * -1)
-full_cmps2016$ICI_Index <- as.factor(full_cmps2016$ICI_Reverse)
-full_cmps2016$ICI_Index <- relevel(full_cmps2016$ICI_Index, ref = "1")
-
+# ### Changing ICI to Factor 
+# full_cmps2016$ICI_Reverse <- (full_cmps2016$Imm_Con_Index * -1)
+# full_cmps2016$ICI_Index <- as.factor(full_cmps2016$ICI_Reverse)
+# full_cmps2016$ICI_Index <- relevel(full_cmps2016$ICI_Index, ref = "1")
 
 
 ### For Latinos ONLY checking Weights and Sample Representativeness among Nat. Origin Groups ---- 

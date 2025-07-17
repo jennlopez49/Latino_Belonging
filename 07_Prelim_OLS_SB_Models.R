@@ -1,7 +1,8 @@
 #### General Vars For Int & Med Models ---------
 cmps_lat_16$variables$ICI_Reverse_Fac <- as.factor(cmps_lat_16$variables$ICI_Reverse)
 dvs <- c("Inclusion_External", "Inclusion_Internal")  # List of DVs (Y)
-ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X)
+# ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
+ivs <- list("latino_sym_16","latino_conc_16")
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election")  # List of Mediators (M)
 controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
