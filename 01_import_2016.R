@@ -428,6 +428,7 @@ latinos_data <- latinos_data %>% mutate(
   )
 )
 
+latinos_data <- latinos_data %>% drop_na(latino_sym_20, latino_conc_20)
 
 ### Creating Survey Design ---
 cmps_lat_16 <- svydesign(

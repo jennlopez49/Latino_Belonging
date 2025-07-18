@@ -99,20 +99,19 @@ mediation_function_standard(dvs, ivs, mediators, controls, cmps_lat_16, cmps_lat
 #           #,
 #           #out = "neg.em.gen.full.tex"
 #           )
-listmods <- med_results_ols$mediator_models[c(1,3,4,6,13,15)]
+listmods <- med_results_ols$mediator_models[1:4]
 stargazer(listmods, type = "text",
-          # covariate.labels = c("Imm. Stigma", "Imm. Stigma (-0.5)",
-          # "Imm. Stigma (0.5)", "Imm. Stigma (1)", "Linked Fate",
-          # "Age", "Gender",
-          # "Education", "Income", "Political Interest",
-          # "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-          # "Generation", "Discrimination Exp.",
-          # "Group Discrimination Percep.","Deportation Worry",
-          # "Constant"),
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma","Linked Fate",
+          "Age", "Gender",
+          "Education", "Income", "Political Interest",
+          "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
+          "Generation", "Discrimination Exp.",
+          "Group Discrimination Percep.","Deportation Worry",
+          "Constant"),
           dep.var.labels = c("Fear", "Anger", "Sadness"), 
           dep.var.caption = "Dependent variable: Negative Emotions"
-          # ,
-          # out = "neg.em.gen.short.tex"
+          ,
+          out = "neg.em.gen.short.tex"
 )
 
 ### Figures ----
@@ -123,11 +122,10 @@ angp <- plot_model(listmods$IV_ICI_Reverse_Fac_Med_Angry_Election, type = "est",
                    
 ### positive ------
 
-posem <- med_results_ols$mediator_models[c(7,9,10,12)]
+posem <- med_results_ols$mediator_models[5:8]
 
 stargazer(posem, type = "latex",
-          covariate.labels = c("Imm. Stigma", "Imm. Stigma (-0.5)",
-                               "Imm. Stigma (0.5)", "Imm. Stigma (1)", "Linked Fate",
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma","Linked Fate",
                                "Age", "Gender",
                                "Education", "Income", "Political Interest",
                                "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
@@ -167,19 +165,19 @@ ggsave(filename = "posem_fig.png",
 # Internal -----------
 
 # Select specific models manually by name (instead of index)
-selected_models <- med_results_ols$outcome_models[c(16:30)]  # Start with all
+selected_models <- med_results_ols$outcome_models[1:10]  # Start with all
 
 # Rearrange the last two models to be in the middle
 reordered_models <- c(
-  selected_models[c(1,3,4,6)],  # First set (e.g., negative emotions)
-  selected_models[c(13,15)], # Move last two models here
-  selected_models[c(7,9,10,12)]   # Remaining models
+  selected_models[c(1:4, 9,10)],  # First set (e.g., negative emotions)
+  selected_models[5:8]
+  # , # Move last two models here
+  # selected_models[c(7,9,10,12)]   # Remaining models
 )
 
 # Display in Stargazer
-stargazer(reordered_models, type = "latex", dep.var.labels = "Internal Inclusion",
-          covariate.labels = c("Imm Stigma",  "Imm Stigma (-0.5)",
-                               "Imm Stigma (0.5)", "Imm Stigma (1)",
+stargazer(reordered_models, type = "latex", dep.var.labels = "External Inclusion",
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
@@ -218,15 +216,14 @@ ggsave(filename = "int_indv_pos.png",
 # External  -----------
 
 # Rearrange the last two models to be in the middle --- did not index / separate the models because external models were 1 - 15 
-reordered_models_ext <- c(
-  med_results_ols$outcome_models[c(1,3,4,6)],  # First set (e.g., negative emotions)
-  med_results_ols$outcome_models[c(13,15)], # Move last two models here
-  med_results_ols$outcome_models[c(7,9,10,12)]   # Remaining models
+reordered_models_int <- c(
+  med_results_ols$outcome_models[c(11:14,19,20)],  # First set (e.g., negative emotions)
+  # med_results_ols$outcome_models[c(13,15)], # Move last two models here
+  med_results_ols$outcome_models[c(15:18)]   # Remaining models
 )
 
-stargazer(reordered_models_ext, type = "latex", dep.var.labels = "External Inclusion",
-          covariate.labels = c("Imm Stigma",  "Imm Stigma (-0.5)",
-                               "Imm Stigma (0.5)", "Imm Stigam (1)",
+stargazer(reordered_models_int, type = "latex", dep.var.labels = "Internal Inclusion",
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
@@ -266,34 +263,38 @@ ggsave(filename = "ext_indv_neg.png",
        dpi = 300) 
 
 #### Testing out interactions between stigma x lf + emotions --> social? -----
-interaction_function_standard(dvs, ivs, mediators, controls, des = cmps_lat_16, 
-                              dat = cmps_lat_16, "int_models")
-listofint_ext <- int_models[c(1:15)]
-listofint_int <- int_models[c(17:31)]
-chosenmodels <- c(listofint_int[c(11:15)], listofint_ext[c(11:15)])
 
-stargazer(chosenmodels[c(1:5)], type = "latex", dep.var.labels = c("Internal Inclusion"),
-          covariate.labels = c("Imm Index (-0.5)",
-                               "Imm Index (0.5)", "Imm Index (1)","Linked Fate", 
+weight_var <- "Weight"
+interaction_function_standard(dvs, ivs, mediators, controls, weight_var, des = cmps_lat_16, 
+                              dat = cmps_lat_16$variables, "int_models")
+listofint_ext <- int_models[c(1:10)]
+listofint_int <- int_models[c(12:20)]
+# chosenmodels <- c(listofint_int[c(11:15)], listofint_ext[c(11:15)])
+
+stargazer(listofint_int, type = "latex", dep.var.labels = c("Internal Inclusion"),
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma","Linked Fate", 
                                "Fear", "Anger", "Pride", "Hope", "Sad",
                                "Age", "Gender",
                                "Education", "Income", "Political Interest",
                                "Mexican", "Cuban", "Party (R $\\longright arrow$ D)",
                                "Second Generation +", "Discrimination Exp.",
-                               "Nat. Discrimination Percep.", "Imm Index (-0.5) x Linked Fate",
-                               "Imm Index (0.5) x Linked Fate",  "Imm Index (1) x Linked Fate",
+                               "Nat. Discrimination Percep.", "Spanish Media", 
+                               "Deportation Worry",
+                               "Imm. Stigma x Linked Fate",
+                               "Concrete Imm. Stigma x Linked Fate",
                                "Constant"),
           out = "int_mods_inclusion_internal.tex")
-stargazer(chosenmodels[c(6:10)], type = "latex", dep.var.labels = c("External Inclusion"),
-          covariate.labels = c("Imm Index (-0.5)",
-                               "Imm Index (0.5)", "Imm Index (1)","Linked Fate", 
+stargazer(listofint_ext, type = "latex", dep.var.labels = c("External Inclusion"),
+          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma","Linked Fate", 
                                "Fear", "Anger", "Pride", "Hope", "Sad",
                                "Age", "Gender",
                                "Education", "Income", "Political Interest",
                                "Mexican", "Cuban", "Party (R $\\longright arrow$ D)",
                                "Second Generation +", "Discrimination Exp.",
-                               "Nat. Discrimination Percep.", "Imm Index (-0.5) x Linked Fate",
-                               "Imm Index (0.5) x Linked Fate",  "Imm Index (1) x Linked Fate",
+                               "Nat. Discrimination Percep.","Spanish Media", 
+                               "Deportation Worry",
+                               "Imm. Stigma x Linked Fate",
+                               "Concrete Imm. Stigma x Linked Fate",
                                "Constant"),
           out = "int_mods_inclusion_external.tex")
 
@@ -323,9 +324,9 @@ ggsave(filename = "ext_sense_int.png",
 
 
 ### testing all emotions at once 
-formula_str <- paste("Inclusion_Internal ~ ICI_Reverse_Fac +", 
+formula_str <- paste("Inclusion_Internal ~ latino_conc_16 +", 
                      paste(c(controls, mediators), collapse = " + "))
-formula_str_ext <- paste("Inclusion_External ~ ICI_Reverse_Fac +", 
+formula_str_ext <- paste("Inclusion_External ~ latino_conc_16 +", 
                      paste(c(controls, mediators), collapse = " + "))
 
 all_em <- svyglm(formula_str,
@@ -351,8 +352,7 @@ ggsave(filename = "all_sense.png",
 ### table ---
 soc_models <- c(all_em, all_em_ext)
 stargazer(all_em, all_em_ext, type = "latex",
-          covariate.labels = c("Imm. Stigma (-.5)", "Imm. Stigma (.5)",
-                               "Imm. Stigma (1)", "Age", "Gender", "Education",
+          covariate.labels = c("Concrete Imm. Stigma", "Age", "Gender", "Education",
                                "Income", "Pol. Interest", "Mexican", "Cuban",
                                "Linked Fate", "Party (R $\\longrightarrow$ D)",
                                "Generation", "Discrimination Exp.",
@@ -369,11 +369,11 @@ stargazer(all_em, all_em_ext, type = "latex",
 
 #### Interactions ---- 
 controls_int <- controls[controls != "Linked_Fate"]
-form_int <- paste("Inclusion_Internal ~ ICI_Reverse_Fac*Linked_Fate +", 
+form_int <- paste("Inclusion_Internal ~ latino_conc_16*Linked_Fate +", 
       paste(c(controls_int, mediators), collapse = " + "))
-form_int_alt <- paste("Inclusion_Internal ~ ICI_Reverse*Linked_Fate +", 
+form_int_alt <- paste("Inclusion_Internal ~ latino_conc_16*Linked_Fate +", 
                   paste(c(controls_int, mediators), collapse = " + "))
-form_ext <- paste("Inclusion_External ~ ICI_Reverse_Fac*Linked_Fate +", 
+form_ext <- paste("Inclusion_External ~ latino_conc_16*Linked_Fate +", 
                   paste(c(controls_int, mediators), collapse = " + "))
 internal_int_all <- svyglm(form_int,
                  design = cmps_lat_16)
@@ -398,8 +398,7 @@ ggsave(filename = "both_int_all.png",
 stargazer(internal_int_all, external_int_all, type = "latex", 
           dep.var.caption = "Dependent Variable: Sense of Belonging",
           dep.var.labels = c("Internal", "External"), 
-          covariate.labels = c("Imm. Stigma (-0.5)", "Imm. Stigma (0.5)",
-                               "Imm. Stigma (1)", "Linked Fate",
+          covariate.labels = c("Concrete Imm. Stigma", "Linked Fate",
                                "Age", "Gender", "Education", "Income",
                                "Pol. Interest", "Mexican", "Cuban", 
                                "Party (R $\\longrightarrow$ D)",
@@ -407,9 +406,7 @@ stargazer(internal_int_all, external_int_all, type = "latex",
                                "Group Discrimination Percp.", "Spanish Media",
                                "Deportation Worry","Fear", "Anger",
                                "Pride", "Hope", "Sad", 
-                               "Imm. Stigma (-0.5) x Linked Fate",
-                               "Imm. Stigma (0.5) x Linked Fate",
-                               "Imm. Stigma (1) x Linked Fate",
+                               "Concrete Imm. Stigma x Linked Fate",
                                "Constant"
                                )
           , out = "all_int.tex"
