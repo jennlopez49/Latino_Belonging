@@ -416,19 +416,43 @@ full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2
 ### For Latinos ONLY checking Weights and Sample Representativeness among Nat. Origin Groups ---- 
 
 latinos_data <- full_cmps2016 %>% filter(Race_Prime == "(2) Hispanic or Latino")
+latinos_data <- latinos_data %>% drop_na(latino_sym_20, latino_conc_20)         # Alaska is NA 
 
-
-#### Discrimination measure --------
+#### Discrimination measure & Indices for climates --------
 latinos_data <- latinos_data %>% mutate(
   Discrimination_Scale = ifelse(
     Personal_Discrimination == 0, 0,  # Did not experience discrimination
     ifelse(
       Race_Ethnicity_Disc == 1 | Immigration_Status_Disc == 1 | Personal_Discrimination == 1, 1, NA
     )
-  )
+  ),
+  sym_lat_index_16 = case_when(
+    latino_sym_16 < -10 ~ -1,
+    latino_sym_16 >= -10 & latino_sym_16 < -5 ~ -0.5,
+    latino_sym_16 >= -5 & latino_sym_16 <= 5 ~ 0,
+    latino_sym_16 > 5 & latino_sym_16 <= 10 ~ 0.5,
+    latino_sym_16 > 10 ~ 1),
+  conc_lat_index_16 = case_when(
+    latino_conc_16 < -10 ~ -1,
+    latino_conc_16 >= -10 & latino_conc_16 < -5 ~ -0.5,
+    latino_conc_16 >= -5 & latino_conc_16 <= 5 ~ 0,
+    latino_conc_16 > 5 & latino_conc_16 <= 10 ~ 0.5,
+    latino_conc_16 > 10 ~ 1),
+  sym_lat_index_20 = case_when(
+    latino_sym_20 < -10 ~ -1,
+    latino_sym_20 >= -10 & latino_sym_20 < -5 ~ -0.5,
+    latino_sym_20 >= -5 & latino_sym_20 <= 5 ~ 0,
+    latino_sym_20 > 5 & latino_sym_20 <= 10 ~ 0.5,
+    latino_sym_20 > 10 ~ 1),
+  conc_lat_index_20 = case_when(
+    latino_conc_20 < -10 ~ -1,
+    latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
+    latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
+    latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
+    latino_conc_20 > 10 ~ 1)
 )
 
-latinos_data <- latinos_data %>% drop_na(latino_sym_20, latino_conc_20)
+
 
 ### Creating Survey Design ---
 cmps_lat_16 <- svydesign(

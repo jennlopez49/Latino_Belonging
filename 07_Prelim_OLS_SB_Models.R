@@ -2,14 +2,17 @@
 cmps_lat_16$variables$ICI_Reverse_Fac <- as.factor(cmps_lat_16$variables$ICI_Reverse)
 dvs <- c("Inclusion_External", "Inclusion_Internal")  # List of DVs (Y)
 # ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
-ivs <- list("latino_sym_16","latino_conc_16")
+ivs <- list("conc_lat_index_16","latino_conc_16")
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election")  # List of Mediators (M)
 controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
               "Mexican", "Cuban",
               "Linked_Fate", "Party",
-              "More_Than_SecondGen", "Discrimination_Scale", 
-              "Latino_Disc", "Spanish_Media", "Worry_Deport")
+              "More_Than_SecondGen", "Discrimination_Scale",
+              "Latino_Disc"
+              , "Spanish_Media"
+              , 
+              "Worry_Deport")
 
 # ################ No interaction/ Basic Models -------------------------------------
 # ## List of Models
@@ -99,14 +102,14 @@ mediation_function_standard(dvs, ivs, mediators, controls, cmps_lat_16, cmps_lat
 #           #,
 #           #out = "neg.em.gen.full.tex"
 #           )
-listmods <- med_results_ols$mediator_models[1:4]
-stargazer(listmods, type = "text",
-          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma","Linked Fate",
+listmods <- med_results_ols$mediator_models[c(1:4, 9, 10)]
+stargazer(listmods, type = "latex",
+          covariate.labels = c("Concrete Imm. Index", "Concrete Imm. Stigma","Linked Fate",
           "Age", "Gender",
           "Education", "Income", "Political Interest",
           "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
           "Generation", "Discrimination Exp.",
-          "Group Discrimination Percep.","Deportation Worry",
+          "Group Discrimination Percep.", "Spanish Media", "Deportation Worry",
           "Constant"),
           dep.var.labels = c("Fear", "Anger", "Sadness"), 
           dep.var.caption = "Dependent variable: Negative Emotions"
@@ -134,6 +137,7 @@ stargazer(posem, type = "latex",
                                "Constant"),
           dep.var.caption = "Dependent variable: Positive Emotions"
           ,
+          dep.var.labels = c("Pride", "Hope"), 
           out = "pos.em.gen.tex"
           )
 
@@ -177,7 +181,7 @@ reordered_models <- c(
 
 # Display in Stargazer
 stargazer(reordered_models, type = "latex", dep.var.labels = "External Inclusion",
-          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma",
+          covariate.labels = c("Concrete Imm. Index", "Concrete Imm. Stigma",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
@@ -223,7 +227,7 @@ reordered_models_int <- c(
 )
 
 stargazer(reordered_models_int, type = "latex", dep.var.labels = "Internal Inclusion",
-          covariate.labels = c("Imm. Stigma", "Concrete Imm. Stigma",
+          covariate.labels = c("Concrete Imm. Index", "Concrete Imm. Stigma",
                                "Fear", "Anger", "Sad", "Pride", "Hope",
                                "Linked Fate", "Age", "Gender",
                                "Education", "Income", "Political Interest",
@@ -328,14 +332,18 @@ formula_str <- paste("Inclusion_Internal ~ latino_conc_16 +",
                      paste(c(controls, mediators), collapse = " + "))
 formula_str_ext <- paste("Inclusion_External ~ latino_conc_16 +", 
                      paste(c(controls, mediators), collapse = " + "))
+formula_str_alt <- paste("Inclusion_Internal ~ conc_lat_index_16 +", 
+                     paste(c(controls, mediators), collapse = " + "))
+formula_str_ext_alt <- paste("Inclusion_External ~ conc_lat_index_16 +", 
+                         paste(c(controls, mediators), collapse = " + "))
 
-all_em <- svyglm(formula_str,
+all_em1 <- svyglm(formula_str,
                  design = cmps_lat_16)
-all_em_nospan <- svyglm(formula_str,
+all_em2 <- svyglm(formula_str_alt,
                         design = cmps_lat_16)
-all_em_ext <- svyglm(formula_str_ext,
+all_em_ext1 <- svyglm(formula_str_ext,
                  design = cmps_lat_16)
-all_em_ext_nospan <- svyglm(formula_str_ext,
+all_em_ext2 <- svyglm(formula_str_ext_alt,
                      design = cmps_lat_16)
 all_em_p <- plot_model(all_em, type = "est", title = "Internal")
 all_em_ext_p <- plot_model(all_em_ext, type = "est", title = "External")
@@ -350,9 +358,10 @@ ggsave(filename = "all_sense.png",
        dpi = 300) 
 
 ### table ---
-soc_models <- c(all_em, all_em_ext)
-stargazer(all_em, all_em_ext, type = "latex",
-          covariate.labels = c("Concrete Imm. Stigma", "Age", "Gender", "Education",
+soc_models <- c(all_em, all_em_alt, all_em_ext, all_em_ext_alt)
+stargazer(all_em1, all_em2, all_em_ext1, all_em_ext2, type = "latex",
+          covariate.labels = c("Concrete Imm. Stigma", "Concrete Imm. Index", 
+                               "Age", "Gender", "Education",
                                "Income", "Pol. Interest", "Mexican", "Cuban",
                                "Linked Fate", "Party (R $\\longrightarrow$ D)",
                                "Generation", "Discrimination Exp.",
@@ -371,15 +380,19 @@ stargazer(all_em, all_em_ext, type = "latex",
 controls_int <- controls[controls != "Linked_Fate"]
 form_int <- paste("Inclusion_Internal ~ latino_conc_16*Linked_Fate +", 
       paste(c(controls_int, mediators), collapse = " + "))
-form_int_alt <- paste("Inclusion_Internal ~ latino_conc_16*Linked_Fate +", 
+form_int_alt <- paste("Inclusion_Internal ~ conc_lat_index_16*Linked_Fate +", 
                   paste(c(controls_int, mediators), collapse = " + "))
 form_ext <- paste("Inclusion_External ~ latino_conc_16*Linked_Fate +", 
                   paste(c(controls_int, mediators), collapse = " + "))
-internal_int_all <- svyglm(form_int,
+form_ext_alt <- paste("Inclusion_External ~ conc_lat_index_16*Linked_Fate +", 
+                  paste(c(controls_int, mediators), collapse = " + "))
+intint1 <- svyglm(form_int,
                  design = cmps_lat_16)
-internal_int_all_alt <- svyglm(form_int_alt,
+intint2 <- svyglm(form_int_alt,
                            design = cmps_lat_16)
-external_int_all <- svyglm(form_ext,
+extint1 <- svyglm(form_ext,
+                           design = cmps_lat_16)
+extint2 <- svyglm(form_ext_alt,
                            design = cmps_lat_16)
 
 int_p1 <- plot_model(internal_int_all, type = "est", title = "Internal")
@@ -395,10 +408,12 @@ ggsave(filename = "both_int_all.png",
        height = 8,                           
        dpi = 300) 
 ### table 
-stargazer(internal_int_all, external_int_all, type = "latex", 
+mods <- c(internal_int_all, internal_int_all_alt, external_int_all, external_int_all_alt)
+stargazer(intint1, intint2, extint1, extint2, type = "latex", 
           dep.var.caption = "Dependent Variable: Sense of Belonging",
           dep.var.labels = c("Internal", "External"), 
-          covariate.labels = c("Concrete Imm. Stigma", "Linked Fate",
+          covariate.labels = c("Concrete Imm. Stigma","Concrete Imm. Index",
+                               "Linked Fate",
                                "Age", "Gender", "Education", "Income",
                                "Pol. Interest", "Mexican", "Cuban", 
                                "Party (R $\\longrightarrow$ D)",
@@ -407,6 +422,7 @@ stargazer(internal_int_all, external_int_all, type = "latex",
                                "Deportation Worry","Fear", "Anger",
                                "Pride", "Hope", "Sad", 
                                "Concrete Imm. Stigma x Linked Fate",
+                               "Concrete Imm. Index x Linked Fate",
                                "Constant"
                                )
           , out = "all_int.tex"

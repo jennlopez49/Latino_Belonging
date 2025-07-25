@@ -70,7 +70,7 @@ states <- states %>% mutate(
     latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
     latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
     latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
-    latino_conc_20 > 10 ~ 1),
+    latino_conc_20 > 10 ~ 1)
 )
 
 sym_16_map <- ggplot(data = states) +
@@ -300,3 +300,254 @@ ggsave(
   height = 8,                             # Height in inches
   dpi = 300                               # Resolution in dots per inch
 )
+
+states_287g <- merge(states, state_exp_287g, by.x = "STUSPS", by.y = "State", all.y = TRUE,
+                     all.x = TRUE)
+
+full_hist_287g <- read.csv("~/Desktop/COIi work/State_Laws/full_hist_287g.csv")
+
+full_hist_287g <- full_hist_287g %>% mutate(
+  active_2010 = ifelse(Year_Signed <= 2008 & Last_Year >= 2012, 1, 0),
+  active_2016 = ifelse(Year_Signed <= 2016 & Last_Year >= 2012, 1, 0),
+  active_2020 = ifelse(Year_Signed <= 2020 & Last_Year >= 2016, 1, 0),
+  active_2025 = ifelse(Year_Signed <= 2025 & Last_Year >= 2020, 1, 0)
+)
+
+agreements_per_state <- full_hist_287g %>%
+  group_by(State) %>%
+  summarise(
+    total_agreements = n(),
+    active_2010 = sum(active_2010, na.rm = TRUE),
+    active_2016 = sum(active_2016, na.rm = TRUE),
+    active_2020 = sum(active_2020, na.rm = TRUE),
+    active_2025 = sum(active_2025, na.rm = TRUE)
+  ) 
+
+agreements <- states %>%
+  left_join(agreements_per_state, by = c("STUSPS" = "State")) %>%
+  mutate(
+    total_agreements = replace_na(total_agreements, 0),
+    active_2010 = replace_na(active_2010, 0),
+    active_2016 = replace_na(active_2016, 0),
+    active_2020 = replace_na(active_2020, 0),
+    active_2025 = replace_na(active_2025, 0)
+  )
+
+ggplot(states_287g) +
+  geom_sf(aes(fill = abs(total_exp_lat_2010))) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "Impact of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreement Scores by State by 2010"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+
+ggplot(states_287g) +
+  geom_sf(aes(fill = abs(total_exp_lat_2016))) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "Impact of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreement Scores by State by 2016"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+
+ggplot(states_287g) +
+  geom_sf(aes(fill = abs(total_exp_lat_2020))) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "Impact of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreement Scores by State by 2020",
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+
+ggplot(states_287g) +
+  geom_sf(aes(fill = abs(total_exp_lat_2025))) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "Impact of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreement Scores by State by 2025"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  )
+
+active10 <- ggplot(agreements) +
+  geom_sf(aes(fill = active_2010)) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "# of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1,
+    option = "inferno"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreements in Each State by 2010"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  ) +  guides(
+    fill = guide_colorbar(
+      barwidth = 15,  # wider bar
+      barheight = 0.5, 
+      title.position = "top"
+    )
+  )
+
+active16 <- ggplot(agreements) +
+  geom_sf(aes(fill = active_2016)) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "# of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1,
+    breaks = c(0, 2, 4, 6),
+    labels = c("0", "2", "4", "6+"),
+    option = "inferno"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreements in Each State by 2016"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  ) +  guides(
+    fill = guide_colorbar(
+      barwidth = 15,  # wider bar
+      barheight = 0.5, 
+      title.position = "top"
+    )
+  )
+
+active20 <- ggplot(agreements) +
+  geom_sf(aes(fill = active_2020)) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "# of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1,
+    option = "inferno",
+    breaks = c(0, 1, 2, 5, 10, 20, 30, 40),
+    labels = c("0", "1", "2", "5", "10","20","30", "40+")
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreements in Each State by 2020"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  ) +  guides(
+    fill = guide_colorbar(
+      barwidth = 15,  # wider bar
+      barheight = 0.5, 
+      title.position = "top"
+    )
+  )
+
+active25 <- ggplot(agreements) +
+  geom_sf(aes(fill = active_2025)) +
+  scale_fill_viridis_c(
+    # colors = c("white", "yellow", "orange","red","firebrick", "purple"),
+    name = "# of 287(g) Agreements",
+    trans = "sqrt",
+    direction = -1,
+    breaks = c(0, 1, 5, 10, 20, 40, 60, 150),
+    labels = c("0", "1", "5", "10", "20", "40", "60", "150+"),
+    option = "inferno"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "287(g) Agreements in Each State by 2025"
+  ) +
+  theme(
+    axis.text = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    plot.title = element_text(size = 14, face = "bold")
+  ) + guides(
+    fill = guide_colorbar(
+      barwidth = 15,  # wider bar
+      barheight = 0.5, 
+      title.position = "top"
+    )
+  )
+
+maps2010s <- active10 + active16
+
+maps2020s <- active20 + active25
+
+ggsave(
+  filename = "287g_maps_2010s.png",  # File name with extension
+  plot = maps2010s,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
+ggsave(
+  filename = "287g_maps_2020s.png",  # File name with extension
+  plot = maps2020s,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)
+
+
