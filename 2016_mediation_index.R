@@ -289,3 +289,97 @@ mediation_table <- extract_mediation_summary(mediation_model)
 print(mediation_table)
 
 mod1 <- med_results$Inclusion_External$IV_Imm_Con_Index_Med_Fear_Election$mediation_result
+
+
+### SEM ----- Code -------------------------------------------------------------
+
+# writing the model
+sem_model_fear <- '
+  # Mediation paths
+  Fear_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016
+  Inclusion_Internal ~ b*Fear_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016
+
+  # Define indirect and total effects
+  indirect := a*b
+  total := cprime + (a*b)
+'
+
+# fitting it without weights
+fit_un_fear <- sem(sem_model_fear, data = cmps_lat_16$variables, estimator = "MLR")
+
+# Use your survey design object (you already have `cmps_lat_16`)
+fit_w_fear <- lavaan.survey(lavaan.fit = fit_un_fear, survey.design = cmps_lat_16)
+
+summary(fit_w_fear, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
+
+
+### 
+sem_model_anger <- '
+  # Mediation paths
+  Angry_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Inclusion_External ~ b*Angry_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+
+  # Define indirect and total effects
+  indirect := a*b
+  total := cprime + (a*b)
+'
+
+# fitting it without weights
+fit_un_anger <- sem(sem_model_anger, data = cmps_lat_16$variables, estimator = "MLR")
+
+# Use your survey design object (you already have `cmps_lat_16`)
+fit_w_anger <- lavaan.survey(lavaan.fit = fit_un_anger, survey.design = cmps_lat_16)
+
+summary(fit_w_anger, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
+
+serial_model <- '
+  # Regressions -- X --> Z
+  Linked_Fate ~ a1*latino_conc_16 + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+   # Z -> emotions (M)
+  Fear_Election ~ a2*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Sad_Election ~ a3*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Angry_Election ~ a4*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Pride_Election ~ a5*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Hope_Election ~ a6*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  ## Outcoem -- M --> Y
+  Inclusion_Internal ~ b1*Fear_Election + b2*Sad_Election + b3*Angry_Election + b4*Pride_Election + b5*Hope_Election + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+
+  # defined serial indirects X -> Z -> Emotion -> Y
+  ind_fear_serial  := a1 * a2 * b1
+  ind_sad_serial   := a1 * a3 * b2
+  ind_angry_serial   := a1 * a4 * b3
+  ind_pride_serial := a1 * a5 * b4
+  ind_hope_serial  := a1 * a6 * b5
+
+  total := cprime + ind_fear_serial + ind_sad_serial + ind_pride_serial + ind_hope_serial
+'
+
+
+
+fit_serial <- sem(serial_model, data = cmps_lat_16$variables, estimator = "MLR")
+fit_serial_svy <- lavaan.survey(fit_serial, survey.design = cmps_lat_16)
+summary(fit_serial_svy, standardized = TRUE, fit.measures = TRUE)
+
+
+
+#### STIGMA --> DISC --> INCLUSION 
+
+sem_model_disc <- '
+  # Mediation paths
+  Discrimination_National_Perc ~ a*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Inclusion_Internal ~ b*Discrimination_National_Perc + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+
+  # Define indirect and total effects
+  indirect := a*b
+  total := cprime + (a*b)
+'
+
+# fitting it without weights
+fit_un_disc <- sem(sem_model_disc, data = cmps_lat_16$variables, estimator = "MLR")
+
+# Use your survey design object (you already have `cmps_lat_16`)
+fit_w_disc <- lavaan.survey(lavaan.fit = fit_un_disc, survey.design = cmps_lat_16)
+
+summary(fit_w_disc, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
+
+

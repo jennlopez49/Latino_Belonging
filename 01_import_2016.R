@@ -14,7 +14,7 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
                                     S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
-                                    C253, LA202_6, S1, L24, C262)
+                                    C253, LA202_6, S1, L24, C262, C245)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
@@ -452,7 +452,8 @@ latinos_data <- latinos_data %>% mutate(
     latino_conc_20 > 10 ~ 1)
 )
 
-
+#### Saving Latino CSV 
+write.csv(latinos_data, "latinos_cmps_2016.csv")
 
 ### Creating Survey Design ---
 cmps_lat_16 <- svydesign(
@@ -477,8 +478,65 @@ national_origin_acs_2016$Pop_Percent <- (national_origin_acs_2016$Pop/total_pop_
 ## Overall - very small discrepancy, generally representative of Latinos 
 
 
+### Asians & Latinos ONLY ------------------------------------------------------
+immigrants_data <- full_cmps2016 %>% filter(Race_Prime %in% c("(2) Hispanic or Latino", "(4) Asian American"))
+immigrants_data <- immigrants_data %>% drop_na(foreign_sym_20, foreign_conc_20)  
+
+immigrant_data <- immigrants_data %>% mutate(
+  Discrimination_Scale = ifelse(
+    Personal_Discrimination == 0, 0,  # Did not experience discrimination
+    ifelse(
+      Race_Ethnicity_Disc == 1 | Immigration_Status_Disc == 1 | Personal_Discrimination == 1, 1, NA
+    )
+  ),
+  sym_for_index_16 = case_when(
+    foreign_sym_16 < -10 ~ -1,
+    foreign_sym_16 >= -10 & foreign_sym_16 < -5 ~ -0.5,
+    foreign_sym_16 >= -5 & foreign_sym_16 <= 5 ~ 0,
+    foreign_sym_16 > 5 & foreign_sym_16 <= 10 ~ 0.5,
+    foreign_sym_16 > 10 ~ 1),
+  conc_for_index_16 = case_when(
+    foreign_conc_16 < -10 ~ -1,
+    foreign_conc_16 >= -10 & foreign_conc_16 < -5 ~ -0.5,
+    foreign_conc_16 >= -5 & foreign_conc_16 <= 5 ~ 0,
+    foreign_conc_16 > 5 & foreign_conc_16 <= 10 ~ 0.5,
+    foreign_conc_16 > 10 ~ 1),
+  sym_for_index_20 = case_when(
+    foreign_sym_20 < -10 ~ -1,
+    foreign_sym_20 >= -10 & foreign_sym_20 < -5 ~ -0.5,
+    foreign_sym_20 >= -5 & foreign_sym_20 <= 5 ~ 0,
+    foreign_sym_20 > 5 & foreign_sym_20 <= 10 ~ 0.5,
+    foreign_sym_20 > 10 ~ 1),
+  conc_for_index_20 = case_when(
+    foreign_conc_20 < -10 ~ -1,
+    foreign_conc_20 >= -10 & foreign_conc_20 < -5 ~ -0.5,
+    foreign_conc_20 >= -5 & foreign_conc_20 <= 5 ~ 0,
+    foreign_conc_20 > 5 & foreign_conc_20 <= 10 ~ 0.5,
+    foreign_conc_20 > 10 ~ 1),
+  Group_Disc = case_when(
+    Race_Prime == "(2) Hispanic or Latino" ~ C247,
+    Race_Prime == "(4) Asian American" ~ C245,
+    TRUE ~ NA_character_  # For respondents not in either group
+  )
+)
+
+immigrant_data <- immigrant_data %>% mutate(
+  sym_for_index_16 = sym_for_index_16 * -1,
+  conc_for_index_16 = conc_for_index_16 * -1, 
+  sym_for_index_20 = sym_for_index_20 * -1,
+  conc_for_index_20 = conc_for_index_20 * -1,
+  foreign_sym_16 = foreign_sym_16 * -1,
+  foreign_conc_16 = foreign_conc_16 * -1,
+  foreign_sym_20 = foreign_sym_20 * -1,
+  foreign_conc_20 = foreign_conc_20 * -1
+)
 
 
+cmps_imm_16 <- svydesign(
+  ids = ~1, 
+  data = immigrant_data, 
+  weights = ~Weight
+)
 
 
 

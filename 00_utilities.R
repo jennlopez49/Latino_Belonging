@@ -13,6 +13,11 @@ library(sf)
 library(mediation)
 library(dplyr)
 library(broom)
+library(lavaan)
+library(lavaan.survey)
+library(lme4)
+library(brms)
+library(csSampling)
 
 ###### Custom Function run Multiple Mediation Analyses  -----------------
 mediation_function <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {
@@ -207,7 +212,7 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
   mediator_models <- list()
   for (M in mediators) {  
     for (X in ivs) {  
-      form_mediator <- as.formula(paste(M, " ~ ", X, "+ Linked_Fate +", paste(controls, collapse = " + ")))
+      form_mediator <- as.formula(paste(M, " ~ ", X, "+", paste(controls, collapse = " + ")))
       mediator_model <- svyglm(form_mediator, design = des, family = gaussian(),
                                data = dat_std)
       
@@ -220,7 +225,7 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
   for (Y in dvs) {  
     for (M in mediators) {  
       for (X in ivs) {  
-        form_outcome <- as.formula(paste(Y, " ~ ", X, "+", M, "+ Linked_Fate +", paste(controls, collapse = " + ")))
+        form_outcome <- as.formula(paste(Y, " ~ ", X, "+", M, "+", paste(controls, collapse = " + ")))
         outcome_model <- svyglm(form_outcome, design = des, family = gaussian(),
                                 data = dat_std)
         
@@ -241,4 +246,138 @@ mediation_function_standard <- function(dvs, ivs, mediators, controls, des,
   }
 }
 
+########## Function to cluster SEs by State ------------------------------------
+
+
+cluster_svyglm <- function(dvs, ivs, controls, dat, cluster_var, weight_var, out = NULL) {
+  
+  results <- list()
+  
+  # define survey design: clustering + weights
+  des <- svydesign(
+    ids = ~ get(cluster_var),   # cluster IDs (e.g., state)
+    weights = ~ get(weight_var),
+    data = dat
+  )
+  
+  for (Y in dvs) {
+    for (X in ivs) {
+      # build formula
+      form <- as.formula(
+        paste(Y, "~", X, "+", paste(controls, collapse = " + "))
+      )
+      
+      # fit weighted, clustered model
+      mod <- svyglm(form, design = des, family = gaussian())
+      
+      results[[paste0("DV_", Y, "_IV_", X)]] <- mod
+    }
+  }
+  
+  if (!is.null(out)) {
+    assign(out, results, envir = .GlobalEnv)
+  } else {
+    return(results)
+  }
+}
+
+
+############# Hierarchical Models to nest respondents --------------------------
+
+hier_lmer <- function(dvs, ivs, controls, dat, cluster_var, out = NULL, random_slopes = FALSE) {
+  
+  results <- list()
+  
+  for (Y in dvs) {
+    for (X in ivs) {
+      # Random intercepts
+      rand <- paste0("(1 | ", cluster_var, ")")
+      
+      # Random slopes if requested
+      if (random_slopes) {
+        rand <- paste0("(", X, " | ", cluster_var, ")")
+      }
+      
+      # Build formula
+      form <- as.formula(
+        paste(Y, "~", X, "+", paste(controls, collapse = " + "), "+", rand)
+      )
+      
+      # Fit model
+      mod <- lmer(form, data = dat)
+      
+      results[[paste0("DV_", Y, "_IV_", X)]] <- mod
+    }
+  }
+  
+  if (!is.null(out)) {
+    assign(out, results, envir = .GlobalEnv)
+  } else {
+    return(results)
+  }
+}
+
+############ Hierarchical using Bayesian --------------------------------------
+
+cs_hier <- function(dvs, ivs, controls, dat, cluster_var, weight_var = NULL,
+                    random_slopes = FALSE, family = gaussian(),
+                    chains = 4, iter = 2000, cores = 4, out = NULL) {
+  
+  library(brms)
+  library(survey)
+  library(csSampling)
+  
+  results <- list()
+  
+  # create survey design object
+  if (is.null(weight_var)) {
+    survey_design <- svydesign(ids = ~1, data = dat)
+  } else {
+    survey_design <- svydesign(ids = ~1, data = dat, weights = as.formula(paste0("~", weight_var)))
+  }
+  
+  for (Y in dvs) {
+    for (X in ivs) {
+      
+      # random effects formula
+      rand <- if(random_slopes) paste0("(", X, " | ", cluster_var, ")") else paste0("(1 | ", cluster_var, ")")
+      
+      # build model formula
+      formula <- bf(
+        as.formula(
+          paste(Y, "~", X, "+", paste(controls, collapse = " + "), "+", rand)
+        )
+      )
+      
+      # Step 1: Fit brms model
+      mod_brms <- brm(
+        formula = formula,
+        data = dat,
+        family = family,
+        chains = chains,
+        iter = iter,
+        cores = cores,
+        seed = 123
+      )
+      
+      mod_cs <-cs_sampling_brms(
+        svydes = survey_design,
+        brmsmod = mod_brms,   # <--- changed from mod_stan
+        data = dat,           # <--- changed from data_stan
+        family = family,
+        ctrl_stan = list(chains = chains, iter = iter)
+      )
+      
+      # save results
+      results[[paste0("DV_", Y, "_IV_", X)]] <- mod_cs
+    }
+  }
+  
+  # return or assign globally
+  if (!is.null(out)) {
+    assign(out, results, envir = .GlobalEnv)
+  } else {
+    return(results)
+  }
+}
 

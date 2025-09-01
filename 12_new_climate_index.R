@@ -217,13 +217,13 @@ services_keywords <- c(
   "medicaid", "snap", "tanf", "social services", "public assistance",
   "child care", "healthcare", "health", "healthcare", "medical", "welfare",
   "benefits eligibility", "mental health", "medical services",
-  "food stamps", "subsidy", "public benefits", "limit english", "english langauge",
+  "food stamps", "subsidy", "public benefits", "limit english", "english language",
   "ESL", "civic", "english proficiency", "language learners", "victim", "naturalization assistance",
   "naturalization services"
 )
 status_keywords <- c("criminal alien", "qualified alien", "qualified aliens", "legal resident", "citizenship status",
                      "immigration status", "permanent residence", "permanent residents",
-                     "authorization document", "eligiblity requirements", "illegal alien",
+                     "authorization document", "eligibility requirements", "illegal alien",
                      "identity document", "legal immigrant", "legal permanent", "alien")
 enforcement_imm_keywords <- c(
   "ice", "detainer", "287(g)", "immigration enforcement", "cooperation with ice",
@@ -237,13 +237,13 @@ criminal_keywords <- c("felony", "misdemeanor", "conviction", "crime", "criminal
   "sentencing", "plea", "detention", "smuggling", "harboring", "fraud", 
   "lawful presence")
 
-refugee_keywords <- c("refugee", "asylee", "resettlement", "siv", "afghan", "syrian", 
+refugee_keywords <- c("refugee", "asylee", "resettlement",
                       "refugee program", "resettlement agency")
 migrant_keywords <- c("migrant", "migrants")
 employment_keywords <- c("employment", "employer", "e-verify", "right to work", "hiring",
                          "labor rights", "workforce", "employee", "unauthorized employment")
 emergency_keywords <- c("emergency services", "911", "police access", "fire department",
-                        "ambulance", "sanctuary", "safe reporting", "fear of deportation")
+                        "ambulance")
 
 coded_laws_full <- coded_laws %>%
   mutate(
