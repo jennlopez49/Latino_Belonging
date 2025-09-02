@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.6.42">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Survey Pilot Data</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="pilots_data_exp_files/libs/clipboard/clipboard.min.js"></script>
+<script src="pilots_data_exp_files/libs/quarto-html/quarto.js"></script>
+<script src="pilots_data_exp_files/libs/quarto-html/popper.min.js"></script>
+<script src="pilots_data_exp_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="pilots_data_exp_files/libs/quarto-html/anchor.min.js"></script>
+<link href="pilots_data_exp_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="pilots_data_exp_files/libs/quarto-html/quarto-syntax-highlighting-2f5df379a58b258e96c21c0638c20c03.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="pilots_data_exp_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="pilots_data_exp_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="pilots_data_exp_files/libs/bootstrap/bootstrap-c0367b04c37547644fece4185067e4a7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Survey Pilot Data</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="survey-pilot-1-2" class="level2">
+<h2 class="anchored" data-anchor-id="survey-pilot-1-2">Survey Pilot 1 &amp; 2</h2>
+<p>#Average, Min, Max Durations (in minutes) of Pilot 1:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 17.29167</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 7</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 38</code></pre>
+</div>
+</div>
+<p>#Average, Min, Max Durations (in minutes) of Pilot 2:</p>
+<ul>
+<li>A respondent took a break and came back to finish the survey (started on the 6th, finished on the 7th), was excluded from these.</li>
+</ul>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 14.86957</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 6</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 33</code></pre>
+</div>
+</div>
+</section>
+<section id="descriptives" class="level1">
+<h1>Descriptives</h1>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 21
+  TreatmentCondition        mean_relief mean_anger mean_pride mean_joy mean_fear
+  &lt;chr&gt;                           &lt;dbl&gt;      &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
+1 Control_Policy                   2.41      0.294       2.82     3.88     0.647
+2 Treatment-Hypothetical_A…        1.93      3.73        1.8      1.67     3    
+3 Treatment-Hypothetical_P…        3.53      1.24        2.47     3.18     1.24 
+# ℹ 15 more variables: mean_shame &lt;dbl&gt;, mean_HypAffectLatino &lt;dbl&gt;,
+#   mean_HypAffectImms &lt;dbl&gt;, mean_HypPersonally &lt;dbl&gt;, mean_HypLikely &lt;dbl&gt;,
+#   mean_HypAttiude &lt;dbl&gt;, mean_GroupDiscImms &lt;dbl&gt;, mean_GroupDiscLat &lt;dbl&gt;,
+#   mean_ImmCrime &lt;dbl&gt;, mean_ImmPoliticansNeg &lt;dbl&gt;,
+#   mean_ImmPoliciesUnfair &lt;dbl&gt;, mean_LatCrime &lt;dbl&gt;,
+#   mean_LatPoliticansNeg &lt;dbl&gt;, mean_LatPoliciesUnfair &lt;dbl&gt;, n &lt;int&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="treatments-manipulation-check-what-did-you-just-read-about" class="level1">
+<h1>Treatments &amp; Manipulation Check — What did you just read about?</h1>
+<p>Control Policy - Consider the following policy proposal that could be implemented in your state: A recent policy proposal in your state would create a working group to analyze whether the current state flower should be kept, or whether other native flowers should be designated as the state flower. The proposed working group would invite high school students and those who work in botanical gardens to conduct research on native flowers and submit proposals on their recommendations for the state flower designation.</p>
+<p>Treatment (Pro-Immigrant) - Consider the following policy proposal that could be implemented in your state: A recent policy proposal in your state would remove the requirement for hospitals to ask their patients about their immigration status. Opponents argue that the policy is necessary to track what is being spent providing undocumented immigrants with medical care. Supporters argue that it would encourage immigrants to seek medical care, and that the policy will help people access public services.</p>
+<p>Treatment (Anti-immigrant) - Consider the following policy proposal that could be implemented in your state: This policy proposal would require hospitals to ask their patients about their immigration status. Supporters argue that the policy is necessary to track what is being spent to provide unauthorized immigrants with medical care to prevent them from “cheating the system.” Opponents argue that it would discourage immigrants from seeking medical care, and that the policy is an attempt to scare people into not using public services.</p>
+<p><em>For the question - what did you just read about?</em></p>
+<p>0 - Chose “None of these” or “Gun Control”</p>
+<p>1 - Was in the Control Group and Chose “State Symbols”</p>
+<p>2 - Was in either of the Hypothetical Policy Treatment Groups and Chose “Immigration”</p>
+<p>3 - Was in either of the Hypothetical Policy Treatment Groups and Chose “Healthcare”</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Would it affect immigrant / latino community / you ?</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-7-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-7-3.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>How likely &amp; would you support this policy?</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-8-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="emotions-stigma-measures-post-treatment-by-treatment-group" class="level1">
+<h1>Emotions &amp; Stigma Measures Post-Treatment by Treatment Group</h1>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-4.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-5.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-9-6.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Stigma Measures (Imm Stigma Matrix &amp; Latino Stigma Matrix)</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-3.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-4.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-5.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-10-6.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Checked whether the items are reliable (they are - immigrant stigma items cronbach alpha is at .8, Latino stigma is at .76)</p>
+<p>Visualization of the Index:</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="anova-testing-emotions-stigma-measures" class="level1">
+<h1>Anova Testing – Emotions &amp; Stigma Measures</h1>
+<p>Emotions -</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Relief <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   21.8  10.908   1.226  0.303
+Residuals          46  409.3   8.898               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Anger <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+TreatmentCondition  2  99.25   49.63   9.946 0.000257 ***
+Residuals          46 229.52    4.99                     
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Shame <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)  
+TreatmentCondition  2  32.08  16.042   3.803 0.0296 *
+Residuals          46 194.04   4.218                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Fear <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value  Pr(&gt;F)   
+TreatmentCondition  2  47.06  23.529   5.552 0.00692 **
+Residuals          46 194.94   4.238                   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Pride <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2    8.5   4.263   0.523  0.596
+Residuals          46  375.1   8.154               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Joy <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   40.3  20.175   2.171  0.126
+Residuals          46  427.6   9.295               </code></pre>
+</div>
+</div>
+<p>Stigma measures -</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(ImmsMajSourceCrime <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   0.36  0.1804   0.123  0.885
+Residuals          46  67.64  1.4704               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(PoliticiansTalkNegImm <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   0.87  0.4327   0.275  0.761
+Residuals          46  72.40  1.5739               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(PoliciesImmUnfair <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   0.63  0.3172    0.22  0.803
+Residuals          46  66.35  1.4423               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(LatinosMajSourceCrime <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   0.95  0.4743   0.387  0.682
+Residuals          46  56.44  1.2269               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(PoliticiansTalkNegLatinos <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   1.91  0.9569   0.611  0.547
+Residuals          46  72.09  1.5671               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(PoliciesLatinosUnfair <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   1.28  0.6415    0.43  0.653
+Residuals          46  68.64  1.4921               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Stigma_Imm_Index <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2    3.7   1.840   0.192  0.826
+Residuals          46  441.4   9.595               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Stigma_Latinos_Index <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2    5.2   2.606   0.296  0.745
+Residuals          46  404.9   8.802               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## alternate --- perceptions of group discrimination against immigrants / latinos </span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(GroupDiscImms_Perc <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2  0.628  0.3141   0.569   0.57
+Residuals          45 24.851  0.5522               
+1 observation deleted due to missingness</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(GroupDiscLatinos_Perc <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)  
+TreatmentCondition  2  3.763  1.8817   4.202 0.0212 *
+Residuals          45 20.153  0.4478                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+1 observation deleted due to missingness</code></pre>
+</div>
+</div>
+</section>
+<section id="outcomes-visualization-and-anova-testing-by-treatment-belonging" class="level1">
+<h1>Outcomes: Visualization and ANOVA Testing by Treatment — Belonging</h1>
+<p>Internal Belonging (Feel They Belong in the US &amp; Their State of Residence)</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-15-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>state_pilots <span class="ot">&lt;-</span> <span class="fu">aov</span>(Belonging_State <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(state_pilots)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   2.44   1.222   0.242  0.786
+Residuals          46 232.66   5.058               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>US_pilots <span class="ot">&lt;-</span> <span class="fu">aov</span>(Belonging_US <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(US_pilots)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2    8.7   4.369    0.61  0.548
+Residuals          46  329.3   7.158               </code></pre>
+</div>
+</div>
+<p>External Belonging (feel that others value / respect them) in the US &amp; their state of residence</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ANOVA test for difference among groups -- can see in the US graph visually</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(BelongExternal_1 <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2  22.19  11.094   1.987  0.149
+Residuals          46 256.79   5.582               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(BelongExternal_2 <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)  
+TreatmentCondition  2  52.45  26.224   4.024 0.0245 *
+Residuals          46 299.76   6.516                 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+<section id="outcomes-visualization-and-anova-testing-by-treatment-immigration-border-attitudes" class="level1">
+<h1>Outcomes: Visualization and ANOVA Testing by Treatment — Immigration &amp; Border Attitudes</h1>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-19-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-19-3.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-19-4.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-19-5.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Political Efficacy —</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-20-2.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(Internal_PolEfficacy <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2  12.54   6.272   2.382  0.104
+Residuals          46 121.13   2.633               </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">aov</span>(External_PolEfficacy <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   Df Sum Sq Mean Sq F value Pr(&gt;F)
+TreatmentCondition  2   8.67   4.337   1.175  0.318
+Residuals          46 169.73   3.690               </code></pre>
+</div>
+</div>
+</section>
+<section id="second-embedded-survey-experiment" class="level1">
+<h1>Second Embedded Survey Experiment</h1>
+<p>Participation Versions:</p>
+<ol type="1">
+<li><p>Voto Latino works to help individuals register to vote and cast ballots on time. Would you like to receive more information from them about voting and elections in your state?</p></li>
+<li><p>Voto Latino provides information on voter registration, casting ballots, and issues affecting the <span class="math inline">\({TermLatinoHispanic /ChoiceGroup/SelectedChoices} community.
+Would you like to receive more information from them about issues facing the\)</span>{TermLatinoHispanic /ChoiceGroup/SelectedChoices} community in your state?</p></li>
+</ol>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="pilots_data_exp_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid figure-img" width="1800"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                     Df Sum Sq Mean Sq F value Pr(&gt;F)
+ParticipationVersion  1  0.389  0.3894   1.664  0.203
+Residuals            47 10.998  0.2340               </code></pre>
+</div>
+</div>
+<p>Some preliminary regressions to make sure its the anti-immigrant treatment moving –</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>model_anger <span class="ot">&lt;-</span> <span class="fu">lm</span>(Anger <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_anger)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Anger ~ TreatmentCondition, data = both_pilots)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.7333 -1.2353 -0.2941  0.7059  6.2667 
+
+Coefficients:
+                                              Estimate Std. Error t value
+(Intercept)                                     0.2941     0.5418   0.543
+TreatmentConditionTreatment-Hypothetical_Anti   3.4392     0.7913   4.346
+TreatmentConditionTreatment-Hypothetical_Pro    0.9412     0.7662   1.228
+                                              Pr(&gt;|t|)    
+(Intercept)                                      0.590    
+TreatmentConditionTreatment-Hypothetical_Anti 7.58e-05 ***
+TreatmentConditionTreatment-Hypothetical_Pro     0.226    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.234 on 46 degrees of freedom
+Multiple R-squared:  0.3019,    Adjusted R-squared:  0.2715 
+F-statistic: 9.946 on 2 and 46 DF,  p-value: 0.0002572</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>model_fear <span class="ot">&lt;-</span> <span class="fu">lm</span>(Fear <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_fear)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Fear ~ TreatmentCondition, data = both_pilots)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.0000 -1.2353 -0.6471  0.7647  6.0000 
+
+Coefficients:
+                                              Estimate Std. Error t value
+(Intercept)                                     0.6471     0.4993   1.296
+TreatmentConditionTreatment-Hypothetical_Anti   2.3529     0.7293   3.227
+TreatmentConditionTreatment-Hypothetical_Pro    0.5882     0.7061   0.833
+                                              Pr(&gt;|t|)   
+(Intercept)                                    0.20145   
+TreatmentConditionTreatment-Hypothetical_Anti  0.00231 **
+TreatmentConditionTreatment-Hypothetical_Pro   0.40910   
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 2.059 on 46 degrees of freedom
+Multiple R-squared:  0.1945,    Adjusted R-squared:  0.1594 
+F-statistic: 5.552 on 2 and 46 DF,  p-value: 0.006919</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>model_int_polef <span class="ot">&lt;-</span> <span class="fu">lm</span>(Internal_PolEfficacy <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_int_polef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = Internal_PolEfficacy ~ TreatmentCondition, data = both_pilots)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.4000 -1.1765 -0.1765  0.8235  3.6000 
+
+Coefficients:
+                                              Estimate Std. Error t value
+(Intercept)                                     5.2353     0.3936  13.302
+TreatmentConditionTreatment-Hypothetical_Anti   1.1647     0.5748   2.026
+TreatmentConditionTreatment-Hypothetical_Pro    0.9412     0.5566   1.691
+                                              Pr(&gt;|t|)    
+(Intercept)                                     &lt;2e-16 ***
+TreatmentConditionTreatment-Hypothetical_Anti   0.0486 *  
+TreatmentConditionTreatment-Hypothetical_Pro    0.0976 .  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.623 on 46 degrees of freedom
+Multiple R-squared:  0.09384,   Adjusted R-squared:  0.05444 
+F-statistic: 2.382 on 2 and 46 DF,  p-value: 0.1037</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>model_ext_polef <span class="ot">&lt;-</span> <span class="fu">lm</span>(External_PolEfficacy <span class="sc">~</span> TreatmentCondition, <span class="at">data =</span> both_pilots)</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model_ext_polef)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = External_PolEfficacy ~ TreatmentCondition, data = both_pilots)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.2941 -1.2941  0.1333  1.1765  4.1333 
+
+Coefficients:
+                                              Estimate Std. Error t value
+(Intercept)                                     4.8235     0.4659  10.353
+TreatmentConditionTreatment-Hypothetical_Anti   1.0431     0.6805   1.533
+TreatmentConditionTreatment-Hypothetical_Pro    0.4706     0.6589   0.714
+                                              Pr(&gt;|t|)    
+(Intercept)                                   1.33e-13 ***
+TreatmentConditionTreatment-Hypothetical_Anti    0.132    
+TreatmentConditionTreatment-Hypothetical_Pro     0.479    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 1.921 on 46 degrees of freedom
+Multiple R-squared:  0.04862,   Adjusted R-squared:  0.007259 
+F-statistic: 1.175 on 2 and 46 DF,  p-value: 0.3178</code></pre>
+</div>
+</div>
+<p>Very Early + Preliminary, but could be a good sign of higher negative emotions (anger) –&gt; higher internal efficacy</p>
+<section id="open-ended-questions" class="level3">
+<h3 class="anchored" data-anchor-id="open-ended-questions">Open-Ended Questions</h3>
+<p>Pilot 1 had all open ended questions. Pilot 2 only had the open-ended question on state belonging and follow-up on the participation question (no open-ended question on US belonging).</p>
+<p><em>For Belonging - the scale is 1 (not at all) to 10 (a lot):</em></p>
+<p>On Belonging (State):</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Response for State Belonging (Rated 7): 'I belong in my state because I live in
+California. We are a majority latino state.' By 38-year-old Male in California 
+
+Response for State Belonging (Rated 9): 'I've lived in Oklahoma as a teen, was
+nice. I moved here when my husband died, because Texas had too many memories;
+Is FINE, very diverse' By 49-year-old Female in Oklahoma 
+
+Response for State Belonging (Rated 9): 'This is where I was born and raised,
+it's where many people who share my Mexican-American heritage also live. I've
+lived in another state with less Mexican-Americans and it felt isolating and
+lonely. I want to live in community with people who share my culture, values,
+and history. For me, that is specifically Southern California. I get to express
+and experience my culture in so many ways--Chicano Art Museum, Chicano Park
+Day, Tamale Festival, Day of the Dead Festivals, etc. The one element of why I
+don't feel totally as if I belong here is because I'm being priced out of my
+own community.  ' By 37-year-old Female in California 
+
+Response for State Belonging (Rated 5): 'I feel like I belong because I live
+here and do many things here, but sometimes I don't feel like belonging because
+I am treated differently because of my accent.' By 27-year-old Male in
+Connecticut 
+
+Response for State Belonging (Rated 8): 'My state is a lot more progressive
+here in the West Coast. Despite this, there will always be people who will be
+racially prejudice no matter what I do. Still, it's more safer here than
+anywhere else.' By 25-year-old Female in California 
+
+Response for State Belonging (Rated 9): 'I definitely feel like I belong in my
+state because I have lived here for over 10 years. I feel like the community
+I’m in is a good one.' By 25-year-old Male in Nevada 
+
+Response for State Belonging (Rated 5): 'It's very right leaning. ' By
+32-year-old Male in Texas 
+
+Response for State Belonging (Rated 5): 'I don't necessarily feel excluded but
+I don't feel very welcome either.' By 21-year-old Female in Maine 
+
+Response for State Belonging (Rated 10): 'I've been a resident for about 17
+years.' By 57-year-old Male in Florida 
+
+Response for State Belonging (Rated 7): 'I feel like I belong to my state
+because I have lived here for over a decade and I have integrated within the
+community. I feel like people know me and know that I am proud to live here and
+call this my home.' By 37-year-old Male in Washington 
+
+Response for State Belonging (Rated 7): 'i feel like people see me as an equal
+because time have progressed rather quickly because of the internet. ' By
+41-year-old Female in Virginia 
+
+Response for State Belonging (Rated 9): 'i feel i belong because i have never
+been discriminated ever since i was born here,despite my ethicsi f' By
+39-year-old Male in Florida 
+
+Response for State Belonging (Rated 10): 'I feel like my state is very liberal
+and have many different cultures here. We also have strong democratic people in
+the senate that fight for Latino rights.' By 48-year-old Male in New Jersey 
+
+Response for State Belonging (Rated 9): 'I’ve spent my entire life here and
+have great pride' By 46-year-old Male in Illinois 
+
+Response for State Belonging (Rated 7): 'I live in a blue state and I feel like
+I am being treated better than when I was living in the south' By 32-year-old
+Male in New York 
+
+Response for State Belonging (Rated 7): 'I’ve been liiving in my state for 20
+years and I feel like I am oft of it and is the safe haven ' By 58-year-old
+Male in New York 
+
+Response for State Belonging (Rated 10): 'I feel I belong in my state because I
+have several neighbors of my ethnic group and therefore face little to no
+discrimination.' By 39-year-old Female in Illinois 
+
+Response for State Belonging (Rated 9): 'I belong to my state because i was
+born there ' By 46-year-old Male in Florida 
+
+Response for State Belonging (Rated 8): 'I belong in my state because I was
+born here and have natural rights to be here. ' By 51-year-old Female in Texas 
+
+Response for State Belonging (Rated 9): 'I feel like i am proud to be a Texan
+Hispanic and American even though i am a lighter toned hispanic and people
+might get confused that i am one i am still proud of my culture and ethnicity.'
+By 24-year-old Male in Texas 
+
+Response for State Belonging (Rated 8): 'I feel a strong connection to my state
+because I have lived here most of my life, and the community values align with
+my own. The local culture and people make me feel at home' By 52-year-old
+Female in Oregon 
+
+Response for State Belonging (Rated 8): 'I feel like I personally belong to my
+state because I do not face much problems that others complain about.' By
+31-year-old Male in California 
+
+Response for State Belonging (Rated 4): 'My state is very bias in its liberal
+beliefs yet its a very expensive state its very tough to fit in New York City.'
+By 29-year-old Male in New York 
+
+Response for State Belonging (Rated 10): 'I feel I do because I was born and
+raised here, plain and simple.' By 27-year-old Male in California 
+
+Response for State Belonging (Rated 9): 'Because I was born in this country. '
+By 30-year-old Female in California 
+
+Response for State Belonging (Rated 10): 'I have never felt as though I don't
+belong here, neither as a state of a country. So I wouldn't even really know
+where to begin to explain why I feel that I belong, I know that I do.' By
+30-year-old Male in Florida 
+
+Response for State Belonging (Rated 6): 'I feel like I have every right to be
+here, but I don't think I agree on issues with a lot of the people around me,
+which contributes to some sense of not belonging.' By 32-year-old Female in
+Arizona 
+
+Response for State Belonging (Rated 9): 'I feel I belong here because there is
+a large Hispanic population that goes back before the US was a country.' By
+49-year-old Male in Texas 
+
+Response for State Belonging (Rated 5): 'Its a state that generally still holds
+some of my progressive attitudes' By 26-year-old Male in California 
+
+Response for State Belonging (Rated 10): 'I feel like I belong in my state
+because the people who live here are a lot like me and I enjoy living here. '
+By 45-year-old Female in Colorado 
+
+Response for State Belonging (Rated 3): 'i belong in my state because i was
+born here and help out my community.' By 42-year-old Male in New Mexico 
+
+Response for State Belonging (Rated 3): 'I feel somewhat disconnected in my
+state because I don’t see many people who share my background or experiences.
+However, I feel a bit more connected to the United States as a whole because of
+its diversity and opportunities.' By 25-year-old Male in New York 
+
+Response for State Belonging (Rated 1): 'lots of racism in Ohio it has always
+made me feel uncomfortable and less than ' By 52-year-old Female in Ohio 
+
+Response for State Belonging (Rated 10): 'I feel like I belong in my state
+because I feel it offers the most services for people with disabilities as I am
+a person with a disability. For example, in this state there is a service
+called paratransit that transports people 24/7 who due to a condition cannot
+travel using bus and subway. To my knowledge, no other state offers 24/7
+paratransit service for people with disabilities.' By 43-year-old Male in New
+York 
+
+Response for State Belonging (Rated 7): 'I just feel like we are always being
+judged but I feel it a lot less in the state that I am due to the wide range of
+people living here.' By 26-year-old Male in California 
+
+Response for State Belonging (Rated 6): 'My state is just expensive and almost
+u liveable.hispanics in poveety or slightly above poverty have a hard time
+surviving in these expensive states.Also get a lot of discr8mination in new
+england.' By 38-year-old Female in Massachusetts 
+
+Response for State Belonging (Rated 8): 'THE STATE USED TO BELONG TO MEXICO AND
+MOST OF THE LABOR AND BLUE COLLAR JOBS HERE ARE COMPOSED/RAN FROM MEXICANS SO I
+FEEL A STRONG CONNECTION TO MY CULTURE AND PEOPLE' By 23-year-old Male in
+California 
+
+Response for State Belonging (Rated 7): 'I mean, I am here without issue, so I
+do not feel like I do not belong. However, I know that some people dislike
+immigrants, regardless of their legal status. While it has never affected me, I
+have seen it affect others and so I dont know if I will ever fully belong.' By
+37-year-old Female in California 
+
+Response for State Belonging (Rated 8): 'I mostly feel I belong in my state
+because people treat me with respect when outside my home. However, I feel that
+some freedoms are being taken away by Republicans and that is something I don't
+like.' By 33-year-old Male in Texas 
+
+Response for State Belonging (Rated 10): 'I belong in my stat because i was
+born in the united states' By 30-year-old Male in New Jersey 
+
+Response for State Belonging (Rated 2): 'I moved here at around 13-14, so I
+didn't really have a say or a choice. I came in as a book worm and like an
+intellectual. There is nothing but hicks and rednecks around here, who are very
+mechanically oriented and smart in that sense, but nobody here reads books or I
+think even knows how to pick up a book and read from it. I have slowly but
+surely adapted into this blue collar drunkard mindset, but I can't help but
+feel like there is somewhere else calling my name where I would truly feel at
+home and not feel like I have to just play along with what everyone around me
+is saying thinking doing and believing just so that I can be a 'Pennsylvanian.'
+I like the place well enough I guess, but I have never once really felt like I
+was at home in the deepest parts of my heart and soul in my time living here,
+and I am now 25 years of age. I hope to one day move somewhere far, far, far
+away, and find my true home, which I do still believe is in the United States
+of America as it's a good place' By 26-year-old Male in Pennsylvania 
+
+Response for State Belonging (Rated 6): 'Since I am a citizen, I believe that I
+can identify as an American and feel like I belong. ' By 32-year-old Female in
+Texas 
+
+Response for State Belonging (Rated 6): 'Because of rampant discrimination
+against immigrants in my state.' By 39-year-old Male in Pennsylvania 
+
+Response for State Belonging (Rated 7): 'I think I belong in my state because I
+get along with everyone anywhere I go. ' By 27-year-old Male in Texas 
+
+Response for State Belonging (Rated 8): 'Although I have never really lived in
+any other state, I feel that I belong in my state, because many in my community
+have values that I share and because we are connected in part through the
+common experiences and the culture. People here, environment and opportunities
+let me feel like at home, like I’m included.' By 43-year-old Male in Florida 
+
+Response for State Belonging (Rated 7): 'i belong in US because is my country '
+By 79-year-old Female in New Mexico 
+
+Response for State Belonging (Rated 7): 'ive lived here my whole life
+surrounded by a community of hispanics. ' By 26-year-old Male in New Jersey 
+
+Response for State Belonging (Rated 7): 'I feel like where I am right now,
+there is a large hispanic community here, however I don't know how it would
+feel outside of here.' By 22-year-old Male in Texas 
+
+Response for State Belonging (Rated 9): 'En mi Estado he tenido oportunidades
+de trabajo y educacion que me permiten ser la persona que soy actualmente.' By
+56-year-old Female in North Carolina </code></pre>
+</div>
+</div>
+<p>Belonging in the US (only Pilot 1 was shown this question):</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Response for US Belonging (Rated 3): 'Especially in the south I would feel
+unwelcomed.' By 38-year-old Male in California 
+
+Response for US Belonging (Rated 10): 'I was BORN here, lived in Panama, as a
+teen; never felt at home there, despite my mother living there half of her
+life. I am a diehard American.' By 49-year-old Female in Oklahoma 
+
+Response for US Belonging (Rated 9): 'I belong here because, as stated in the
+Constitution, I am granted citizenship right as someone born here. End of
+story. The reason that I didn't put a 10, is because as a Brown queer woman I
+am constantly being made to feel through policies and fake culture wars that I
+don't belong and it can feel isolating. ' By 37-year-old Female in California 
+
+Response for US Belonging (Rated 5): 'I feel like I belong because I live here
+and do many things here, but sometimes I don't feel like belonging because I am
+treated differently because of my accent.' By 27-year-old Male in Connecticut 
+
+Response for US Belonging (Rated 0): 'With Trump's current administration, as
+well as the actions and words he's said in the past as part of his presidency,
+the majority of America have seen us as a threat, regardless of if we were born
+in the states, a legal resident, or undocumented. For how we are, we are deemed
+not worthy of being on American soil.' By 25-year-old Female in California 
+
+Response for US Belonging (Rated 10): 'I do belong in the US because this is my
+home. Even despite all the issues this country is currently facing, there is a
+lot to look forward to.' By 25-year-old Male in Nevada 
+
+Response for US Belonging (Rated 7): 'I was born in this country. I have a
+right to be here' By 32-year-old Male in Texas 
+
+Response for US Belonging (Rated 10): 'I've lived here my entire life, I belong
+here.' By 21-year-old Female in Maine 
+
+Response for US Belonging (Rated 10): 'I was born in the U.S. and as a citizen
+I do in fact belong here.' By 57-year-old Male in Florida 
+
+Response for US Belonging (Rated 8): 'I feel like I am an American. Even though
+I immigrated here I know that I follow all the cultural norms and traditions
+and I don't feel like an outsider at all.' By 37-year-old Male in Washington 
+
+Response for US Belonging (Rated 10): 'everywhere i travel to even if its a
+state with few tourists im embraced because i share american social customs.'
+By 41-year-old Female in Virginia 
+
+Response for US Belonging (Rated 9): 'i feel i have never been discriminated
+ever since i was born here despite my ethic' By 39-year-old Male in Florida 
+
+Response for US Belonging (Rated 9): 'Since I was born here I have a strong
+sense of belonging to this country. I feel like for the most part
+discrimination against me has not been harsh.' By 48-year-old Male in New
+Jersey 
+
+Response for US Belonging (Rated 9): 'I have great pride in my country ' By
+46-year-old Male in Illinois 
+
+Response for US Belonging (Rated 3): 'I dont really agree with the stuff the
+government does, I also don't relate to the average american when it comes to
+politics ' By 32-year-old Male in New York 
+
+Response for US Belonging (Rated 2): 'I am not sure if in other states I will
+be considered as an American some states wont accept me' By 58-year-old Male in
+New York 
+
+Response for US Belonging (Rated 7): 'I quite belong because in the US racial
+and ethnic discrimination is in most places and my group is considered a
+minority.' By 39-year-old Female in Illinois 
+
+Response for US Belonging (Rated 9): 'i belong to the US because am a citizen
+by birth ' By 46-year-old Male in Florida 
+
+Response for US Belonging (Rated 10): 'I belong in the US because this is my
+birthplace. ' By 51-year-old Female in Texas 
+
+Response for US Belonging (Rated 9): 'I feel like i belong to make the country
+better and feel i can provide that in anything that i choose to do!' By
+24-year-old Male in Texas 
+
+Response for US Belonging (Rated 8): 'I feel connected to the United States
+because I believe in the country's core values of freedom and opportunity,
+though there are aspects of the political climate that sometimes make me feel
+disconnected' By 52-year-old Female in Oregon 
+
+Response for US Belonging (Rated 9): 'I do belong to USA because I was born and
+raised here, I know the culture and I behave as an American. ' By 31-year-old
+Male in California 
+
+Response for US Belonging (Rated 7): 'I feel like I feel like I don't belong in
+the United States because the financial ladder is hard to climb and I feel left
+out.' By 29-year-old Male in New York 
+
+Response for US Belonging (Rated 10): 'I belong here because I grew up in this
+country and grew up around American culture this is my home.' By 27-year-old
+Male in California </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="whether-they-would-like-to-be-contacted-by-a-civic-organization-voto-latino--" class="level1">
+<h1>Whether they would like to be contacted by a civic organization (Voto Latino) -</h1>
+<p>Current thoughts: The “no cue” version should just say a civic organization (rather than name a specific one)</p>
+<p><em>Participation Response - 0 (No, would not like to be contacted) or 1 (Yes, would like to be contacted)</em></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'My state does a good job in keeping us informed about issues, I
+would not want to be contacted becuase I know the issues well.' By 38-year-old
+Male in California 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I don't need help voting; I always vote. English is my native language,
+America is my country.' By 49-year-old Female in Oklahoma 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I can make my own decisions. Latinx are not a monolith and we vote
+based on our own personal values. ' By 37-year-old Female in California 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'Because I feel like I would like to know more about that Voto Latino' By
+27-year-old Male in Connecticut 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I want to keep up to date on what's going on in my community. It's
+already bad enough that the government is being secretive about the camps they
+hold for those seized by ICE, and I have family that I need to protect.' By
+25-year-old Female in California 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I would like to learn more information about it.' By 25-year-old Male in
+Nevada 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I have plenty of information already.' By 32-year-old Male in
+Texas 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I would like information on what's going on politically.' By 21-year-old
+Female in Maine 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I'm definitely able to gather more information on my own.  ' By
+57-year-old Male in Florida 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'Because I already know what I need to do for all of that. I am
+already registered to vote and have vogted and I know what affects me as a
+Hispanic I don't care what affects others.' By 37-year-old Male in Washington 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): ' its sad but i dont want to feel weighed down knowing whats
+happening to immigrants. ' By 41-year-old Female in Virginia 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'yaes because i would love to know more how fair this voting is done ' By
+39-year-old Male in Florida 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'As someone who has voted in every major election since I turned 18, I
+don’t need this kind of support. Though I do like what they’re doing with
+this.' By 48-year-old Male in New Jersey 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I like to ek out my own information ' By 46-year-old Male in
+Illinois 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I am already registered to vote ' By 32-year-old Male in New York 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I am saturated of politics and community politics ' By 58-year-old
+Male in New York 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'Because this is information I can personally look up and find.' By
+39-year-old Female in Illinois 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I would like to know much about my community ' By 46-year-old Male
+in Florida 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I don't care for one on one contact with people. I would not care to have
+a conversation about it but I would be interested in learning about the issue
+in other ways like social media or reading about it online. ' By 51-year-old
+Female in Texas 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I would like to be more informed on current and up to date issues
+revolving my culture and ethnicity as a hispanic US citizen.' By 24-year-old
+Male in Texas 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I would not like to be contacted because I prefer to seek out voting
+information on my own when needed. I like to have control over the sources I
+receive updates from' By 52-year-old Female in Oregon 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I learned a lot about the my group online and other sources, I
+would not want to be feed with bias information incase the organization choose
+to be bias.' By 31-year-old Male in California 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I want to know more about local issues since the news is dominated
+by Federal politics.' By 29-year-old Male in New York 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I would not because I'm pretty sure I can find that information on my
+own.' By 27-year-old Male in California 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I would like to have more information on it.' By 30-year-old
+Female in California 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I feel confident in my own knowledge about what is and isn't a
+political issue for me and my community. I don't feel that I would get any
+value or understanding from it.' By 30-year-old Male in Florida 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I am already registered to vote and have no trouble casting my ballot on
+time.' By 32-year-old Female in Arizona 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I like to seek ways to help on my own.' By 49-year-old Male in Texas 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I'm not intrested at the moment' By 26-year-old Male in California 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I wouldn't like to be contacted because I'm not very interested in
+politics.' By 45-year-old Female in Colorado 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'i have too many organizations alresdy trying to contact me.' By
+42-year-old Male in New Mexico 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I would like to be contacted because staying informed about issues
+that affect the Latino/a community is important to me, and I want to be more
+involved in civic activities.' By 25-year-old Male in New York 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'I would not mind hearing what they have to say' By 52-year-old
+Female in Ohio 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I am not interested in civic engagement as such is the reason why I do not
+wish to be contacted by a civic organization.' By 43-year-old Male in New York 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I would like to receive information so that I can share it with my
+family/friends.' By 26-year-old Male in California 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I dont like to get involved with the community.I dont feel like
+anyone cares what hispanics think.' By 38-year-old Female in Massachusetts 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I DONT KNOW HOW EFFECTIVE THAT WOULD BE, SOMETHING IM NOT TOO INTERESTED
+IN' By 23-year-old Male in California 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+0): 'I don't feel I need help or information with/about that. I could see it
+being helpful to some of my family members though.' By 37-year-old Female in
+California 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I like to make my own research on important issues. There are many
+sources online I could use to be informed.' By 33-year-old Male in Texas 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I dont have a reason to be contacted ' By 30-year-old Male in New Jersey 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I guess I am not doing my civic duty but I guess I just don't care
+about politics, but I know that that makes me unpatriotic, which should bring
+some shame to me.' By 26-year-old Male in Pennsylvania 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I get enough information from doing my own research.' By
+32-year-old Female in Texas 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I would like to be contacted to be enlightened on the general voting
+process.' By 39-year-old Male in Pennsylvania 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'I am able to do my own research and educate myself ' By
+27-year-old Male in Texas 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I’m interested in contacting a civil organization for being kept up to
+date and partaking in the matters that affect my community. Working with such
+organizations can lend me contributing to some social cause.' By 43-year-old
+Male in Florida 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'i find it interesting,i like to get more information it can help me one
+day' By 79-year-old Female in New Mexico 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 0): 'as mush as i would like that ive accepted at this point that
+things rarely change' By 26-year-old Male in New Jersey 
+
+Response for wanting (or not wanting) more information (Shown No Cue &amp; Chose
+1): 'I think it is interesting and would like to know more.' By 22-year-old
+Male in Texas 
+
+Response for wanting (or not wanting) more information (Shown Latino Issue Cue
+&amp; Chose 1): 'Es importante tener conocimiento real y actual de lo que mi
+comunidad esta pasando en estos momentos de tantos cambios que afectan la
+estabilidad laboral, economica y familiar de tantas personas que ven destruir
+sus familias.' By 56-year-old Female in North Carolina </code></pre>
+</div>
+</div>
+<p>Thoughts on open-ended questions: people provided “real” answers, and for some, it seemed like that the questions were on topics that they wanted to discuss. The questions on belonging to me seemed to be produce more useful or thought-provoking answers that can shed light on that question of how immigration is affecting people psychologically. The participation question did get some good answers reflecting efficacy (worry about the community &amp; wanting to do more or expressing hopelessness), but many were along the vein of “no, already have enough information” or “would like to seek that information on my own.”</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
