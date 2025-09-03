@@ -6,6 +6,7 @@
 .pdf
 .tex
 .csv
-*.js
-*.css
+.js
+.css
+pilots_data_exp_files/
 .DS_Store
