@@ -6,3 +6,6 @@
 .pdf
 .tex
 .csv
+*.js
+*.css
+.DS_Store
