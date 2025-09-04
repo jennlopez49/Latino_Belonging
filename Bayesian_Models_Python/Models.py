@@ -36,7 +36,7 @@ for col in categorical_vars:
 model = bmb.Model("Discrimination_Scale ~ conc_lat_index_16 + (1|State)", data=cmps2016_clean)
 trace = model.fit(draws=100, chains=1)  # small run to test compilation
 
-def run_bayesian_hier(dvs, ivs, controls, cluster_var, data, iter=2000, chains=4, target_accept=0.95):
+def run_bayesian_hier(dvs, ivs, controls, cluster_var, data, iter=2000, chains=4, target_accept=0.99):
     results = {}
     
     for Y in dvs:
@@ -98,9 +98,62 @@ combined_df_emos = pd.concat(
 # Move 'Model' column to front
 cols = ['Model'] + [c for c in combined_df_emos.columns if c != 'Model']
 combined_df_emos = combined_df_emos[cols]
+combined_df_emos['Model'].unique() # to get model names
+
+## Rearranging to make it cleaner/easier to read
+model_name_map = {
+    'Discrimination_Scale_conc_lat_index_16': 'Discrimination Experience + Stigma Index',
+    'Discrimination_Scale_latino_conc_16': 'Discrimination Experience + Stigma',
+    'Latino_Disc_conc_lat_index_16': 'Perception of Disc. + Stigma Index',
+    'Latino_Disc_latino_conc_16': 'Perception of Disc. + Stigma',
+    'Fear_Election_conc_lat_index_16' : 'Fear + Stigma Index',
+    'Fear_Election_latino_conc_16' : 'Fear + Stigma',
+    'Angry_Election_conc_lat_index_16' : 'Anger + Stigma Index',
+    'Angry_Election_latino_conc_16' : 'Anger + Stigma',
+    'Sad_Election_conc_lat_index_16' : 'Sad + Stigma Index',
+    'Sad_Election_latino_conc_16' : 'Sad + Stigma',
+    'Pride_Election_conc_lat_index_16' : 'Pride + Stigma Index', 
+    'Pride_Election_latino_conc_16' : 'Pride + Stigma',
+    'Hope_Election_conc_lat_index_16' : 'Hope + Stigma Index',
+    'Hope_Election_latino_conc_16' : 'Hope + Stigma'
+}
+
+combined_df_disc_reset = combined_df_disc.reset_index().rename(columns={'index': 'Parameter'})
+combined_df_emos_reset = combined_df_emos.reset_index().rename(columns = {'index': 'Parameter'})
+
+# Replace model names using the mapping
+combined_df_disc_reset['Model'] = combined_df_disc_reset['Model'].map(model_name_map)
+combined_df_emos_reset['Model'] = combined_df_emos_reset['Model'].map(model_name_map)
+
+# Optional: select only the columns you want for LaTeX
+cols_for_latex = ['Parameter', 'Model', 'mean', 'sd', 'hdi_3%', 'hdi_97%']
+latex_df_disc = combined_df_disc_reset[cols_for_latex]
+latex_df_emos = combined_df_emos_reset[cols_for_latex]
+## Cleaning up parameter names 
+param_map = {
+    'sigma': 'Residual SD',
+    'Intercept': 'Intercept',
+    'conc_lat_index_16': 'Stigma Index',
+    'Age': 'Age',
+    'Gender': 'Gender',
+    'Party': 'Party',
+    'More_Than_SecondGen': 'Second Generation +',
+    'latino_conc_16' : 'Stigma'
+}
+
+latex_df_disc_copy = latex_df_disc.copy()
+# Extract the state codes from the parameter names
+latex_df_disc_copy['Parameter'] = latex_df_disc_copy['Parameter'].apply(
+    lambda x: param_map.get(x, x)
+)
+
+latex_df_emos_copy = latex_df_emos.copy()
+latex_df_emos_copy['Parameter'] = latex_df_emos_copy['Parameter'].apply(
+    lambda x: param_map.get(x,x)
+)
 
 #### Making the LATEX tables 
-latex_disc = combined_df_disc.to_latex(
+latex_disc = latex_df_disc_copy.to_latex(
     index=False,              # don’t print row numbers
     escape=False,             # don’t escape LaTeX symbols
     caption="Discrimination Model Results",
@@ -108,12 +161,13 @@ latex_disc = combined_df_disc.to_latex(
 )
 
 # For emotion results
-latex_emos = combined_df_emos.to_latex(
+latex_emos = latex_df_emos_copy.to_latex(
     index=False,
     escape=False,
     caption="Emotion Model Results",
     label="tab:emo_results"
 )
+
 
 # Print to screen
 print(latex_disc)
