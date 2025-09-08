@@ -10,7 +10,7 @@ codedlaws_2016 <- coded_laws_16_20 %>% filter(!Class == "I")
 
 ### Doing Topic Modelling ---- 
 
-
+library(dplyr)
 library(tidytext)
 library(tm)
 library(topicmodels)
@@ -19,9 +19,9 @@ library(stringr)
 codedlaws_2012 <- codedlaws_2012 %>% select(-c(Class, X))
                                             
 codedlaws_2012 <- codedlaws_2012 %>% mutate(
-  Class = Class_Cleaned) %>% select(-Class_Cleaned)
+  Class = Class_Cleaned) %>% dplyr::select(-Class_Cleaned)
 
-codedlaws_2016 <- codedlaws_2016 %>% select(-Column1)
+codedlaws_2016 <- codedlaws_2016 %>% dplyr::select(-Column1)
 
 ### Combine into one dataframe ####
 coded_laws <- bind_rows(
@@ -34,8 +34,9 @@ coded_laws <- bind_rows(
 coded_laws <- coded_laws %>%
   mutate(id = Bill_Number,
          text = Summary) %>%
-  select(State, id, text, Class, period)
+  dplyr::select(State, id, text, Class, period, Year)
 
+################## Tried Text Methods ------------------------------------------
 # Remove NAs and short entries
 coded_laws <- coded_laws %>%
   filter(!is.na(text), nchar(text) > 20)
@@ -287,7 +288,7 @@ coded_laws_full <- coded_laws_full %>% mutate(
 ### FULL INDICATOR (WITH SYMBOLIC LEG) ------- 
 
 coded_sym <- coded_laws_full %>%
-  group_by(State, period) %>%
+  group_by(State, period, Year) %>%
   summarise(Class_Pts = sum(weighted_class)) %>%
   ungroup()
 
@@ -298,7 +299,7 @@ coded_laws_concrete <- coded_laws_full %>%
   filter(!(Class_Int %in% c(-0.5, 0.5)))
 
 coded_concrete <- coded_laws_concrete %>%
-  group_by(State, period) %>%
+  group_by(State, period, Year) %>%
   summarise(Class_Pts = sum(weighted_class)) %>%
   ungroup()
 
@@ -385,4 +386,68 @@ scores_final$latino_conc_20[scores_final$State == "AL"] <- 0
 scores_final$foreign_conc_20[scores_final$State == "AL"] <- 0
 
 # saving 
-write.csv(scores_final, "scores_final.csv")
+# write.csv(scores_final, "scores_final.csv")
+
+### ------------------- ADD SUBPERIODS 2012-2014 AND 2014-2016 -------------------
+
+# Symbolic
+coded_sym_12_14 <- coded_sym %>% filter(period == "2012-2016" & Year <= 2014)
+coded_sym_14_16 <- coded_sym %>% filter(period == "2012-2016" & Year > 2014)
+
+# Concrete
+coded_conc_12_14 <- coded_concrete %>% filter(period == "2012-2016" & Year <= 2014)
+coded_conc_14_16 <- coded_concrete %>% filter(period == "2012-2016" & Year > 2014)
+
+# Join with 287(g) scores (assuming your state_exp_287g has columns for subperiods)
+exp_lat_12_14 <- state_exp_287g %>% dplyr::select(State, total_exp_lat_2016, total_exp_for_2016)
+exp_lat_14_16 <- state_exp_287g %>% dplyr::select(State, total_exp_lat_2016, total_exp_for_2016)
+
+# Symbolic subperiods
+combined_sym_12_14 <- coded_sym_12_14 %>%
+  left_join(exp_lat_12_14, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
+         exp_for_score = replace_na(total_exp_for_2014, 0),
+         class_lat_12_14 = Class_Pts + exp_lat_score,
+         class_for_12_14 = Class_Pts + exp_for_score) %>%
+  dplyr::select(State, class_lat_12_14, class_for_12_14)
+
+combined_sym_14_16 <- coded_sym_14_16 %>%
+  left_join(exp_lat_14_16, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
+         exp_for_score = replace_na(total_exp_for_2016, 0),
+         class_lat_14_16 = Class_Pts + exp_lat_score,
+         class_for_14_16 = Class_Pts + exp_for_score) %>%
+  dplyr::select(State, class_lat_14_16, class_for_14_16)
+
+# Concrete subperiods
+combined_conc_12_14 <- coded_conc_12_14 %>%
+  left_join(exp_lat_12_14, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
+         exp_for_score = replace_na(total_exp_for_2014, 0),
+         class_lat_12_14 = Class_Pts + exp_lat_score,
+         class_for_12_14 = Class_Pts + exp_for_score) %>%
+  dplyr::select(State, class_lat_12_14, class_for_12_14)
+
+combined_conc_14_16 <- coded_conc_14_16 %>%
+  left_join(exp_lat_14_16, by = "State") %>%
+  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
+         exp_for_score = replace_na(total_exp_for_2016, 0),
+         class_lat_14_16 = Class_Pts + exp_lat_score,
+         class_for_14_16 = Class_Pts + exp_for_score) %>%
+  dplyr::select(State, class_lat_14_16, class_for_14_16)
+
+### ------------------- MERGE SUBPERIOD SCORES -------------------
+# Symbolic
+symb_subperiods <- combined_sym_12_14 %>%
+  left_join(combined_sym_14_16, by = "State")
+
+# Concrete
+conc_subperiods <- combined_conc_12_14 %>%
+  left_join(combined_conc_14_16, by = "State")
+
+# Merge symbolic + concrete into one final dataset
+scores_final_subperiods <- symb_subperiods %>%
+  left_join(conc_subperiods, by = "State")
+
+# Save
+write.csv(scores_final_subperiods, "scores_final_subperiods.csv")

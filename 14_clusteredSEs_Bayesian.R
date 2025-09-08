@@ -43,5 +43,14 @@ res_cs <- cs_hier(
   cores = 4
 )
 
+find_csv_creator <- function(csv_name) {
+  for (f in list.files(".", pattern = "\\.R$", recursive = TRUE)) {
+    lines <- readLines(f, warn = FALSE)
+    if (any(grepl(csv_name, lines, fixed = TRUE))) {
+      cat("Found in:", f, "\n")
+    }
+  }
+}
 
-
+# Example: search for where final_dataset.csv is written
+find_csv_creator("scores_final.csv")
