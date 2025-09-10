@@ -306,7 +306,7 @@ coded_concrete <- coded_laws_concrete %>%
 
 ### Adding in 287(g) agreements ------------
 
-state_exp_287g <- read.csv("~/Desktop/COIi work/State_Laws/states_287g_sums.csv")
+state_exp_287g <- read.csv("~/Desktop/COIi work/State_Laws/state_exp_full.csv")
 
 ### 2012-2016 period -----------------------------------------------------------
 
@@ -391,63 +391,109 @@ scores_final$foreign_conc_20[scores_final$State == "AL"] <- 0
 ### ------------------- ADD SUBPERIODS 2012-2014 AND 2014-2016 -------------------
 
 # Symbolic
-coded_sym_12_14 <- coded_sym %>% filter(period == "2012-2016" & Year <= 2014)
-coded_sym_14_16 <- coded_sym %>% filter(period == "2012-2016" & Year > 2014)
+coded_sym_12_14 <- coded_sym %>% filter(period == "2012-2016" & Year < 2014)
+coded_sym_14_16 <- coded_sym %>% filter(period == "2012-2016" & Year > 2013)
 
 # Concrete
-coded_conc_12_14 <- coded_concrete %>% filter(period == "2012-2016" & Year <= 2014)
-coded_conc_14_16 <- coded_concrete %>% filter(period == "2012-2016" & Year > 2014)
+coded_conc_12_14 <- coded_concrete %>% filter(period == "2012-2016" & Year < 2014)
+coded_conc_14_16 <- coded_concrete %>% filter(period == "2012-2016" & Year > 2013)
 
 # Join with 287(g) scores (assuming your state_exp_287g has columns for subperiods)
-exp_lat_12_14 <- state_exp_287g %>% dplyr::select(State, total_exp_lat_2016, total_exp_for_2016)
-exp_lat_14_16 <- state_exp_287g %>% dplyr::select(State, total_exp_lat_2016, total_exp_for_2016)
+# exp_lat_12_14 <- state_exp_287g %>% dplyr::select(State, total_exp_lat_2016, total_exp_for_2016) ## only did relevant period (14-16)
+exp_lat_14_16 <- state_exp_287g %>% dplyr::select(state, total_exp_lat_2014, total_exp_for_2014,
+                                                  total_exp_lat_2016, total_exp_for_2016)
 
 # Symbolic subperiods
-combined_sym_12_14 <- coded_sym_12_14 %>%
-  left_join(exp_lat_12_14, by = "State") %>%
-  mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
-         exp_for_score = replace_na(total_exp_for_2014, 0),
-         class_lat_12_14 = Class_Pts + exp_lat_score,
-         class_for_12_14 = Class_Pts + exp_for_score) %>%
-  dplyr::select(State, class_lat_12_14, class_for_12_14)
+# combined_sym_12_14 <- coded_sym_12_14 %>%
+#   left_join(exp_lat_12_14, by = "State") %>%
+#   mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
+#          exp_for_score = replace_na(total_exp_for_2014, 0),
+#          class_lat_12_14 = Class_Pts + exp_lat_score,
+#          class_for_12_14 = Class_Pts + exp_for_score) %>%
+#   dplyr::select(State, class_lat_12_14, class_for_12_14)
 
 combined_sym_14_16 <- coded_sym_14_16 %>%
-  left_join(exp_lat_14_16, by = "State") %>%
-  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
-         exp_for_score = replace_na(total_exp_for_2016, 0),
-         class_lat_14_16 = Class_Pts + exp_lat_score,
-         class_for_14_16 = Class_Pts + exp_for_score) %>%
-  dplyr::select(State, class_lat_14_16, class_for_14_16)
+  left_join(exp_lat_14_16, by = c("State" = "state")) %>%
+  mutate(exp_lat_score_14 = replace_na(total_exp_lat_2014, 0),
+         exp_for_score_14 = replace_na(total_exp_for_2014, 0),
+         exp_lat_score_16 = replace_na(total_exp_lat_2016, 0),
+         exp_for_score_16 = replace_na(total_exp_for_2016, 0),
+         class_lat_14 = Class_Pts + exp_lat_score_14,
+         class_for_14 = Class_Pts + exp_for_score_14,
+         class_lat_16 = Class_Pts + exp_lat_score_16,
+         class_for_16 = Class_Pts + exp_for_score_16,
+         class_lat_14_16_avg = (class_lat_14 + class_lat_16)/2,
+         class_for_14_16_avg = (class_for_14 + class_for_16)/2) %>%
+  dplyr::select(State, class_lat_14, class_for_14, class_lat_16, class_for_16,
+                class_lat_14_16_avg,
+                class_for_14_16_avg)
 
 # Concrete subperiods
-combined_conc_12_14 <- coded_conc_12_14 %>%
-  left_join(exp_lat_12_14, by = "State") %>%
-  mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
-         exp_for_score = replace_na(total_exp_for_2014, 0),
-         class_lat_12_14 = Class_Pts + exp_lat_score,
-         class_for_12_14 = Class_Pts + exp_for_score) %>%
-  dplyr::select(State, class_lat_12_14, class_for_12_14)
+# combined_conc_12_14 <- coded_conc_12_14 %>%
+#   left_join(exp_lat_14, by = "State") %>%
+#   mutate(exp_lat_score = replace_na(total_exp_lat_2014, 0),
+#          exp_for_score = replace_na(total_exp_for_2014, 0),
+#          class_lat_12_14 = Class_Pts + exp_lat_score,
+#          class_for_12_14 = Class_Pts + exp_for_score) %>%
+#   dplyr::select(State, class_lat_12_14, class_for_12_14)
 
 combined_conc_14_16 <- coded_conc_14_16 %>%
-  left_join(exp_lat_14_16, by = "State") %>%
-  mutate(exp_lat_score = replace_na(total_exp_lat_2016, 0),
-         exp_for_score = replace_na(total_exp_for_2016, 0),
-         class_lat_14_16 = Class_Pts + exp_lat_score,
-         class_for_14_16 = Class_Pts + exp_for_score) %>%
-  dplyr::select(State, class_lat_14_16, class_for_14_16)
+  left_join(exp_lat_14_16, by = c("State" = "state")) %>%
+  mutate(exp_lat_score_14 = replace_na(total_exp_lat_2014, 0),
+         exp_for_score_14 = replace_na(total_exp_for_2014, 0),
+         exp_lat_score_16 = replace_na(total_exp_lat_2016, 0),
+         exp_for_score_16 = replace_na(total_exp_for_2016, 0),
+         class_lat_14 = Class_Pts + exp_lat_score_14,
+         class_for_14 = Class_Pts + exp_for_score_14,
+         class_lat_16 = Class_Pts + exp_lat_score_16,
+         class_for_16 = Class_Pts + exp_for_score_16,
+         class_lat_14_16_avg = (class_lat_14 + class_lat_16)/2,
+         class_for_14_16_avg = (class_for_14 + class_for_16)/2) %>%
+  dplyr::select(State, class_lat_14, class_for_14, class_lat_16, class_for_16,
+                class_lat_14_16_avg,
+                class_for_14_16_avg)
+
+combined_conc_14_16_final <- combined_conc_14_16 %>%
+  group_by(State) %>%
+  summarise(
+    class_lat_14 = sum(class_lat_14, na.rm = TRUE),
+    class_for_14 = sum(class_for_14, na.rm = TRUE),
+    class_lat_16 = sum(class_lat_16, na.rm = TRUE),
+    class_for_16 = sum(class_for_16, na.rm = TRUE)
+  ) %>%
+  mutate(
+    class_lat_14_16_avg = (class_lat_14 + class_lat_16) / 2,
+    class_for_14_16_avg = (class_for_14 + class_for_16) / 2
+  )
+
+# symbolic 
+
+
+combined_sym_14_16_final <- combined_sym_14_16 %>%
+  group_by(State) %>%
+  summarise(
+    class_lat_sym14 = sum(class_lat_14, na.rm = TRUE),
+    class_for_sym14 = sum(class_for_14, na.rm = TRUE),
+    class_lat_sym16 = sum(class_lat_16, na.rm = TRUE),
+    class_for_sym16 = sum(class_for_16, na.rm = TRUE)
+  ) %>%
+  mutate(
+    class_lat_14_16_sym.avg = (class_lat_sym14 + class_lat_sym16) / 2,
+    class_for_14_16_sym.avg = (class_for_sym14 + class_for_sym16) / 2
+  )
 
 ### ------------------- MERGE SUBPERIOD SCORES -------------------
 # Symbolic
-symb_subperiods <- combined_sym_12_14 %>%
-  left_join(combined_sym_14_16, by = "State")
-
-# Concrete
-conc_subperiods <- combined_conc_12_14 %>%
-  left_join(combined_conc_14_16, by = "State")
+# symb_subperiods <- combined_sym_12_14 %>%
+#   left_join(combined_sym_14_16, by = "State")
+# 
+# # Concrete
+# conc_subperiods <- combined_conc_12_14 %>%
+#   left_join(combined_conc_14_16, by = "State")
 
 # Merge symbolic + concrete into one final dataset
-scores_final_subperiods <- symb_subperiods %>%
-  left_join(conc_subperiods, by = "State")
+scores_final_subperiods <- combined_conc_14_16_final %>%
+  left_join(combined_sym_14_16_final, by = "State")
 
 # Save
 write.csv(scores_final_subperiods, "scores_final_subperiods.csv")
