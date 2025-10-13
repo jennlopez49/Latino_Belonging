@@ -2,6 +2,7 @@
 #inclusivity <- readxl::read_xlsx("inclusivity_scores_2009_16.xlsx")
 
 final_scores <- read.csv("scores_final.csv")
+scores_subperiod <- read.csv("scores_final_subperiods.csv")
 # Load U.S. states shapefile
 states <- tigris::states(cb = TRUE, resolution = "20m", class = "sf")
 
@@ -10,7 +11,8 @@ states <- states[!states$STUSPS %in% c("HI", "AK", "GU", "PR", "VI"), ]
 states$state 
 
 # merge 
-states <- merge(states, final_scores, by.x = "STUSPS", by.y = "State")
+states <- merge(states, scores_final_subperiods, 
+                by.x="STUSPS", by.y="State")
 # states$ICI_Score_2016 <- as.numeric(states$ICI_Score_2016) 
 # states$ICI_2016_col <- ifelse(states$ICI_Score_2016 < -86, 0, 
 #                               ifelse(states$ICI_Score_2016 > -86 & states$ICI_Score_2016 <= -1, .5, 
@@ -47,30 +49,42 @@ states <- merge(states, final_scores, by.x = "STUSPS", by.y = "State")
 
 ### Standardizing 
 states <- states %>% mutate(
-  sym_lat_index_16 = case_when(
-  latino_sym_16 < -10 ~ -1,
-  latino_sym_16 >= -10 & latino_sym_16 < -5 ~ -0.5,
-  latino_sym_16 >= -5 & latino_sym_16 <= 5 ~ 0,
-  latino_sym_16 > 5 & latino_sym_16 <= 10 ~ 0.5,
-  latino_sym_16 > 10 ~ 1),
-  conc_lat_index_16 = case_when(
-    latino_conc_16 < -10 ~ -1,
-    latino_conc_16 >= -10 & latino_conc_16 < -5 ~ -0.5,
-    latino_conc_16 >= -5 & latino_conc_16 <= 5 ~ 0,
-    latino_conc_16 > 5 & latino_conc_16 <= 10 ~ 0.5,
-    latino_conc_16 > 10 ~ 1),
-  sym_lat_index_20 = case_when(
-    latino_sym_20 < -10 ~ -1,
-    latino_sym_20 >= -10 & latino_sym_20 < -5 ~ -0.5,
-    latino_sym_20 >= -5 & latino_sym_20 <= 5 ~ 0,
-    latino_sym_20 > 5 & latino_sym_20 <= 10 ~ 0.5,
-    latino_sym_20 > 10 ~ 1),
-  conc_lat_index_20 = case_when(
-    latino_conc_20 < -10 ~ -1,
-    latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
-    latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
-    latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
-    latino_conc_20 > 10 ~ 1)
+  # sym_lat_index_16 = case_when(
+  # latino_sym_16 < -10 ~ -1,
+  # latino_sym_16 >= -10 & latino_sym_16 < -5 ~ -0.5,
+  # latino_sym_16 >= -5 & latino_sym_16 <= 5 ~ 0,
+  # latino_sym_16 > 5 & latino_sym_16 <= 10 ~ 0.5,
+  # latino_sym_16 > 10 ~ 1),
+  # conc_lat_index_16 = case_when(
+  #   latino_conc_16 < -10 ~ -1,
+  #   latino_conc_16 >= -10 & latino_conc_16 < -5 ~ -0.5,
+  #   latino_conc_16 >= -5 & latino_conc_16 <= 5 ~ 0,
+  #   latino_conc_16 > 5 & latino_conc_16 <= 10 ~ 0.5,
+  #   latino_conc_16 > 10 ~ 1),
+  # sym_lat_index_20 = case_when(
+  #   latino_sym_20 < -10 ~ -1,
+  #   latino_sym_20 >= -10 & latino_sym_20 < -5 ~ -0.5,
+  #   latino_sym_20 >= -5 & latino_sym_20 <= 5 ~ 0,
+  #   latino_sym_20 > 5 & latino_sym_20 <= 10 ~ 0.5,
+  #   latino_sym_20 > 10 ~ 1),
+  # conc_lat_index_20 = case_when(
+  #   latino_conc_20 < -10 ~ -1,
+  #   latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
+  #   latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
+  #   latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
+  #   latino_conc_20 > 10 ~ 1),
+  conc_lat_index_14_16 = case_when(
+    class.conc_lat_14_16 < -10 ~ -1,
+    class.conc_lat_14_16 >= -10 & class.conc_lat_14_16 < -5 ~ -0.5,
+    class.conc_lat_14_16 >= -5 & class.conc_lat_14_16 <= 5 ~ 0,
+    class.conc_lat_14_16 > 5 & class.conc_lat_14_16 <= 10 ~ 0.5,
+    class.conc_lat_14_16 > 10 ~ 1),
+  sym_lat_index_14_16 = case_when(
+    class.sym_lat_14_16 < -10 ~ -1,
+    class.sym_lat_14_16 >= -10 & class.sym_lat_14_16 < -5 ~ -0.5,
+    class.sym_lat_14_16 >= -5 & class.sym_lat_14_16 <= 5 ~ 0,
+    class.sym_lat_14_16 > 5 & class.sym_lat_14_16 <= 10 ~ 0.5,
+    class.sym_lat_14_16 > 10 ~ 1)
 )
 
 sym_16_map <- ggplot(data = states) +
@@ -551,3 +565,49 @@ ggsave(
 )
 
 
+
+conc_16_map <- ggplot(data = states) +
+  geom_sf(aes(fill = conc_lat_index_14_16)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+                       limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State 2014-2016",
+    subtitle = "Concrete Policies",
+    caption = "Data Source: Original Data."
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "plot"
+  )
+
+sym_16_map <- ggplot(data = states) +
+  geom_sf(aes(fill = sym_lat_index_14_16)) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "lightblue", midpoint = 0,
+                       limits = c(-1, 1)) +
+  theme_minimal() +
+  labs(
+    title = "Immigrant Climate by State 2014-2016",
+    subtitle = "Concrete Policies",
+    caption = "Data Source: Original Data."
+  ) +
+  theme(
+    axis.text = element_blank(),  # Removes lat/long labels
+    axis.ticks = element_blank(), # Removes axis ticks
+    panel.grid = element_blank(), 
+    legend.position = "bottom",
+    plot.title = element_text(size = 16, face = "bold"),
+    plot.title.position = "plot"
+  )
+
+ggsave(
+  filename = "conc_map14_16.png",  # File name with extension
+  plot = conc_16_map,                             # Plot object
+  width = 10,                             # Width in inches
+  height = 8,                             # Height in inches
+  dpi = 300                               # Resolution in dots per inch
+)

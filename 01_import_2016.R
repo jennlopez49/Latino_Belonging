@@ -167,10 +167,10 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                                   C109 == "(3) Slightly as an outsider" ~ 3,
                                   C109 == "(4) Not at all as an outsider" ~ 4
                           ),
-  Excluded_US_Soc = case_when(C109 == "(1) Always" ~ 1,        # Question is - "How often do ppl try to exclude you in the US?"
-                              C109 == "(2) Very often" ~ 2,                  # Coded so higher numbers --> less exclusion
-                              C109 == "(3) Rarely" ~ 3,
-                              C109 == "(4) Never" ~ 4
+  Excluded_US_Soc = case_when(C110 == "(1) Always" ~ 1,        # Question is - "How often do ppl try to exclude you in the US?"
+                              C110 == "(2) Very often" ~ 2,                  # Coded so higher numbers --> less exclusion
+                              C110 == "(3) Rarely" ~ 3,
+                              C110 == "(4) Never" ~ 4
                               ),
   Personal_Discrimination = case_when(C251 == "(2) No" ~ 0,                      # Have you ever been treated unfairly or personally experienced discrimination 
                                       C251 == "(1) Yes" ~ 1                      #because of your race, ethnicity, gender, sexuality,
@@ -243,7 +243,8 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   cmps.add.2016$Inclusion_Index <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Valued_Respected_US_z", "Outsider_US_z", "Excluded_US_Soc_z")], na.rm = TRUE)
   cmps.add.2016$Inclusion_Internal <- rowMeans(cmps.add.2016[, c("Belong_US_z", "Outsider_US_z")], na.rm = TRUE)
   cmps.add.2016$Inclusion_External <- rowMeans(cmps.add.2016[, c( "Valued_Respected_US_z", "Excluded_US_Soc_z")], na.rm = TRUE)
-  
+  cmps.add.2016$Internal_Belonging <- cmps.add.2016$Belong_US + cmps.add.2016$Outsider_US
+  cmps.add.2016$External_Belonging <- cmps.add.2016$Valued_Respected_US + cmps.add.2016$Excluded_US_Soc
   # Check the index
   summary(cmps.add.2016$Inclusion_Index)
   
@@ -303,8 +304,12 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
 # )
   
 final_scores <- read.csv("scores_final.csv")
+
+scores_final_subperiods <- read.csv("scores_final_subperiods.csv")
   
 full_cmps2016 <- left_join(cmps.add.2016, final_scores, by = "State")
+
+fullcmps2016 <- left_join(full_cmps2016,scores_final_subperiods, by = "State")
 
 #### Adding in Latino Pop &&& Election Vote Margin Results ------
 
@@ -352,13 +357,13 @@ latino.pop.data_16 <- read.csv("latino_pop.csv") %>% mutate(State = NAME,
   dplyr::select(State, percent.latino.2016)
 
 ### adding in the 2016 pieces to the CMPS data ----------
-full_cmps2016 <- left_join(full_cmps2016, latino.pop.data_16, by = "State")
+fullcmps2016 <- left_join(fullcmps2016, latino.pop.data_16, by = "State")
 ### adding vote margins ------
-full_cmps2016 <- left_join(full_cmps2016, votemargin_16, by = "State")
+fullcmps2016 <- left_join(fullcmps2016, votemargin_16, by = "State")
 
-full_cmps2016 <- full_cmps2016 %>% mutate(vote_margin = -vote_margin)
+fullcmps2016 <- fullcmps2016 %>% mutate(vote_margin = -vote_margin)
 
-full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2016$vote_margin < 6, 1, 0)
+fullcmps2016$Battleground <- ifelse(fullcmps2016$vote_margin > -6 & fullcmps2016$vote_margin < 6, 1, 0)
 
 #### subsetting to just latinos --------
 #latinos_2016 <- full_cmps2016 %>% filter(Latino == 1)
@@ -415,7 +420,7 @@ full_cmps2016$Battleground <- ifelse(full_cmps2016$vote_margin > -6 & full_cmps2
 
 ### For Latinos ONLY checking Weights and Sample Representativeness among Nat. Origin Groups ---- 
 
-latinos_data <- full_cmps2016 %>% filter(Race_Prime == "(2) Hispanic or Latino")
+latinos_data <- fullcmps2016 %>% filter(Race_Prime == "(2) Hispanic or Latino")
 latinos_data <- latinos_data %>% drop_na(latino_sym_20, latino_conc_20)         # Alaska is NA 
 
 #### Discrimination measure & Indices for climates --------
@@ -449,7 +454,26 @@ latinos_data <- latinos_data %>% mutate(
     latino_conc_20 >= -10 & latino_conc_20 < -5 ~ -0.5,
     latino_conc_20 >= -5 & latino_conc_20 <= 5 ~ 0,
     latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
-    latino_conc_20 > 10 ~ 1)
+    latino_conc_20 > 10 ~ 1),
+  # sym_lat_index_14_16 = case_when(
+  #   latino_sym_20 < -10 ~ -1,
+  #   latino_sym_20 >= -10 & latino_sym_20 < -5 ~ -0.5,
+  #   latino_sym_20 >= -5 & latino_sym_20 <= 5 ~ 0,
+  #   latino_sym_20 > 5 & latino_sym_20 <= 10 ~ 0.5,
+  #   latino_sym_20 > 10 ~ 1),
+  conc_lat_index_14_16 = case_when(
+    class.conc_lat_14_16 < -10 ~ -1,
+    class.conc_lat_14_16 >= -10 & class.conc_lat_14_16 < -5 ~ -0.5,
+    class.conc_lat_14_16 >= -5 & class.conc_lat_14_16 <= 5 ~ 0,
+    class.conc_lat_14_16 > 5 & class.conc_lat_14_16 <= 10 ~ 0.5,
+    class.conc_lat_14_16 > 10 ~ 1),
+  sym_lat_index_14_16 = case_when(
+    class.sym_lat_14_16 < -10 ~ -1,
+    class.sym_lat_14_16 >= -10 & class.sym_lat_14_16 < -5 ~ -0.5,
+    class.sym_lat_14_16 >= -5 & class.sym_lat_14_16 <= 5 ~ 0,
+    class.sym_lat_14_16 > 5 & class.sym_lat_14_16 <= 10 ~ 0.5,
+    class.sym_lat_14_16 > 10 ~ 1)
+  
 )
 
 #### Saving Latino CSV 
@@ -462,6 +486,22 @@ cmps_lat_16 <- svydesign(
   weights = ~Weight
 )
 
+### Doing foreign-born vs us-born latinos samples 
+
+native_born <- latinos_data %>% filter(NativeBorn == 1)
+foreign_born <- latinos_data %>% filter(!NativeBorn == 1)
+
+native_cmps <- svydesign(
+  ids = ~1, 
+  data = native_born, 
+  weights = ~Weight
+) 
+
+foreign_cmps <- svydesign(
+  ids = ~1, 
+  data = foreign_born, 
+  weights = ~Weight
+) 
 
 ### Double Checking - Sample Prop Table - 
 prop.table(svytable(~National_Origin, cmps_lat_16))

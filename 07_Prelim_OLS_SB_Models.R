@@ -1,18 +1,18 @@
 #### General Vars For Int & Med Models ---------
-cmps_lat_16$variables$ICI_Reverse_Fac <- as.factor(cmps_lat_16$variables$ICI_Reverse)
-dvs <- c("Inclusion_External", "Inclusion_Internal")  # List of DVs (Y)
+#cmps_lat_16$variables$ICI_Reverse_Fac <- as.factor(cmps_lat_16$variables$ICI_Reverse)
+dvs <- c("Internal_Belonging", "External_Belonging")  # List of DVs (Y)
 # ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
-ivs <- list("conc_lat_index_16","latino_conc_16")
+ivs <- list("conc_lat_index_16","latino_conc_16", "class.conc_lat_14_16")
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election")  # List of Mediators (M)
-controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
+full.controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
               "Mexican", "Cuban",
               "Linked_Fate", "Party",
               "More_Than_SecondGen", "Discrimination_Scale",
-              "Latino_Disc"
-              , "Spanish_Media"
-              , 
-              "Worry_Deport")
+              "Latino_Disc")
+basic.controls <- c("Age", "Gender",
+                    "Mexican", "Cuban", "Party",
+                    "More_Than_SecondGen")
 
 # ################ No interaction/ Basic Models -------------------------------------
 # ## List of Models
@@ -80,10 +80,16 @@ controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest",
 # 
 
 #### Run function for Mediation models------------------------------------------
+ivs <- list("conc_lat_index_16","latino_conc_16", "class.conc_lat_14_16")
 
+mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, basic.controls, cmps_lat_16, cmps_lat_16, out ="med_basic_ols")
+mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, full.controls, cmps_lat_16, cmps_lat_16, out ="med_full_ols")
 
-mediation_function_standard(dvs, ivs, mediators, controls, cmps_lat_16, cmps_lat_16, out ="med_results_ols")
-
+### subsets
+mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, 
+                            basic.controls, native_cmps, native_cmps, out ="med_basic_native")
+mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, 
+                            basic.controls, foreign_cmps, foreign_cmps, out ="med_full_foreign")
 #### PRODUCING TABLES OF STIGMA --> EMOTION ------------------------------------
 # list_mods <- med_results_ols$mediator_models[c(2,3,5,6, 14,15)]
 

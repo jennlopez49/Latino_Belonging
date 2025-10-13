@@ -1,5 +1,164 @@
 ### Mediation analysis ---------------------------------------------------------
-############ Fear --------------------------------------------------------------
+# alternate survey design to cluster SEs
+state_ses <- svydesign(ids = ~State, 
+                         data = latinos_data, 
+                         weights = ~Weight)
+############ --------------------------------------------------------------
+# mod 1 ---> M ~ X ( X-->M)
+persdisc <- svyglm(Discrimination_Scale ~ class.conc_lat_14_16 + age_sqd + Gender + 
+                     Education + Income + 
+                     More_Than_SecondGen, 
+                   design = state_ses, family = "gaussian")
+groupdisc <- svyglm(Latino_Disc ~ class.conc_lat_14_16 + age_sqd + Gender + 
+                     Education + Income + 
+                     More_Than_SecondGen, 
+                   design = state_ses, family = "gaussian")
+
+# mod 2 ---> Y ~ M + X 
+
+sb_int_pers <- svyglm(Internal_Belonging ~ class.conc_lat_14_16 + Discrimination_Scale
+                 + age_sqd + Gender + 
+                      Education + Income + 
+                      More_Than_SecondGen, 
+                    design = state_ses, family = "gaussian")
+sb_int_group <- svyglm(Internal_Belonging ~ class.conc_lat_14_16 + Latino_Disc
+                      + age_sqd + Gender + 
+                        Education + Income + 
+                        More_Than_SecondGen, 
+                      design = state_ses, family = "gaussian")
+
+sb_ext_pers <- svyglm(External_Belonging ~ class.conc_lat_14_16 + Discrimination_Scale
+                      + age_sqd + Gender + 
+                        Education + Income + 
+                        More_Than_SecondGen, 
+                      design = state_ses, family = "gaussian")
+sb_ext_group <- svyglm(External_Belonging ~ class.conc_lat_14_16 + Latino_Disc
+                       + age_sqd + Gender + 
+                         Education + Income + 
+                         More_Than_SecondGen, 
+                       design = state_ses, family = "gaussian")
+
+# pers 
+mediation_result.pers <- mediate(fear_mediator, model_outcome.fear, treat = "latino_conc_16", mediator = "Fear_Election", sims = 5000)
+mediation_int.pers <- mediate(fear_mediator, model_int.fear, treat = "latino_sym_16", mediator = "Fear_Election", sims = 5000)
+mediation_ext.pers <- mediate(fear_mediator, model_int.fear, treat = "latino_sym_16", mediator = "Fear_Election", sims = 5000)
+#group 
+
+
+library(lavaan)
+# lavaan syntax: use observed variables
+
+library(lavaan.survey)
+
+latinos_data <- latinos_data %>% mutate(
+  Disc_Index = Discrimination_Scale + Latino_Disc,
+  Disc_FearInt = Disc_Index * Fear_Election,
+  Disc_AngryInt = Disc_Index * Angry_Election,
+  Disc_SadInt = Disc_Index * Sad_Election,
+  Disc_HopeInt = Disc_Index * Hope_Election,
+  Disc_PrideInt = Disc_Index * Pride_Election
+)
+
+state_ses <- svydesign(ids = ~State, 
+                       data = latinos_data, 
+                       weights = ~Weight)
+# 1. Define your mediation model
+model_emotion_chain_int <- '
+  # Paths from context to discrimination
+  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen
+  
+  # Define interaction terms
+  
+  # Discrimination + interactions → belonging
+  Internal_Belonging ~ d1*Discrimination_Scale + d2*Latino_Disc +
+                       f1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen +
+                       Fear_Election + Angry_Election + Sad_Election + Hope_Election + 
+                       Pride_Election
+'
+model_emotion_chain_ext <- '
+  # Paths from context to discrimination
+  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen
+  # Discrimination + interactions → belonging
+  External_Belonging ~ d1*Discrimination_Scale + d2*Latino_Disc + 
+                       f1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen +
+                       Fear_Election + Angry_Election + Sad_Election + Hope_Election + 
+                       Pride_Election
+'
+
+# 2. Fit the model using lavaan
+fit_emotion_chain_int <- sem(model_emotion_chain_int, data = latinos_data)
+fit_emotion_chain_ext <- sem(model_emotion_chain_ext, data = latinos_data)
+
+
+fit_svy_int <- lavaan.survey(lavaan.fit = fit_emotion_chain_int, survey.design = state_ses)
+fit_svy_ext <- lavaan.survey(lavaan.fit = fit_emotion_chain_ext, survey.design = state_ses)
+
+# 5. Summarize results
+summary(fit_svy_int, standardized = TRUE, fit.measures = TRUE)
+summary(fit_svy_ext, standardized = TRUE, fit.measures = TRUE)
+
+## table ---> 
+# Output file
+models <- list( "Internal Belonging" = fit_svy_int, "External Belonging" = fit_svy_ext )
+file <- "appendix_models.tex"
+sink(file)
+
+cat("\\documentclass{article}\n")
+cat("\\usepackage{booktabs}\n")
+cat("\\begin{document}\n")
+cat("\\section*{Appendix: Model Outputs}\n\n")
+
+# Function to print one model table
+create_appendix_table <- function(model, model_name) {
+  
+  n_obs <- fitMeasures(model, "nobs")
+  n_par <- fitMeasures(model, "npar")
+  
+  cfi <- fitMeasures(model, "cfi")
+  tli <- fitMeasures(model, "tli")
+  rmsea <- fitMeasures(model, "rmsea")
+  srmr <- fitMeasures(model, "srmr")
+  
+  params <- parameterEstimates(model, standardized = TRUE)
+  paths <- params[params$op %in% c("~", ":="), c("lhs","op","rhs","est","se","z","pvalue","std.all")]
+  
+  cat("====================================\n")
+  cat(paste("Model:", model_name, "\n"))
+  cat(paste("N =", n_obs, ", Number of parameters =", n_par, "\n"))
+  cat(paste("Fit indices: CFI =", round(cfi,3),
+            ", TLI =", round(tli,3),
+            ", RMSEA =", round(rmsea,3),
+            ", SRMR =", round(srmr,3), "\n"))
+  cat("====================================\n")
+  
+  cat("\\begin{tabular}{l l l r r r r r}\n")
+  cat("\\toprule\n")
+  cat("LHS & OP & RHS & Est & SE & z & p & Std.all \\\\\n")
+  cat("\\midrule\n")
+  
+  for (i in 1:nrow(paths)) {
+    row <- paths[i, ]
+    cat(row$lhs, "&", row$op, "&", row$rhs, "&",
+        round(row$est,3), "&", round(row$se,3), "&",
+        round(row$z,3), "&", round(row$pvalue,3), "&",
+        round(row$std.all,3), "\\\\\n")
+  }
+  
+  cat("\\bottomrule\n")
+  cat("\\end{tabular}\n\n")
+}
+
+# Apply to all models
+for (m in names(models)) {
+  create_appendix_table(models[[m]], m)
+}
+
+cat("\\end{document}\n")
+sink()
+
+
+
+##########
 # Fit the mediator model (Model 1: M ~ X + controls)
 lf_mediator <- svyglm(Linked_Fate ~ latino_conc_16 + age_sqd + Gender + 
                         Education + Income + Discrimination_Scale
