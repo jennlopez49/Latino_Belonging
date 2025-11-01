@@ -239,3 +239,151 @@ stargazer(ext_basic, listmods_sb_ext, ext_full, type = "latex",
           label = "ext.cl", out = "ext.cl.tex"
 )
 
+
+######### Ch. 3 Models ---------------
+
+# DVS -- BorderSecurity, Pathway_Citizenship
+
+res_ch3_fear <- cluster_svyglm(
+  dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "Fear_Election"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_anger <- cluster_svyglm(
+  dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "Angry_Election"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_sad <- cluster_svyglm(
+  dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "Sad_Election"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_pride <- cluster_svyglm(
+  dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "Pride_Election"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_hope <- cluster_svyglm(
+  dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "Hope_Election"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+# 
+listmods_ch3 <- setNames(
+  list(
+    res_ch3_fear$DV_BorderSecurity_IV_class.conc_lat_14_16, 
+    res_ch3_fear$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_fear$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_anger$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_anger$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_anger$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_sad$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_sad$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_sad$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_hope$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_hope$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_hope$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_pride$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_pride$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_pride$DV_Pathway_Deport_IV_class.conc_lat_14_16
+  ),
+  c("Fear & Border Security", 
+    "Fear & Pathway-Deportations", 
+    "Fear & Pathway for Citizenship", 
+    "Anger & Border Security",
+    "Anger & Pathway-Deportations", 
+    "Anger & Pathway for Citizenship", 
+    "Sad & Border Security",
+    "Sad & Pathway-Deportations", 
+    "Sad & Pathway for Citizenship", 
+    "Hope & Border Security",
+    "Hope & Pathway-Deportations", 
+    "Hope & Pathway for Citizenship", 
+    "Pride & Border Security",
+    "Pride & Pathway-Deportations", 
+    "Pride & Pathway for Citizenship")
+)
+
+listmods_bs <- setNames(
+  list(
+    res_ch3_fear$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_anger$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_sad$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_hope$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_pride$DV_BorderSecurity_IV_class.conc_lat_14_16
+  ),
+  c("Fear & Border Security",
+    "Anger & Border Security",
+    "Sad & Border Security",
+    "Hope & Border Security",
+    "Pride & Border Security")
+)
+
+listmods_pathway <- setNames(
+  list(
+    res_ch3_fear$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_fear$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_anger$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_anger$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_sad$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_sad$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_hope$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_hope$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
+    res_ch3_pride$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
+    res_ch3_pride$DV_Pathway_Deport_IV_class.conc_lat_14_16
+  ),
+  c(
+    "Fear & Pathway-Deportations", 
+    "Fear & Pathway for Citizenship", 
+    "Anger & Pathway-Deportations", 
+    "Anger & Pathway for Citizenship", 
+    "Sad & Pathway-Deportations", 
+    "Sad & Pathway for Citizenship", 
+    "Hope & Pathway-Deportations", 
+    "Hope & Pathway for Citizenship", 
+    "Pride & Pathway-Deportations", 
+    "Pride & Pathway for Citizenship")
+)
+
+stargazer(listmods_bs, type = "latex",
+          covariate.labels = c("Concrete Imm. Index", "Age",
+                               "Gender", "Party (R $\\longrightarrow$ D)", 
+                               "Second Gen +",
+                               "Fear", "Anger", "Sad", "Hope", "Pride", 
+                               "Constant"),
+          dep.var.labels = "Tighten Border Security",
+          out = "bs_mods.tex")  
+stargazer(listmods_pathway[c(1,3,5,7,9)], type = "latex",
+          covariate.labels = c("Concrete Imm. Index", "Age",
+                               "Gender", "Party (R $\\longrightarrow$ D)", 
+                               "Second Gen +",
+                               "Fear", "Anger", "Sad", "Hope", "Pride", 
+                               "Constant"),
+          dep.var.labels = c("Pathway for Citizenship"),
+          out = "cit_mods.tex")
