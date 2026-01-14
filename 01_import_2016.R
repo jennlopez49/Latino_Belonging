@@ -14,7 +14,8 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     LA303, L364, L365, L366, C374, C375, C375_6_OTHER,
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
                                     S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
-                                    C253, LA202_6, S1, L24, C262, C245)
+                                    C253, LA202_6, S1, L24, C262, C245, SPLITC337,
+                                    C337, BLA205, C141, SPLITC141, SPLITC38)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
@@ -229,7 +230,34 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                         C262 == "(07) 7" ~ 7,
                         C262 == "(08) 8" ~ 8, 
                         C262 == "(09) 9" ~ 9,
-                        C262 == "(10) 10" ~ 10)
+                        C262 == "(10) 10" ~ 10),
+  SplitC337 = case_when(SPLITC337 == "(1) illegal" ~ 1,
+                        SPLITC337 == "(2) undocumented" ~ 2),
+  BorderSecurity = case_when(C337 == "(1) Decrease" ~ -1,                       ### Re-coding so decrease = neg, increase = pos
+                             C337 == "(3) Stay the same" ~ 0,
+                             C337 == "(2) Increase" ~ 1),
+  DeportCrim = case_when(BLA205 == "(4) Strongly disagree" ~ 1,                 ### "Criminal imms should be deported" --> high numbers, more border sec 
+                         BLA205 == "(3) Somewhat disagree" ~ 2,
+                         BLA205 == "(2) Somewhat agree" ~ 3,
+                         BLA205 == "(1) Strongly agree" ~ 4),
+  Mex_Deport = case_when(C141 == "(1) Strongly support pathway to citizenship" ~ 1,
+                         C141 == "(2) Somewhat support pathway to citizenship" ~ 2,
+                         C141 == "(4) Somewhat support deporting these immigrants"~ 3,
+                         C141 == "(3) Strongly support deporting these immigrants" ~ 4),
+  MexSplit = case_when(SPLITC141 == "(1) A" ~ 1,                                ## 1 - undoc Mexican, undocumented only (for Mex_Deport)
+                       SPLITC141 == "(2) B" ~ 2),
+  Pathway_Deport = case_when(C38 == "(1) They should be allowed to stay in their jobs and apply for U.S. citizenship" ~ 3, ##### high numbers --> more support for pathway, low numbers --> deportation
+                             C38 == "(2) They should be allowed to stay in their jobs, but temporarily" ~ 2,
+                             C38 == "(3) They should be required to leave their jobs and immediately leave the U.S" ~ 1),
+  SplitPathway = case_when(SPLITC38 == "(1) A" ~ 1,                                ## 1 - undoc, 2 - illegal
+                           SPLITC38 == "(2) B" ~ 2),
+  Pathway_Citizenship = case_when(C39 == "(5) Strongly disagree" ~ 1,           # Pathway for citizenship --> high #s agree
+                                  C39 == "(4) Disagree" ~ 2,
+                                  C39 == "(3) Neither agree nor disagree" ~ 3,
+                                  C39 == "(2) Agree" ~ 4,
+                                  C39 == "(1) Strongly agree" ~ 5),
+  BorderState =   case_when(State %in% c("TX", "CA", "NM", "AZ") ~ 1,
+  TRUE ~ 0)
   )
   
 ######## Belonging Index ------------------------------------------------------

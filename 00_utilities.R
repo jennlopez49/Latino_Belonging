@@ -19,6 +19,7 @@ library(lme4)
 library(brms)
 library(csSampling)
 library(coefplot)
+library(margins)
 
 ###### Custom Function run Multiple Mediation Analyses  -----------------
 mediation_function <- function(dvs, ivs, mediators, controls, des, dat, out = NULL) {

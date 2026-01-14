@@ -1,5 +1,6 @@
 ############### DISCRIMINATION MODELS -----------------------------------------
 
+
 # Vars
 dvs <- c("External_Belonging", "Internal_Belonging")  # List of DVs (Y)
 # ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
@@ -8,7 +9,7 @@ mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Ele
                   "Sad_Election","Discrimination_Scale",
                   "Latino_Disc")  # List of Mediators (M)
 simp_controls <- c("Age", "Gender", "Party",
-              "More_Than_SecondGen")
+              "More_Than_SecondGen", "BorderState")
 
 
 ###
@@ -248,7 +249,7 @@ res_ch3_fear <- cluster_svyglm(
   dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Fear_Election"),
+               "More_Than_SecondGen", "BorderState", "Fear_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -258,7 +259,7 @@ res_ch3_anger <- cluster_svyglm(
   dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Angry_Election"),
+               "More_Than_SecondGen","BorderState",  "Angry_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -268,7 +269,7 @@ res_ch3_sad <- cluster_svyglm(
   dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Sad_Election"),
+               "More_Than_SecondGen", "BorderState", "Sad_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -278,7 +279,7 @@ res_ch3_pride <- cluster_svyglm(
   dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Pride_Election"),
+               "More_Than_SecondGen", "BorderState", "Pride_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -288,12 +289,53 @@ res_ch3_hope <- cluster_svyglm(
   dvs = c("BorderSecurity", "Pathway_Citizenship", "Pathway_Deport"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Hope_Election"),
+               "More_Than_SecondGen", "BorderState", "Hope_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
 )
 
+res_ch3_disc_group <- cluster_svyglm(
+  dvs = c("BorderSecurity","Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen","BorderState", 
+               "Latino_Disc"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_disc_pers <- cluster_svyglm(
+  dvs = c("BorderSecurity","Pathway_Citizenship", "Pathway_Deport"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "BorderState", 
+               "Discrimination_Scale"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_int_group <- cluster_svyglm(
+  dvs = c("BorderSecurity","Pathway_Citizenship"),
+  ivs = c("class.conc_lat_14_16*Latino_Disc"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "BorderState"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ch3_int_pers <- cluster_svyglm(
+  dvs = c("BorderSecurity","Pathway_Citizenship"),
+  ivs = c("class.conc_lat_14_16*Discrimination_Scale"),
+  controls = c("Age", "Gender", "Party",
+               "More_Than_SecondGen", "BorderState"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
 # 
 listmods_ch3 <- setNames(
   list(
@@ -311,7 +353,11 @@ listmods_ch3 <- setNames(
     res_ch3_hope$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
     res_ch3_pride$DV_BorderSecurity_IV_class.conc_lat_14_16,
     res_ch3_pride$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_pride$DV_Pathway_Deport_IV_class.conc_lat_14_16
+    res_ch3_pride$DV_Pathway_Deport_IV_class.conc_lat_14_16,
+    res_ch3_int_group$`DV_BorderSecurity_IV_class.conc_lat_14_16*Latino_Disc`,
+    res_ch3_int_group$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Latino_Disc`,
+    res_ch3_int_pers$`DV_BorderSecurity_IV_class.conc_lat_14_16*Discrimination_Scale`,
+    res_ch3_int_pers$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Discrimination_Scale`
   ),
   c("Fear & Border Security", 
     "Fear & Pathway-Deportations", 
@@ -327,7 +373,11 @@ listmods_ch3 <- setNames(
     "Hope & Pathway for Citizenship", 
     "Pride & Border Security",
     "Pride & Pathway-Deportations", 
-    "Pride & Pathway for Citizenship")
+    "Pride & Pathway for Citizenship",
+    "BS Int Group",
+    "PC Int Group",
+    "BS Int Pers",
+    "PC Int Pers")
 )
 
 listmods_bs <- setNames(
@@ -336,54 +386,159 @@ listmods_bs <- setNames(
     res_ch3_anger$DV_BorderSecurity_IV_class.conc_lat_14_16,
     res_ch3_sad$DV_BorderSecurity_IV_class.conc_lat_14_16,
     res_ch3_hope$DV_BorderSecurity_IV_class.conc_lat_14_16,
-    res_ch3_pride$DV_BorderSecurity_IV_class.conc_lat_14_16
+    res_ch3_pride$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_disc_group$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_disc_pers$DV_BorderSecurity_IV_class.conc_lat_14_16,
+    res_ch3_int_group$`DV_BorderSecurity_IV_class.conc_lat_14_16*Latino_Disc`,
+    res_ch3_int_pers$`DV_BorderSecurity_IV_class.conc_lat_14_16*Discrimination_Scale`
   ),
   c("Fear & Border Security",
     "Anger & Border Security",
     "Sad & Border Security",
     "Hope & Border Security",
-    "Pride & Border Security")
+    "Pride & Border Security",
+    "Border Security & Group Discrimination",
+    "Border Security & Personal Discrimination",
+    "BS Int Group",
+    "BS Int Pers")
 )
 
 listmods_pathway <- setNames(
   list(
     res_ch3_fear$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_fear$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
     res_ch3_anger$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_anger$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
     res_ch3_sad$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_sad$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
     res_ch3_hope$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_hope$DV_Pathway_Deport_IV_class.conc_lat_14_16, 
-    res_ch3_pride$DV_Pathway_Citizenship_IV_class.conc_lat_14_16, 
-    res_ch3_pride$DV_Pathway_Deport_IV_class.conc_lat_14_16
+    res_ch3_pride$DV_Pathway_Citizenship_IV_class.conc_lat_14_16,
+    res_ch3_disc_group$DV_Pathway_Citizenship_IV_class.conc_lat_14_16,
+    res_ch3_disc_pers$DV_Pathway_Citizenship_IV_class.conc_lat_14_16,
+    res_ch3_int_group$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Latino_Disc`,
+    res_ch3_int_pers$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Discrimination_Scale`
   ),
   c(
-    "Fear & Pathway-Deportations", 
     "Fear & Pathway for Citizenship", 
-    "Anger & Pathway-Deportations", 
     "Anger & Pathway for Citizenship", 
-    "Sad & Pathway-Deportations", 
     "Sad & Pathway for Citizenship", 
-    "Hope & Pathway-Deportations", 
     "Hope & Pathway for Citizenship", 
-    "Pride & Pathway-Deportations", 
-    "Pride & Pathway for Citizenship")
+    "Pride & Pathway for Citizenship",
+    "Pathway for Citizenship & Group Discrimination",
+    "Pathway for Citizenship & Personal Discrimination",
+    "PC Int Group",
+    "PC Int Pers")
 )
+
+
+## regular weighted OLS ----
+ch3_dvs <- c("BorderSecurity", "Pathway_Citizenship")
+mediation_function_standard(ch3_dvs, "class.conc_lat_14_16", mediators, 
+                            simp_controls, cmps_lat_16, cmps_lat_16, out = "ch3_basic_ols")
+
+
+## basic models 
+control_ch3_bs <- svyglm(BorderSecurity ~ class.conc_lat_14_16 + Age + Gender + 
+                           Party + More_Than_SecondGen + BorderState, cmps_lat_16,
+                        family = gaussian())
+control_ch3_path <- svyglm(Pathway_Citizenship ~ class.conc_lat_14_16 + Age + Gender + 
+                           Party + More_Than_SecondGen + BorderState, cmps_lat_16,
+                         family = gaussian())
+### interaction model
+int_ch3_bs_pers <- svyglm(BorderSecurity ~ class.conc_lat_14_16*Discrimination_Scale + Age + Gender + 
+                           Party + More_Than_SecondGen + BorderState, cmps_lat_16, family = gaussian())
+int_ch3_bs_group <- svyglm(BorderSecurity ~ class.conc_lat_14_16*Latino_Disc + Age + Gender + 
+                            Party + More_Than_SecondGen + BorderState, cmps_lat_16, family = gaussian())
+
+int_ch3_path_pers <- svyglm(Pathway_Citizenship ~ class.conc_lat_14_16*Discrimination_Scale + Age + Gender + 
+                             Party + More_Than_SecondGen + BorderState, cmps_lat_16,
+                           family = gaussian())
+int_ch3_path_group <- svyglm(Pathway_Citizenship ~ class.conc_lat_14_16*Latino_Disc + Age + Gender + 
+                              Party + More_Than_SecondGen + BorderState, cmps_lat_16,
+                            family = gaussian())
+
+basic_ch3_bs <- list(control_ch3_bs, ch3_basic_ols$outcome_models[1:7], int_ch3_bs_pers,int_ch3_bs_group)
+basic_ch3_path <- list(control_ch3_path, ch3_basic_ols$outcome_models[8:14], int_ch3_path_pers, int_ch3_path_group)
 
 stargazer(listmods_bs, type = "latex",
           covariate.labels = c("Concrete Imm. Index", "Age",
-                               "Gender", "Party (R $\\longrightarrow$ D)", 
-                               "Second Gen +",
-                               "Fear", "Anger", "Sad", "Hope", "Pride", 
+                               "Gender", "Party (R $\\longrightarrow$ D)",
+                               "Second Gen +","Border State",
+                               "Fear", "Anger", "Sadness", "Hope", "Pride",
+                               "Concrete Imm Index:Group Disc",
+                               "Group Discrimination",
+                               "Concrete Imm Index:Pers Disc",
+                               "Personal Discrimination",
                                "Constant"),
           dep.var.labels = "Tighten Border Security",
-          out = "bs_mods.tex")  
-stargazer(listmods_pathway[c(1,3,5,7,9)], type = "latex",
+          out = "bs_mods.tex"
+          )  
+stargazer(listmods_pathway, type = "latex",
           covariate.labels = c("Concrete Imm. Index", "Age",
                                "Gender", "Party (R $\\longrightarrow$ D)", 
-                               "Second Gen +",
+                               "Second Gen +", "Border State",
                                "Fear", "Anger", "Sad", "Hope", "Pride", 
+                               "Concrete Imm Index:Group Disc",
+                               "Group Discrimination",
+                               "Concrete Imm Index:Pers Disc",
+                               "Personal Discrimination",
                                "Constant"),
           dep.var.labels = c("Pathway for Citizenship"),
           out = "cit_mods.tex")
+
+stargazer(basic_ch3_bs, type = "latex",
+          covariate.labels = c("Concrete Imm. Index",
+                               "Fear", "Anger", "Pride", "Hope","Sadness",
+                               "Personal Discrimination","Group Discrimination", 
+                               "Age",
+                               "Gender", "Party (R $\\longrightarrow$ D)", 
+                               "Second Gen +", "Border State",
+                               "Concrete Imm Index:Pers Disc",
+                               "Concrete Imm Index:Group Disc",
+                               "Constant"),
+          dep.var.labels = c("Tighten Border Security"), out = "basic_bs.tex"
+          )
+
+stargazer(basic_ch3_path, type = "latex",
+          covariate.labels = c("Concrete Imm. Index",
+                               "Fear", "Anger", "Pride", "Hope", "Sad",
+                               "Personal Discrimination", "Group Discrimination", "Age",
+                               "Gender", "Party (R $\\longrightarrow$ D)",
+                               "Second Gen +", "Border State",
+                               "Concrete Imm Index:Pers Disc",
+                               "Concrete Imm Index:Group Disc",
+                               "Constant"),
+          dep.var.labels = c("Pathway for Citizenship"), out = "basic_path.tex"
+)
+
+
+#### marginal effects --- for pathway interaction 
+
+
+## clustered SEs model
+int_path <- res_ch3_int_pers$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Discrimination_Scale`
+
+## non clustered model 
+int_path_basic <- basic_ch3_path[[3]]
+
+### margins for both 
+
+emm <- emmeans(int_path, ~ Discrimination_Scale | class.conc_lat_14_16)
+emm_b <- emmeans(int_path_basic, ~ Discrimination_Scale | class.conc_lat_14_16)
+contrast(emm, method = "pairwise")
+contrast(emm_b, method = "pairwise")
+
+
+int_plot <- plot_model(res_ch3_int_pers$`DV_Pathway_Citizenship_IV_class.conc_lat_14_16*Discrimination_Scale`, type = "int")
+int_plot +   labs(x = "Concrete Imm. Index",      # changes x-axis label
+       color = "Personal Discrimination"  # changes legend title for color
+  )
+int_plot <- int_plot + labs(x = "Concrete Imm. Index",      
+                            # changes x-axis 
+                            labelcolor = "Personal Discrimination"  # changes legend title for color
+                            )
+
+   ggsave(
+         filename = "int_plot_ch3.png",  # File name with extension
+         plot = int_plot,                             # Plot object
+         width = 10,                             # Width in inches
+         height = 8,                             # Height in inches
+         dpi = 300                               # Resolution in dots per inch
+     )
