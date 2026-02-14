@@ -542,3 +542,128 @@ int_plot <- int_plot + labs(x = "Concrete Imm. Index",
          height = 8,                             # Height in inches
          dpi = 300                               # Resolution in dots per inch
      )
+   
+   
+### running mediation analysis for ch. 3
+   
+   bs_med_1 <- '
+  # mediator
+  Discrimination_Scale ~ a*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # outcome
+  BorderSecurity ~ b*Discrimination_Scale + c*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # indirect effect
+  indirect := a*b
+
+  # total effect
+  total := c + (a*b)
+'
+   
+   # fit lavaan model
+   fit_bs_1 <- sem(bs_med_1, data = cmps_lat_16$variables, meanstructure = TRUE)
+   
+   # adjust for survey weights
+   fit_bs1_svy <- lavaan.survey(fit_bs_1, survey.design = cmps_lat_16)
+   
+   # summary
+   summary(fit_bs1_svy, standardized = TRUE, fit.measures = TRUE)
+   
+   
+   bs_med_1 <- '
+  # mediator
+  Discrimination_Scale ~ a*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # outcome
+  BorderSecurity ~ b*Discrimination_Scale + c*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # indirect effect
+  indirect := a*b
+
+  # total effect
+  total := c + (a*b)
+'
+   
+   # fit lavaan model
+   fit_bs_1 <- sem(bs_med_1, data = cmps_lat_16$variables, meanstructure = TRUE)
+   
+   # adjust for survey weights
+   fit_bs1_svy <- lavaan.survey(fit_bs_1, survey.design = cmps_lat_16)
+   
+   # summary
+   summary(fit_bs1_svy, standardized = TRUE, fit.measures = TRUE)
+   
+## border sec + group level disc
+   
+   
+   bs_med_2 <- '
+  # mediator
+  Latino_Disc ~ a*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # outcome
+  BorderSecurity ~ b*Latino_Disc + c*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # indirect effect
+  indirect := a*b
+
+  # total effect
+  total := c + (a*b)
+'
+   
+   # fit lavaan model
+   fit_bs_2 <- sem(bs_med_2, data = cmps_lat_16$variables, meanstructure = TRUE)
+   
+   # adjust for survey weights
+   fit_bs2_svy <- lavaan.survey(fit_bs_2, survey.design = cmps_lat_16)
+   
+   # summary
+   summary(fit_bs2_svy, standardized = TRUE, fit.measures = TRUE)
+   
+   
+### pathway + personal disc
+   path_med_1 <- '
+  # mediator
+  Discrimination_Scale ~ a*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # outcome
+  Pathway_Citizenship ~ b*Discrimination_Scale + c*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # indirect effect
+  indirect := a*b
+
+  # total effect
+  total := c + (a*b)
+'
+   
+   # fit lavaan model
+   fit_path_1 <- sem(path_med_1, data = cmps_lat_16$variables, meanstructure = TRUE)
+   
+   # adjust for survey weights
+   fit_path1_svy <- lavaan.survey(fit_path_1, survey.design = cmps_lat_16)
+   
+   # summary
+   summary(fit_path1_svy, standardized = TRUE, fit.measures = TRUE)
+   
+### pathway + group disc 
+   path_med_2 <- '
+  # mediator
+  Latino_Disc ~ a*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # outcome
+  Pathway_Citizenship ~ b*Latino_Disc + c*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen + BorderState
+
+  # indirect effect
+  indirect := a*b
+
+  # total effect
+  total := c + (a*b)
+'
+   
+   # fit lavaan model
+   fit_path_2 <- sem(path_med_2, data = cmps_lat_16$variables, meanstructure = TRUE)
+   
+   # adjust for survey weights
+   fit_path2_svy <- lavaan.survey(fit_path_2, survey.design = cmps_lat_16)
+   
+   # summary
+   summary(fit_path2_svy, standardized = TRUE, fit.measures = TRUE)
