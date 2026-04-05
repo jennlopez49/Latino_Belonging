@@ -1,7 +1,10 @@
 # ============================================================
 # Latino Political Attitudes and Behavior - Data Cleaning
 # ============================================================
-
+library(lme4)
+library(lmerTest)
+library(modelsummary) # gives p-values
+library(stargazer)
 INSERT_PATH <- "Latino Political Attitudes and Behavior - Cleaned_March 21, 2026_23.02.csv"
 
 library(tidyverse)
@@ -286,14 +289,16 @@ df_short <- df_short %>% mutate(
   # --- Stigma: Immigrants Matrix (1-5) ---
   StigmaImmMatrix_1 = as.integer(StigmaImmMatrix_1),
   StigmaImmMatrix_2 = as.integer(StigmaImmMatrix_2),
-  StigmaImmMatrix_5 = as.integer(StigmaImmMatrix_3),
-  StigmaImm_mean = rowMeans(cbind(StigmaImmMatrix_1, StigmaImmMatrix_2, StigmaImmMatrix_5), na.rm = TRUE),
+  StigmaImmMatrix_3 = as.integer(StigmaImmMatrix_3),
+  StigmaImm_mean = rowMeans(cbind(StigmaImmMatrix_1, StigmaImmMatrix_2, StigmaImmMatrix_3), 
+                            na.rm = TRUE),
   
   # --- Stigma: Latinos Matrix (1-5) ---
   StigmaLatinoMatrix_1 = as.integer(StigmaLatinoMatrix_1),
   StigmaLatinoMatrix_2 = as.integer(StigmaLatinoMatrix_2),
-  StigmaLatinoMatrix_5 = as.integer(StigmaLatinoMatrix_3),
-  StigmaLatino_mean = rowMeans(cbind(StigmaLatinoMatrix_1, StigmaLatinoMatrix_2, StigmaLatinoMatrix_5), na.rm = TRUE),
+  StigmaLatinoMatrix_3 = as.integer(StigmaLatinoMatrix_3),
+  StigmaLatino_mean = rowMeans(cbind(StigmaLatinoMatrix_1, StigmaLatinoMatrix_2, 
+                                     StigmaLatinoMatrix_3), na.rm = TRUE),
   
   # --- Internal/External Efficacy Matrix (1-5) ---
   # Items: 1=officials don't care (external, reverse), 5=politics complicated (internal, reverse)
@@ -533,3 +538,149 @@ df_clean <- df_clean %>%
 # Check distribution
 summary(df_clean$PolKnow_index)
 hist(df_clean$PolKnow_index)
+
+
+###### Match the respondents to their states -----------------------------------
+scores_2025 <- read.csv("/Users/jenniferlopez/Desktop/COIi work/State_Laws/scores_final_updated.csv")
+
+qualtrics_states <- c(
+  "AL",  # 1  - Alabama
+  "AK",  # 2  - Alaska
+  "AZ",  # 3  - Arizona
+  "AR",  # 4  - Arkansas
+  "CA",  # 5  - California
+  "CO",  # 6  - Colorado
+  "CT",  # 7  - Connecticut
+  "DE",  # 8  - Delaware
+  "DC",  # 9  - District of Columbia
+  "FL",  # 10 - Florida
+  "GA",  # 11 - Georgia
+  "HI",  # 12 - Hawaii
+  "ID",  # 13 - Idaho
+  "IL",  # 14 - Illinois
+  "IN",  # 15 - Indiana
+  "IA",  # 16 - Iowa
+  "KS",  # 17 - Kansas
+  "KY",  # 18 - Kentucky
+  "LA",  # 19 - Louisiana
+  "ME",  # 20 - Maine
+  "MD",  # 21 - Maryland
+  "MA",  # 22 - Massachusetts
+  "MI",  # 23 - Michigan
+  "MN",  # 24 - Minnesota
+  "MS",  # 25 - Mississippi
+  "MO",  # 26 - Missouri
+  "MT",  # 27 - Montana
+  "NE",  # 28 - Nebraska
+  "NV",  # 29 - Nevada
+  "NH",  # 30 - New Hampshire
+  "NJ",  # 31 - New Jersey
+  "NM",  # 32 - New Mexico
+  "NY",  # 33 - New York
+  "NC",  # 34 - North Carolina
+  "ND",  # 35 - North Dakota
+  "OH",  # 36 - Ohio
+  "OK",  # 37 - Oklahoma
+  "OR",  # 38 - Oregon
+  "PA",  # 39 - Pennsylvania
+  NA,    # 40 - MISSING in Qualtrics
+  "RI",  # 41 - Rhode Island
+  "SC",  # 42 - South Carolina
+  "SD",  # 43 - South Dakota
+  "TN",  # 44 - Tennessee
+  "TX",  # 45 - Texas
+  "UT",  # 46 - Utah
+  "VT",  # 47 - Vermont
+  "VA",  # 48 - Virginia
+  "WA",  # 49 - Washington
+  "WV",  # 50 - West Virginia
+  "WI",  # 51 - Wisconsin
+  "WY"   # 52 - Wyoming
+)
+###
+df_clean$State_char <- qualtrics_states[df_clean$State]
+df_clean <- left_join(df_clean, scores_2025, by= c("State_char" = "State"))
+
+
+# index check --- 
+psych::alpha(df_clean[, c("StigmaImmMatrix_1", "StigmaImmMatrix_2", "StigmaImmMatrix_3")])
+
+### map fig 
+
+library(tidyverse)
+library(tigris)
+library(sf)
+
+# --- Bin the exposure variable ---
+scores_2025 <- scores_2025 %>%
+  mutate(
+    conc_lat_index_24 = case_when(
+      latino_conc_24 > 15         ~  1,
+      latino_conc_24 > 0          ~  0.5,
+      latino_conc_24 >= -15      ~  0,
+      latino_conc_24 >= -100      ~ -0.5,
+      latino_conc_24 < -100       ~ -1,
+      TRUE ~ NA_real_
+    )
+  )
+
+# --- Load and prep shapefile ---
+states_sf <- tigris::states(cb = TRUE, resolution = "20m", class = "sf") %>%
+  filter(!STUSPS %in% c("HI", "AK", "GU", "PR", "VI", "AS", "MP"))
+
+# --- Merge ---
+states_sf <- states_sf %>%
+  left_join(scores_2025, by = c("STUSPS" = "State"))
+
+# --- Map ---
+conc_24_map <- ggplot(data = states_sf) +
+  geom_sf(aes(fill = factor(conc_lat_index_24)), color = "white", linewidth = 0.3) +
+  scale_fill_manual(
+    values = c(
+      "-1"  = "#d73027",   # extreme hostile - dark red
+      "-0.5" = "#f4a582",  # moderate hostile - light red
+      "0"   = "#ffffbf",   # minimal - yellow
+      "0.5" = "#92c5de",   # mildly protective - light blue
+      "1"   = "#4575b4"    # highly protective - dark blue
+    ),
+    labels = c(
+      "-1"   = "Extreme hostile (< -100)",
+      "-0.5" = "Moderate hostile (-15 to -100)",
+      "0"    = "Low hostile (0 to -15)",
+      "0.5"  = "Mildly protective (0 to 15)",
+      "1"    = "Highly protective (> 15)"
+    ),
+    name = "Policy Climate",
+    na.value = "grey80"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "State-Level Structural Stigma Against Immigrants, 2023–2026",
+    subtitle = "Concrete policies (287g agreements + legislation)",
+    caption = "Note: Scores based on 287g agreements and state legislation (2023 to March 2026),\nweighted by 2020\u20132024 ACS Latino population estimates."
+  ) +
+  theme(
+    axis.text  = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.text  = element_text(size = 9),
+    legend.key.width = unit(0.8, "cm"),
+    plot.title = element_text(size = 14, face = "bold", hjust = .5),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(hjust = 0),
+    plot.caption = element_text(size = 8, color = "grey40", hjust = 0)
+  ) +
+  guides(fill = guide_legend(nrow = 2))
+
+conc_24_map
+
+# --- Save ---
+ggsave(
+  filename = "state_climate_2024_Conc.png",
+  plot = conc_24_map,
+  width = 10,
+  height = 7,
+  dpi = 300
+)

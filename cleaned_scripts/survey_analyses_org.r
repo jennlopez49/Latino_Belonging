@@ -37,7 +37,7 @@ lapply(emotions, function(e) {
   dplyr::select(DV, Mediator, estimate, std.error, p.value) %>%
   mutate(across(where(is.numeric), ~round(., 3)))
 ### STRICT PASS ONLY ---------
-df_pass <- df_clean %>% filter(ManipCheck1_result == 1)
+
 
 lm(BelongingPost_state ~ Treatment, data = df_pass 
    %>% filter(!is.na(Treatment))) %>% summary()
@@ -130,7 +130,7 @@ policy_dvs        <- c("ImmAttitudeHyp_r",
                        "Pathway_Citizenship",
                        "BorderPolicyIndex",
                        "InteriorPolicyIndex")
-
+df_pass <- df_clean %>% filter(ManipCheck1_result == 1)
 # Chapter 2: Belonging
 sem_survey(
   dvs            = belonging_dvs,
@@ -408,7 +408,7 @@ stargazer(belstate_lat_out, belUS_lat_out, type = "text",
           dep.var.caption = "Internal Belonging",
           dep.var.labels = c("State", "United States"),
           covariate.labels = c( "Anger", "Fear", "Shame", "Relief", "Pride", "Joy",
-                                "Imm. Stigma Perception", "Treatment - Anti", 
+                                "Latino Stigma Perception", "Treatment - Anti", 
                                 "Treatment - Pro", "Age", "Sex", "Education",
                                 "Income",
                                 "Party (D $\\longrightarrow$ R)", 
@@ -434,14 +434,14 @@ stargazer(belext_state_lat, belext_US_lat, type = "latex",
           dep.var.caption = "External Belonging",
           dep.var.labels = c("State", "United States"),
           covariate.labels = c( "Anger", "Fear", "Shame", "Relief", "Pride", "Joy",
-                                "Imm. Stigma Perception", "Treatment - Anti", 
+                                "Latino Stigma Perception", "Treatment - Anti", 
                                 "Treatment - Pro", "Age", "Sex", "Education",
                                 "Income",
                                 "Party (D $\\longrightarrow$ R)", 
                                 "Acculturation", 
                                 "Linked Fate",
                                 "Constant"), 
-          out = "main_ext_ch2.tex")
+          out = "app_ext_lat_ch2.tex")
 
 
 ### interactions -------------------------- stigma x treatment --> outcome?
@@ -449,6 +449,61 @@ stargazer(belext_state_lat, belext_US_lat, type = "latex",
 belonging_dvs <- c("BelongingPost_state", "BelongingPost_US",
                    "BelongExternal_state", "BelongExternal_US")
 
+## basic models first ----
+belong_em <- lapply(belonging_dvs, function(dv) {
+  form <- as.formula(paste(dv, "~ Treatment + StigmaImm_mean +",
+                           "Age + Sex + Education + Income + Emotions_Anger + 
+                           Emotions_Fear + Emotions_Shame + 
+                       Emotions_Relief + Emotions_Pride + Emotions_Joy + 
+                           PartyID_5pt + Acculturation + LinkedFate_r"))
+  lm(form, data = df_clean %>% filter(!is.na(Treatment)))
+})
+names(belong_em) <- belonging_dvs
+state_belong <- list(belong_em$BelongingPost_state, belong_em$BelongExternal_state)
+US_belong <- list(belong_em$BelongingPost_US, belong_em$BelongExternal_US)
+re_belong_em <- c(state_belong, US_belong)
+
+belong_em_app <- lapply(belonging_dvs, function(dv) {
+  form <- as.formula(paste(dv, "~ Treatment + StigmaLatino_mean +",
+                           "Age + Sex + Education + Income + Emotions_Anger + 
+                           Emotions_Fear + Emotions_Shame + 
+                       Emotions_Relief + Emotions_Pride + Emotions_Joy + 
+                           PartyID_5pt + Acculturation + LinkedFate_r"))
+  lm(form, data = df_clean %>% filter(!is.na(Treatment)))
+})
+names(belong_em_app) <- belonging_dvs
+state_belong_app <- list(belong_em_app$BelongingPost_state, belong_em_app$BelongExternal_state)
+state_belong_app <- list(belong_em_app$BelongingPost_US, belong_em_app$BelongExternal_US)
+re_belong_em_app <- c(state_belong_app, state_belong_app)
+
+## main table -----------------------------------------------------------------
+# will have to manually edit in latex
+stargazer(re_belong_em,
+          type = "latex",
+          dep.var.caption = "Belonging", dep.var.labels = c("Internal", "External", "Internal", "External"),
+          column.labels = c("State", "US"),
+          column.separate = c(2, 2), covariate.labels = c("Anti", "Pro",
+          "Imm. Stigma",
+          "Age", "Sex", "Education", "Income",
+          "Anger", "Fear", "Shame",
+          "Relief", "Pride", "Joy",
+          "Party (D $\\longrightarrow$ R)", "Acculturation",
+          "Linked Fate", "Constant"),
+          out = "main_em.tex")
+
+stargazer(re_belong_em_app,
+          type = "latex",
+          dep.var.caption = "Belonging", dep.var.labels = c("Internal", "External", "Internal", "External"),
+          column.labels = c("State", "US"),
+          column.separate = c(2, 2), covariate.labels = c("Anti", "Pro",
+                                                          "Latino Stigma",
+                                                          "Age", "Sex", "Education", "Income",
+                                                          "Anger", "Fear", "Shame",
+                                                          "Relief", "Pride", "Joy",
+                                                          "Party (D $\\longrightarrow$ R)", "Acculturation",
+                                                          "Linked Fate", "Constant"),
+          out = "app_em.tex"
+          )
 # Treatment x StigmaImm interaction
 belong_int_imm <- lapply(belonging_dvs, function(dv) {
   form <- as.formula(paste(dv, "~ Treatment * StigmaImm_mean +",
@@ -489,7 +544,7 @@ stargazer(belong_int_imm,
                                "Imm. Stigma",
                                "Age", "Sex", "Education", "Income",
                                "Anger", "Fear", "Shame",
-                               "Relief", "Joy",
+                               "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)", "Acculturation",
                                "Linked Fate",
                                "Anti x Stigma",
@@ -504,10 +559,10 @@ stargazer(belong_int_lat,
                              "State (External)", "US (External)"),
           dep.var.caption = "Dependent Variable: Belonging",
           covariate.labels = c("Anti", "Pro",
-                               "Imm. Stigma",
+                               "Latino Stigma",
                                "Age", "Sex", "Education", "Income",
                                "Anger", "Fear", "Shame",
-                               "Relief", "Joy",
+                               "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)", "Acculturation",
                                "Linked Fate",
                                "Anti x Stigma",
@@ -557,8 +612,31 @@ bel_US_int_em <- belong_int_imm_em$BelongingPost_US
 belext_state_int_em <- belong_int_imm_em$BelongExternal_state
 belext_US_int_em <- belong_int_imm_em$BelongExternal_state
 
-stargazer(bel_state_int_em, bel_US_int_em, type = "text")
-stargazer(belext_state_int_em, belext_US_int_em, type = "text")
+stargazer(bel_state_int_em, bel_US_int_em, type = "latex",
+          dep.var.labels = c("State", "United States"),
+          dep.var.caption = "Internal Belonging",
+          covariate.labels = c("Anti", "Pro",
+                               "Imm. Stigma",
+                               "Anger", "Fear", "Shame","Pride",
+                               "Relief", "Pride","Joy", "Age", "Sex", "Education", "Income",
+                               "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Linked Fate",
+                               "Anti x Stigma",
+                               "Pro x Stigma",
+                               "Constant"), out = "inter_em_int_imm.tex")
+stargazer(belext_state_int_em, belext_US_int_em, type = "latex",
+          dep.var.labels = c("State", "United States"),
+          dep.var.caption = "External Belonging",
+          covariate.labels = c("Anti", "Pro",
+                               "Imm. Stigma",
+                               "Anger", "Fear", "Shame",
+                               "Relief", "Pride","Joy", "Age", "Sex", 
+                               "Education", "Income",
+                               "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Linked Fate",
+                               "Anti x Stigma",
+                               "Pro x Stigma",
+                               "Constant"), out = "exter_em_int_imm.tex")
 
 ################### CHAPTER 3 ANALYSES #########################################
 survey_controls_pol <- c("Age", "Sex", "Education", "Income",
@@ -670,3 +748,193 @@ stargazer(bel_full, type = "latex", dep.var.labels = c("Internal - State",
           "Linked Fate", "Border State", "Treatment (Anti) x Imm. Stigma",
           "Treatment (Pro) x Imm. Stigma",
           "Constant"), out = "ch2_all_em_org.tex")
+
+
+###### RE-RUNNING MODELS WITH STIGMA CONTEXT 
+## ============================================================
+
+## --- 1. MEDIATOR MODELS (for main_med_ch2) ---
+stigma_c <-med_ch2_results$stigma_models$IV_Treatment_Stigma_StigmaImm_mean
+# Stigma model
+stigma_cc <- lm(StigmaImm_mean ~ Treatment + latino_conc_24 +
+                  Age + Sex + Education + Income +
+                  PartyID_5pt + Acculturation + LinkedFate_r,
+                data = df_clean %>% filter(!is.na(Treatment)))
+
+mlm_stigma <- lmer(StigmaImm_mean ~ Treatment +
+                     latino_conc_24 +  # start linear, see if it holds
+                     Age + Sex + Education + Income +
+                     PartyID_5pt + Acculturation + LinkedFate_r +
+                     (1 | State_char),
+                   data = df_clean %>% filter(!is.na(Treatment)))
+
+summary(mlm_stigma)
+
+library(clubSandwich)
+model_data <- model.frame(mlm_stigma)
+# CR2 is the recommended type for small numbers of clusters
+mlm <- coef_test(mlm_stigma, vcov = "CR2", cluster = model_data$State_char)
+mlm$
+state_level <- df_clean %>%
+  group_by(State_char) %>%
+  summarize(
+    mean_stigma = mean(StigmaImm_mean, na.rm = TRUE),
+    exposure = mean(latino_conc_24, na.rm = TRUE),
+    n = n()
+  )
+
+lm_state <- lm(mean_stigma ~ exposure, data = state_level)
+summary(lm_state)
+
+library(modelsummary)
+robust_vcov <- vcovCR(mlm_stigma, cluster = model_data$State_char, type = "CR2")
+modelsummary(
+  list("Basic" = stigma_c,
+    "OLS" = stigma_cc,
+       "MLM" = mlm_stigma,
+       "MLM (Robust SE)" = mlm_stigma,
+       "State OLS" = lm_state),
+  vcov = list("classical",   # Basic
+              "classical", "classical",mlm$SE,
+              "classical"),
+  stars = c("*" = .05, "**" = .01, "***" = .001),
+  gof_map = c("nobs", "icc", "r.squared", "adj.r.squared"),
+  coef_rename = c(
+    "latino_conc_24" = "Structural Exposure",
+    "TreatmentAnti" = "Anti Treatment",
+    "TreatmentPro" = "Pro Treatment",
+    "LinkedFate_r" = "Linked Fate",
+    "PartyID_5pt" = "Party ID",
+    "Acculturation" = "Acculturation",
+    "(Intercept)" = "Intercept"
+  ),
+  coef_omit = NULL, # or list specific ones to drop
+  notes = list("Robust SEs clustered at state level (CR2).",
+               "State OLS uses state-level means as unit of analysis."),
+  output = "latex_tabular"
+)
+
+# Emotion models
+emotions_cc <- lapply(survey_emotions, function(em) {
+  form <- as.formula(paste(em, "~ StigmaImm_mean + Treatment + latino_conc_24 +",
+                           "Age + Sex + Education + Income +",
+                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+  lm(form, data = df_clean %>% filter(!is.na(Treatment)))
+}) %>% setNames(survey_emotions)
+
+imm_med_mods_cc <- c(
+  list(stigma_cc),
+  list(emotions_cc$Emotions_Anger,
+       emotions_cc$Emotions_Fear,
+       emotions_cc$Emotions_Shame,
+       emotions_cc$Emotions_Relief,
+       emotions_cc$Emotions_Pride,
+       emotions_cc$Emotions_Joy)
+)
+
+imm_med_mods_interleaved <- c(rbind(imm_med_mods, imm_med_mods_cc))
+
+stargazer(imm_med_mods_interleaved[3:8], type = "latex",
+          dep.var.labels = c("Anger", "Fear",
+                             "Shame"),
+          covariate.labels = c("Imm. Stigma Perception", "Treatment - Anti",
+                               "Treatment - Pro", "Concrete Imm. Index",
+                               "Age", "Sex", "Education", "Income",
+                               "Party (D $\\longrightarrow$ R)",
+                               "Acculturation", "Linked Fate", "Constant"),
+          longtable = TRUE, float = FALSE,
+          out = "main_med_neg_cc.tex")
+
+# Table 2: Positive Emotions (Relief, Pride, Joy)
+# cols: relief(9), relief_cc(10), pride(11), pride_cc(12), joy(13), joy_cc(14)
+stargazer(imm_med_mods_interleaved[9:14], type = "latex",
+          dep.var.labels = c("Relief", "Relief",
+                             "Pride", "Pride",
+                             "Joy", "Joy"),
+          covariate.labels = c("Imm. Stigma Perception", "Treatment - Anti",
+                               "Treatment - Pro", "Concrete Imm. Index",
+                               "Age", "Sex", "Education", "Income",
+                               "Party (D $\\longrightarrow$ R)",
+                               "Acculturation", "Linked Fate", "Constant"),
+          longtable = TRUE, float = FALSE,
+          out = "main_med_pos_cc.tex")
+
+
+## --- 2. ALL-EMOTIONS MODELS (for main_em) ---
+## These mirror belong_em but add class.conc_lat_14_16
+
+belong_em_cc <- lapply(belonging_dvs, function(dv) {
+  form <- as.formula(paste(dv, "~ Treatment + StigmaImm_mean + latino_conc_24 +",
+                           "Age + Sex + Education + Income +",
+                           "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
+                           "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
+                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+  lm(form, data = df_clean %>% filter(!is.na(Treatment)))
+}) %>% setNames(belonging_dvs)
+
+state_belong_cc <- list(belong_em_cc$BelongingPost_state, 
+                        belong_em_cc$BelongExternal_state)
+US_belong_cc    <- list(belong_em_cc$BelongingPost_US,    
+                        belong_em_cc$BelongExternal_US)
+re_belong_em_cc <- c(state_belong_cc, US_belong_cc)
+
+re_belong_em_interleaved <- list(
+  belong_em$BelongingPost_state,     belong_em_cc$BelongingPost_state,
+  belong_em$BelongExternal_state,    belong_em_cc$BelongExternal_state,  # <-- swapped
+  belong_em$BelongingPost_US,        belong_em_cc$BelongingPost_US,
+  belong_em$BelongExternal_US,       belong_em_cc$BelongExternal_US
+)
+
+stargazer(re_belong_em_interleaved,
+          type = "latex",
+          dep.var.caption = "Belonging", 
+          dep.var.labels = c("Internal", "External", "Internal", "External"),
+          column.labels = c("State", "US"),
+          column.separate = c(4, 4),
+          covariate.labels = c("Anti", "Pro",
+                               "Imm. Stigma", "Concrete Imm. Index",
+                               "Age", "Sex", "Education", "Income",
+                               "Anger", "Fear", "Shame",
+                               "Relief", "Pride", "Joy",
+                               "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Linked Fate", "Constant"),
+          out = "main_em_cc.tex")
+
+
+## --- 3. INTERACTION MODELS (for belong_inter_imm) ---
+## These mirror belong_int_imm but add class.conc_lat_14_16
+
+belong_int_imm_cc <- lapply(belonging_dvs, function(dv) {
+  form <- as.formula(paste(dv, "~ Treatment * StigmaImm_mean + latino_conc_24 +",
+                           "Age + Sex + Education + Income +",
+                           "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
+                           "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
+                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+  lm(form, data = df_clean %>% filter(!is.na(Treatment)))
+}) %>% setNames(belonging_dvs)
+
+belong_int_imm_interleaved <- list(
+  belong_int_imm$BelongingPost_state,    belong_int_imm_cc$BelongingPost_state,
+  belong_int_imm$BelongingPost_US,       belong_int_imm_cc$BelongingPost_US,
+  belong_int_imm$BelongExternal_state,   belong_int_imm_cc$BelongExternal_state,
+  belong_int_imm$BelongExternal_US,      belong_int_imm_cc$BelongExternal_US
+)
+
+stargazer(belong_int_imm_interleaved,
+          type = "latex",
+          dep.var.caption = "Belonging", 
+          dep.var.labels = c("Internal", "External", "Internal", "External"),
+          column.labels = c("State", "US"),
+          column.separate = c(4, 4),
+          covariate.labels = c("Anti", "Pro",
+                               "Imm. Stigma", "Concrete Imm. Index",
+                               "Age", "Sex", "Education", "Income",
+                               "Anger", "Fear", "Shame",
+                               "Relief", "Pride", "Joy",
+                               "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Linked Fate",
+                               "Anti x Stigma",
+                               "Pro x Stigma",
+                               "Constant"),
+          label = "belong.int.imm.cc",
+          out = "belong_inter_imm_cc.tex")

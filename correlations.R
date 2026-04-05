@@ -5,7 +5,7 @@ cors <- cmps_lat_16$variables %>% dplyr::select(Linked_Fate, Age, Gender, Educat
                                      Discrimination_National_Perc, 
                                      Spanish_Media,
                                      Worry_Deport,
-                                     Pol_Interest, ICI_Reverse,
+                                     Pol_Interest, class.conc_lat_14_16,
                                      Fear_Election, Angry_Election, Pride_Election,
                                      Hope_Election, Sad_Election, Latino_Disc) %>% 
   na.omit()
