@@ -1,6 +1,6 @@
 #### General Vars For Int & Med Models ---------
 #cmps_lat_16$variables$ICI_Reverse_Fac <- as.factor(cmps_lat_16$variables$ICI_Reverse)
-dvs <- c("Internal_Belonging", "External_Belonging")  # List of DVs (Y)
+dvs <- c("Belong_US", "Valued_Respected_US")  # List of DVs (Y)
 # ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
 ivs <- list("conc_lat_index_16","latino_conc_16", "class.conc_lat_14_16")
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
@@ -10,9 +10,12 @@ full.controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest",
               "Linked_Fate", "Party",
               "More_Than_SecondGen", "Discrimination_Scale",
               "Latino_Disc")
-basic.controls <- c("Age", "Gender",
+basic.controls <- c("Age", "Gender", "Education", "Income",
                     "Mexican", "Cuban", "Party",
-                    "More_Than_SecondGen")
+                    "More_Than_SecondGen", "Latino_Disc")
+basic.controls_alt <- c("Age", "Gender", "Education", "Income",
+                    "Mexican", "Cuban", "Party",
+                    "More_Than_SecondGen", "Discrimination_Scale")
 
 # ################ No interaction/ Basic Models -------------------------------------
 # ## List of Models
@@ -83,6 +86,7 @@ basic.controls <- c("Age", "Gender",
 ivs <- list("conc_lat_index_16","latino_conc_16", "class.conc_lat_14_16")
 
 mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, basic.controls, cmps_lat_16, cmps_lat_16, out ="med_basic_ols")
+mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, basic.controls_alt, cmps_lat_16, cmps_lat_16, out ="med_basic_alt_ols")
 mediation_function_standard(dvs, "class.conc_lat_14_16", mediators, full.controls, cmps_lat_16, cmps_lat_16, out ="med_full_ols")
 
 ### subsets
@@ -109,19 +113,105 @@ mediation_function_standard(dvs, "class.conc_lat_14_16", mediators,
 #           #out = "neg.em.gen.full.tex"
 #           )
 listmods <- med_results_ols$mediator_models[c(1:4, 9, 10)]
-stargazer(listmods, type = "latex",
-          covariate.labels = c("Concrete Imm. Index", "Concrete Imm. Stigma","Linked Fate",
+stargazer(med_basic_ols$mediator_models[c(1:2,5,3:4)], type = "latex",
+          covariate.labels = c("Concrete Imm. Stigma",
           "Age", "Gender",
-          "Education", "Income", "Political Interest",
-          "Mexican", "Cuban", "Party (R $\\longrightarrow$ D)",
-          "Generation", "Discrimination Exp.",
-          "Group Discrimination Percep.", "Spanish Media", "Deportation Worry",
+          "Education", "Income",
+          "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+          "Generation",
+          "Group Discrimination Percep.",
           "Constant"),
-          dep.var.labels = c("Fear", "Anger", "Sadness"), 
-          dep.var.caption = "Dependent variable: Negative Emotions"
+          dep.var.labels = c("Fear", "Anger", "Sadness", "Pride", "Hope"), 
+          dep.var.caption = "Dependent variable: Emotions"
           ,
-          out = "neg.em.gen.short.tex"
+          out = "em.gen.tex"
 )
+
+stargazer(med_basic_alt_ols$mediator_models[c(1:2,5,3:4)], type = "latex",
+          covariate.labels = c("Concrete Imm. Stigma",
+                               "Age", "Gender",
+                               "Education", "Income",
+                               "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                               "Generation",
+                               "Personal Disc.",
+                               "Constant"),
+          dep.var.labels = c("Fear", "Anger", "Sadness", "Pride", "Hope"), 
+          dep.var.caption = "Dependent variable: Emotions"
+          ,
+          out = "em.gen.app.tex"
+)
+
+stargazer(med_basic_alt_ols$outcome_models, type = "latex",
+          covariate.labels = c("Concrete Imm. Stigma",
+                               "Fear", "Anger", "Pride", "Hope", "Sadness",
+                               "Age", "Gender",
+                               "Education", "Income",
+                               "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                               "Generation",
+                               "Personal Disc.",
+                               "Constant"),
+          dep.var.labels = c("Internal - US", "External - US"), 
+          dep.var.caption = "Dependent variable: Belonging"
+          ,
+          out = "bel.gen.app.tex"
+          )
+
+stargazer(med_basic_ols$outcome_models, type = "latex",
+          covariate.labels = c("Concrete Imm. Stigma",
+                               "Fear", "Anger", "Pride", "Hope", "Sadness",
+                               "Age", "Gender",
+                               "Education", "Income",
+                               "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                               "Generation",
+                               "Latino Disc.",
+                               "Constant"),
+          dep.var.labels = c("Internal - US", "External - US"), 
+          dep.var.caption = "Dependent variable: Belonging"
+          ,
+          out = "bel.gen.tex"
+)
+
+## all em models
+int <- svyglm(Belong_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
+              + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+              + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
+              design = cmps_lat_16)
+int_alt <- svyglm(Belong_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
+              + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+              + Mexican + Cuban + Party + More_Than_SecondGen + Discrimination_Scale,
+              design = cmps_lat_16)
+
+ext <- svyglm(Valued_Respected_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
+              + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+              + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
+              design = cmps_lat_16)
+ext_alt <- svyglm(Valued_Respected_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
+                  + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+                  + Mexican + Cuban + Party + More_Than_SecondGen + Discrimination_Scale,
+                  design = cmps_lat_16)
+
+stargazer(int, ext, type = "latex",  covariate.labels = c("Concrete Imm. Stigma",
+                                                             "Fear", "Anger", "Pride", "Hope", "Sadness",
+                                                             "Age", "Gender",
+                                                             "Education", "Income",
+                                                             "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                                                             "Generation",
+                                                             "Latino Disc.",
+                                                             "Constant"),
+          dep.var.labels = c("Internal", "External"), 
+          dep.var.caption = "Dependent variable: Belonging",
+          out = "bel.all.tex")
+stargazer(int_alt, ext_alt, type = "latex",  covariate.labels = c("Concrete Imm. Stigma",
+                                                         "Fear", "Anger", "Pride", "Hope", "Sadness",
+                                                         "Age", "Gender",
+                                                         "Education", "Income",
+                                                         "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                                                         "Generation",
+                                                         "Pers. Disc.",
+                                                         "Constant"),
+          dep.var.labels = c("Internal", "External"), 
+          dep.var.caption = "Dependent variable: Belonging",
+          out = "bel.all_app.tex")
 
 ### Figures ----
 negp <- plot_model(listmods$IV_ICI_Reverse_Fac_Med_Fear_Election, type = "est", 

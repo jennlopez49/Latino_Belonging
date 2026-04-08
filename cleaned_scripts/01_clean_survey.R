@@ -368,7 +368,11 @@ df_short <- df_short %>% mutate(
   
   # --- Income ---
   # 1=<$25k, 2=$25-49k, 3=$50-74k, 4=$75-99k, 5=$100-149k, 6=$150k+, 7=PrefNotSay
-  Income = as.numeric(Income)
+  Income = as.numeric(Income),
+  
+  # 2. Turn -99 and 7 into NA
+  # We use %in% to catch multiple values at once
+  Income = if_else(Income %in% c(-99, 7), NA_real_, Income)
 )
 
 # ============================================================
@@ -605,6 +609,7 @@ df_clean <- left_join(df_clean, scores_2025, by= c("State_char" = "State"))
 # index check --- 
 psych::alpha(df_clean[, c("StigmaImmMatrix_1", "StigmaImmMatrix_2", "StigmaImmMatrix_3")])
 
+
 ### map fig 
 
 library(tidyverse)
@@ -684,3 +689,34 @@ ggsave(
   height = 7,
   dpi = 300
 )
+
+##### desc table
+# Define variable sets
+survey_emotions   <- c("Emotions_Anger", "Emotions_Fear", "Emotions_Shame",
+                       "Emotions_Relief", "Emotions_Pride", "Emotions_Joy")
+
+survey_stigma     <- c("StigmaImm_mean", "StigmaLatino_mean")
+
+survey_controls   <- c("Age", "Sex", "Education", "Income",
+                       "PartyID_5pt", "Acculturation")
+
+belonging_dvs     <- c("BelongingPost_state", "BelongingPost_US",
+                       "BelongExternal_state", "BelongExternal_US")
+
+policy_dvs        <- c("ImmAttitudeHyp_r", 
+                       "BorderSecurity",
+                       "Pathway_Citizenship",
+                       "BorderPolicyIndex",
+                       "InteriorPolicyIndex")
+
+vars_org <- df_clean %>% dplyr::select(Age, Education, Income, PartyID_5pt, 
+                                       Acculturation, StigmaImm_mean, 
+                                       StigmaLatino_mean, Emotions_Anger, 
+                                       Emotions_Fear, Emotions_Shame,
+                                       Emotions_Relief, Emotions_Pride, 
+                                       Emotions_Joy, BelongingPost_state,
+                                       BelongingPost_US, BelongExternal_state,
+                                       BelongExternal_US, Treatment_cont)
+datasummary_balance(~ Treatment_cont, data = vars_org, output = "balance_table.tex")
+
+

@@ -15,13 +15,20 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
                                     S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
                                     C253, LA202_6, S1, L24, C262, C245, SPLITC337,
-                                    C337, BLA205, C141, SPLITC141, SPLITC38)
+                                    C337, BLA205, C141, SPLITC141, SPLITC38, C27)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
   State = S4,
-  Birthyear = paste0("19", S6),
-  Age = (2016 - as.numeric(Birthyear)),
+  # 1. Create the 4-digit year and make sure it's numeric
+  Birthyear_i = as.numeric(paste0("19", S6)),
+  
+  # 2. If it's not 4 digits (like if S6 was "0"), make it NA
+  # We use as.character() inside nchar just for the check
+  Birthyear = if_else(nchar(as.character(Birthyear_i)) < 4, NA_real_, Birthyear_i),
+  
+  # 3. Now subtract numbers from numbers (2016 - 19xx)
+  Age = 2016 - Birthyear,
   age_sqd = Age^2,
   Native = as.character(S7),
   NativeBorn = case_when(S7 == "(1) United States" ~ 1,
@@ -30,12 +37,25 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Origin = S10,
   Voted = case_when(S10 == "(1) Yes, I voted" ~ 1,
                     S10 == "(2) No, I did NOT vote"  ~ 0),
-  Party = case_when(C25 == "(1) Republican" ~ 1, 
-                    C25 == "(2) Democrat" ~ 2,
-                    C25 == "(3) Independent" ~ 3,
+  Party3pt = case_when(C25 == "(1) Republican" ~ 3,                                ## RECODED SO DEM - 1, IND - 2, REP - 3
+                    C25 == "(2) Democrat" ~ 1,
+                    C25 == "(3) Independent" ~ 2,
                     C25 == "(4) Other party" ~ 4),
-  #PtyStrength = case_when(C)
-  #Party_5pt = 
+  Party = case_when( ### Dem - 1, Lean Dem - 2, 3 - Ind, 4 - Lean Rep, 5 - Rep
+    # 1. Main Party ID
+    C25 == "(2) Democrat" ~ 1,
+    C25 == "(1) Republican" ~ 5,
+    
+    # 2. The Leaning (Independents and Others)
+    C25 %in% c("(3) Independent", "(4) Other party") & C27 == "(02) Democrat" ~ 2,
+    C25 %in% c("(3) Independent", "(4) Other party") & C27 == "(01) Republican" ~ 4,
+    
+    # 3. The True Neutrals (Ind/Other who don't lean or said Don't Know)
+    C25 %in% c("(3) Independent", "(4) Other party") ~ 3,
+    
+    # 4. Catch-all for missingness
+    TRUE ~ NA_real_
+  ),
   Linked_Fate = case_when(C150 == "(2) No" ~ 0,
                           C151 == "(3) Not very much" ~ 1,
                           C151 == "(2) Some" ~ 2,
@@ -505,7 +525,10 @@ latinos_data <- latinos_data %>% mutate(
 )
 
 #### Saving Latino CSV 
-write.csv(latinos_data, "latinos_cmps_2016.csv")
+#write.csv(latinos_data, "latinos_cmps_2016.csv")
+
+## fixing age errors - 
+
 
 ### Creating Survey Design ---
 cmps_lat_16 <- svydesign(
@@ -606,6 +629,23 @@ cmps_imm_16 <- svydesign(
   weights = ~Weight
 )
 
+# Check correlation for Internal
+cor(cmps.add.2016$Belong_US, cmps.add.2016$Outsider_US, use="complete.obs")
 
+# Check correlation for External
+cor(cmps.add.2016$Valued_Respected_US, cmps.add.2016$Excluded_US_Soc, use="complete.obs")
 
+### errors - 
 
+age <- latinos_data[c(23, 324, 405, 1827, 2530), ]
+
+### desc table using modelsummary ----
+vars <- latinos_data %>% dplyr::select(Age, Education, Income, Gender, Party,
+                                       More_Than_SecondGen, Latino_Disc,
+                                       Discrimination_Scale, Fear_Election,
+                                       Angry_Election,Pride_Election, 
+                                       Hope_Election, Sad_Election
+                                       )
+
+# For categorical variables
+datasummary_skim(vars, output = "desc_table_cmps.tex")
