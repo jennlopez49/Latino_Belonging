@@ -8,14 +8,14 @@ mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Ele
 full.controls <- c("Age", "Gender", "Education", "Income", "Pol_Interest", 
               "Mexican", "Cuban",
               "Linked_Fate", "Party",
-              "More_Than_SecondGen", "Discrimination_Scale",
+              "More_Than_SecondGen", "Imm_Disc",
               "Latino_Disc")
 basic.controls <- c("Age", "Gender", "Education", "Income",
                     "Mexican", "Cuban", "Party",
-                    "More_Than_SecondGen", "Latino_Disc")
+                    "More_Than_SecondGen", "Imm_Disc")
 basic.controls_alt <- c("Age", "Gender", "Education", "Income",
                     "Mexican", "Cuban", "Party",
-                    "More_Than_SecondGen", "Discrimination_Scale")
+                    "More_Than_SecondGen", "Latino_Disc")
 
 # ################ No interaction/ Basic Models -------------------------------------
 # ## List of Models
@@ -119,7 +119,7 @@ stargazer(med_basic_ols$mediator_models[c(1:2,5,3:4)], type = "latex",
           "Education", "Income",
           "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
           "Generation",
-          "Group Discrimination Percep.",
+          "Imm. Discrimination Percep.",
           "Constant"),
           dep.var.labels = c("Fear", "Anger", "Sadness", "Pride", "Hope"), 
           dep.var.caption = "Dependent variable: Emotions"
@@ -133,7 +133,7 @@ stargazer(med_basic_alt_ols$mediator_models[c(1:2,5,3:4)], type = "latex",
                                "Education", "Income",
                                "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
                                "Generation",
-                               "Personal Disc.",
+                               "Latino Discrimination Percep.",
                                "Constant"),
           dep.var.labels = c("Fear", "Anger", "Sadness", "Pride", "Hope"), 
           dep.var.caption = "Dependent variable: Emotions"
@@ -148,7 +148,7 @@ stargazer(med_basic_alt_ols$outcome_models, type = "latex",
                                "Education", "Income",
                                "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
                                "Generation",
-                               "Personal Disc.",
+                               "Latino Discrimination Percep.",
                                "Constant"),
           dep.var.labels = c("Internal - US", "External - US"), 
           dep.var.caption = "Dependent variable: Belonging"
@@ -163,7 +163,7 @@ stargazer(med_basic_ols$outcome_models, type = "latex",
                                "Education", "Income",
                                "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
                                "Generation",
-                               "Latino Disc.",
+                               "Imm. Discrimination Percep.",
                                "Constant"),
           dep.var.labels = c("Internal - US", "External - US"), 
           dep.var.caption = "Dependent variable: Belonging"
@@ -174,21 +174,29 @@ stargazer(med_basic_ols$outcome_models, type = "latex",
 ## all em models
 int <- svyglm(Belong_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
               + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
-              + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
+              + Mexican + Cuban + Party + More_Than_SecondGen + Imm_Disc,
               design = cmps_lat_16)
 int_alt <- svyglm(Belong_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
               + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
-              + Mexican + Cuban + Party + More_Than_SecondGen + Discrimination_Scale,
+              + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
               design = cmps_lat_16)
 
 ext <- svyglm(Valued_Respected_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
               + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
-              + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
+              + Mexican + Cuban + Party + More_Than_SecondGen + Imm_Disc,
               design = cmps_lat_16)
 ext_alt <- svyglm(Valued_Respected_US ~ class.conc_lat_14_16 + Fear_Election + Angry_Election
                   + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
-                  + Mexican + Cuban + Party + More_Than_SecondGen + Discrimination_Scale,
+                  + Mexican + Cuban + Party + More_Than_SecondGen + Latino_Disc,
                   design = cmps_lat_16)
+int.int <- svyglm(Belong_US ~ class.conc_lat_14_16*Imm_Disc + Fear_Election + Angry_Election
+              + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+              + Mexican + Cuban + Party + More_Than_SecondGen,
+              design = cmps_lat_16)
+ext.int <- svyglm(Valued_Respected_US ~ class.conc_lat_14_16*Imm_Disc + Fear_Election + Angry_Election
+              + Pride_Election + Hope_Election + Sad_Election + Age + Gender + Education + Income
+              + Mexican + Cuban + Party + More_Than_SecondGen,
+              design = cmps_lat_16)
 
 stargazer(int, ext, type = "latex",  covariate.labels = c("Concrete Imm. Stigma",
                                                              "Fear", "Anger", "Pride", "Hope", "Sadness",
@@ -196,7 +204,7 @@ stargazer(int, ext, type = "latex",  covariate.labels = c("Concrete Imm. Stigma"
                                                              "Education", "Income",
                                                              "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
                                                              "Generation",
-                                                             "Latino Disc.",
+                                                             "Imm. Discrimination Percep.",
                                                              "Constant"),
           dep.var.labels = c("Internal", "External"), 
           dep.var.caption = "Dependent variable: Belonging",
@@ -207,11 +215,23 @@ stargazer(int_alt, ext_alt, type = "latex",  covariate.labels = c("Concrete Imm.
                                                          "Education", "Income",
                                                          "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
                                                          "Generation",
-                                                         "Pers. Disc.",
+                                                         "Latino Discrimination Percep.",
                                                          "Constant"),
           dep.var.labels = c("Internal", "External"), 
           dep.var.caption = "Dependent variable: Belonging",
           out = "bel.all_app.tex")
+stargazer(int.int, ext.int,
+          type = "latex",  covariate.labels = c("Concrete Imm. Stigma", "Imm. Stigma Percep.",
+                                                "Fear", "Anger", "Pride", "Hope", "Sadness",
+                                                "Age", "Gender",
+                                                "Education", "Income",
+                                                "Mexican", "Cuban", "Party (D $\\longrightarrow$ R)",
+                                                "Generation", "Concrete Imm. Stigma x Perception",
+                                                "Constant"),
+          dep.var.labels = c("Internal", "External"), 
+          dep.var.caption = "Dependent variable: Belonging",
+          out = "interaction.org.tex")
+
 
 ### Figures ----
 negp <- plot_model(listmods$IV_ICI_Reverse_Fac_Med_Fear_Election, type = "est", 

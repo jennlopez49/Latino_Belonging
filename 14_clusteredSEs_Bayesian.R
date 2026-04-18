@@ -20,11 +20,53 @@ mediation_function_standard(dvs, ivs, mediators, simp_controls, cmps_lat_16,
 res <- cluster_svyglm(
   dvs = c("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
           "Sad_Election"
-          # ,"Discrimination_Scale",
           # "Latino_Disc"
           ),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
+  controls = c("Age", "Gender", "Education","Income", "Party",
+               "More_Than_SecondGen", "Imm_Disc"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+res_int <- cluster_svyglm(
+  dvs = c("Belong_US"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Education","Income", "Party",
+               "More_Than_SecondGen", "Fear_Election", "Angry_Election", 
+               "Pride_Election", "Hope_Election",
+               "Sad_Election","Imm_Disc"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_ext <- cluster_svyglm(
+  dvs = c("Valued_Respected_US"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Education","Income", "Party",
+               "More_Than_SecondGen", "Fear_Election", "Angry_Election", 
+               "Pride_Election", "Hope_Election",
+               "Sad_Election","Imm_Disc"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+
+res_stig <- cluster_svyglm(
+  dvs = c("Imm_Disc"
+  ),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender","Education", "Income", "Party",
+               "More_Than_SecondGen"),
+  dat = cmps_lat_16$variables,
+  cluster_var = "State",       # your clustering variable
+  weight_var = "Weight" # your survey weight variable
+)
+res_stig_basic <- cluster_svyglm(
+  dvs = c("Imm_Disc"),
+  ivs = c("Age"),
+  controls = c("Gender", "Education","Income", "Party",
                "More_Than_SecondGen"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
@@ -32,49 +74,49 @@ res <- cluster_svyglm(
 )
 
 res_sb_fear <- cluster_svyglm(
-  dvs = c("External_Belonging", "Internal_Belonging"),
+  dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Fear_Election"),
+  controls = c("Age", "Gender","Education","Income",  "Party",
+               "More_Than_SecondGen", "Fear_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
 )
 
 res_sb_angry <- cluster_svyglm(
-  dvs = c("External_Belonging", "Internal_Belonging"),
+  dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Angry_Election"),
+  controls = c("Age", "Gender","Education","Income",  "Party",
+               "More_Than_SecondGen", "Angry_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
 )
 
 res_sb_sad <- cluster_svyglm(
-  dvs = c("External_Belonging", "Internal_Belonging"),
+  dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Sad_Election"),
+  controls = c("Age", "Gender","Education","Income",  "Party",
+               "More_Than_SecondGen", "Sad_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
 )
 res_sb_pride<- cluster_svyglm(
-  dvs = c("External_Belonging", "Internal_Belonging"),
+  dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Pride_Election"),
+  controls = c("Age", "Gender", "Education","Income", "Party",
+               "More_Than_SecondGen", "Pride_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
 )
 
 res_sb_hope <- cluster_svyglm(
-  dvs = c("External_Belonging", "Internal_Belonging"),
+  dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
-  controls = c("Age", "Gender", "Party",
-               "More_Than_SecondGen", "Hope_Election"),
+  controls = c("Age", "Gender","Education","Income",  "Party",
+               "More_Than_SecondGen", "Hope_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -82,11 +124,11 @@ res_sb_hope <- cluster_svyglm(
 
 listmods_sb_ext <- setNames(
   list(
-    res_sb_fear$DV_External_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_angry$DV_External_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_sad$DV_External_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_hope$DV_External_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_pride$DV_External_Belonging_IV_class.conc_lat_14_16
+    res_sb_fear$DV_Valued_Respected_US_IV_class.conc_lat_14_16, 
+    res_sb_angry$DV_Valued_Respected_US_IV_class.conc_lat_14_16, 
+    res_sb_sad$DV_Valued_Respected_US_IV_class.conc_lat_14_16, 
+    res_sb_hope$DV_Valued_Respected_US_IV_class.conc_lat_14_16, 
+    res_sb_pride$DV_Valued_Respected_US_IV_class.conc_lat_14_16
   ),
   c("Fear & External Belonging", 
     "Anger & External Belonging", 
@@ -97,11 +139,11 @@ listmods_sb_ext <- setNames(
 
 listmods_sb_int <- setNames(
   list(
-    res_sb_fear$DV_Internal_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_angry$DV_Internal_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_sad$DV_Internal_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_hope$DV_Internal_Belonging_IV_class.conc_lat_14_16, 
-    res_sb_pride$DV_Internal_Belonging_IV_class.conc_lat_14_16
+    res_sb_fear$DV_Belong_US_IV_class.conc_lat_14_16, 
+    res_sb_angry$DV_Belong_US_IV_class.conc_lat_14_16, 
+    res_sb_sad$DV_Belong_US_IV_class.conc_lat_14_16, 
+    res_sb_hope$DV_Belong_US_IV_class.conc_lat_14_16, 
+    res_sb_pride$DV_Belong_US_IV_class.conc_lat_14_16
   ),
   c("Fear & Internal Belonging", 
     "Anger & Internal Belonging", 
@@ -110,12 +152,94 @@ listmods_sb_int <- setNames(
     "Pride & Internal Belonging")
 )
 
+listmods_stig <- list(
+  res_stig_basic$DV_Imm_Disc_IV_Age,
+  res_stig$DV_Imm_Disc_IV_class.conc_lat_14_16
+)
 
+listmods_neg <- list(
+  res$DV_Fear_Election_IV_class.conc_lat_14_16,
+  res$DV_Angry_Election_IV_class.conc_lat_14_16,
+  res$DV_Sad_Election_IV_class.conc_lat_14_16
+)
+
+# Positive emotions + stigma predictor  
+listmods_pos <- list(
+  res$DV_Hope_Election_IV_class.conc_lat_14_16,
+  res$DV_Pride_Election_IV_class.conc_lat_14_16
+)
+
+# External belonging by emotion
+listmods_sb_ext <- list(
+  res_sb_fear$DV_Valued_Respected_US_IV_class.conc_lat_14_16,
+  res_sb_angry$DV_Valued_Respected_US_IV_class.conc_lat_14_16,
+  res_sb_sad$DV_Valued_Respected_US_IV_class.conc_lat_14_16,
+  res_sb_hope$DV_Valued_Respected_US_IV_class.conc_lat_14_16,
+  res_sb_pride$DV_Valued_Respected_US_IV_class.conc_lat_14_16,
+  res_ext$DV_Valued_Respected_US_IV_class.conc_lat_14_16
+)
+
+# Internal belonging by emotion
+listmods_sb_int <- list(
+  res_sb_fear$DV_Belong_US_IV_class.conc_lat_14_16,
+  res_sb_angry$DV_Belong_US_IV_class.conc_lat_14_16,
+  res_sb_sad$DV_Belong_US_IV_class.conc_lat_14_16,
+  res_sb_hope$DV_Belong_US_IV_class.conc_lat_14_16,
+  res_sb_pride$DV_Belong_US_IV_class.conc_lat_14_16,
+  res_int$DV_Belong_US_IV_class.conc_lat_14_16
+)
+
+stargazer(listmods_stig, type = "latex", dep.var.labels = c("Imm. Stigma Perception"),
+          covariate.labels = c("Concrete Imm. Index",
+                               "Age", "Gender",
+                               "Education", "Income", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation",
+                               "Constant"),
+          label = "clustered_stig", out = "cmps.stig.cl.tex")
+
+stargazer(listmods_neg, type = "latex", dep.var.labels = c("Fear", "Anger", "Sadness"),
+          covariate.labels = c("Concrete Imm. Index",
+                               "Age", "Gender",
+                               "Education", "Income", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Imm. Discrimination Percep.",
+                               "Constant"),
+          label = "clustered_neg", out = "cmps.neg.cl.tex")
+
+stargazer(listmods_pos, type = "latex", dep.var.labels = c("Hope", "Pride"),
+          covariate.labels = c("Concrete Imm. Index",
+                               "Age", "Gender",
+                               "Education", "Income", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Imm. Discrimination Percep.",
+                               "Constant"),
+          label = "clustered_pos", out = "cmps.pos.cl.tex")
+stargazer(listmods_sb_int, type = "latex", dep.var.labels = c("Internal Belonging"),
+          covariate.labels = c("Concrete Imm. Index",
+                               "Age", "Gender",
+                               "Education", "Income", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Fear", "Anger", "Sadness", "Hope",
+                               "Pride",
+                               "Imm. Discrimination Percep.",
+                               "Constant"),
+          label = "clustered_int", out = "cmps.int.cl.tex")
+stargazer(listmods_sb_ext, type = "latex", dep.var.labels = c("Internal Belonging"),
+          covariate.labels = c("Concrete Imm. Index",
+                               "Age", "Gender",
+                               "Education", "Income", 
+                               "Party (R $\\longrightarrow$ D)",
+                               "Generation", "Fear", "Anger", "Sadness", "Hope",
+                               "Pride",
+                               "Imm. Discrimination Percep.",
+                               "Constant"),
+          label = "clustered_ext", out = "cmps.ext.cl.tex")
 ##################### Running Bayesian Mods ------------------------------------
 res_cs <- cs_hier(
-  dvs = c("Discrimination_Scale", "Latino_Disc"),
-  ivs = c("conc_lat_index_16","latino_conc_16"),
-  controls = c("Age", "Gender", "Party", "More_Than_SecondGen"),
+  dvs = c("Imm_Disc", "Latino_Disc"),
+  ivs = c("conc_lat_index_16"),
+  controls = c("Age", "Gender", "Income","Party", "More_Than_SecondGen"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",
   weight_var = "Weight",

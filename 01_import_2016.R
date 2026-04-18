@@ -241,6 +241,11 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                          C247 == "(3) A little" ~ 2,
                          C247 == "(4) None at all" ~ 1, 
                          C247 == "(5) Don't know" ~ NA),
+  Imm_Disc = case_when(C246 == "(1) A lot" ~ 4,
+                          C246 == "(2) Some" ~ 3,
+                          C246 == "(3) A little" ~ 2,
+                          C246 == "(4) None at all" ~ 1, 
+                          C246 == "(5) Don't know" ~ NA),
   Skin_Tone = case_when(C262 == "(01) 1" ~ 1, 
                         C262 == "(02) 2" ~ 2, 
                         C262 == "(03) 3" ~ 3, 
@@ -641,7 +646,7 @@ age <- latinos_data[c(23, 324, 405, 1827, 2530), ]
 
 ### desc table using modelsummary ----
 vars <- latinos_data %>% dplyr::select(Age, Education, Income, Gender, Party,
-                                       More_Than_SecondGen, Latino_Disc,
+                                       More_Than_SecondGen, Latino_Disc,Imm_Disc,
                                        Discrimination_Scale, Fear_Election,
                                        Angry_Election,Pride_Election, 
                                        Hope_Election, Sad_Election
