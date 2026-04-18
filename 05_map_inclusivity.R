@@ -48,7 +48,7 @@ states <- merge(states, scores_final_subperiods,
 # states$ICI_2016_col_index <- as.numeric(as.character(states$bucketed_index_alt))
 
 ### Standardizing 
-states <- states %>% mutate(
+states <- states %>% dplyr::mutate(
   # sym_lat_index_16 = case_when(
   # latino_sym_16 < -10 ~ -1,
   # latino_sym_16 >= -10 & latino_sym_16 < -5 ~ -0.5,
@@ -74,17 +74,69 @@ states <- states %>% mutate(
   #   latino_conc_20 > 5 & latino_conc_20 <= 10 ~ 0.5,
   #   latino_conc_20 > 10 ~ 1),
   conc_lat_index_14_16 = case_when(
-    class.conc_lat_14_16 < -10 ~ -1,
-    class.conc_lat_14_16 >= -10 & class.conc_lat_14_16 < -5 ~ -0.5,
-    class.conc_lat_14_16 >= -5 & class.conc_lat_14_16 <= 5 ~ 0,
-    class.conc_lat_14_16 > 5 & class.conc_lat_14_16 <= 10 ~ 0.5,
-    class.conc_lat_14_16 > 10 ~ 1),
+    class.conc_lat_14_16 < -10          ~ -1,    # most hostile: -27 to -10
+    class.conc_lat_14_16 >= -10 & class.conc_lat_14_16 < -3  ~ -0.5,  # moderate hostile
+    class.conc_lat_14_16 >= -3 & class.conc_lat_14_16 <= 3   ~  0,    # near neutral
+    class.conc_lat_14_16 > 3 & class.conc_lat_14_16 <= 15    ~  0.5,  # mildly protective
+    class.conc_lat_14_16 > 15                                 ~  1,    # highly protective (83.75 outlier)
+    TRUE ~ NA_real_),
   sym_lat_index_14_16 = case_when(
     class.sym_lat_14_16 < -10 ~ -1,
     class.sym_lat_14_16 >= -10 & class.sym_lat_14_16 < -5 ~ -0.5,
     class.sym_lat_14_16 >= -5 & class.sym_lat_14_16 <= 5 ~ 0,
     class.sym_lat_14_16 > 5 & class.sym_lat_14_16 <= 10 ~ 0.5,
     class.sym_lat_14_16 > 10 ~ 1)
+)
+
+conc_16_map <- ggplot(data = states) +
+  geom_sf(aes(fill = factor(conc_lat_index_14_16)), color = "white", linewidth = 0.3) +
+  scale_fill_manual(
+    values = c(
+      "-1"   = "#d73027",
+      "-0.5" = "#f4a582",
+      "0"    = "#ffffbf",
+      "0.5"  = "#92c5de",
+      "1"    = "#4575b4"
+    ),
+    labels = c(
+      "-1"   = "Extreme hostile (< -10)",
+      "-0.5" = "Moderate hostile (-5 to -10)",
+      "0"    = "Low hostile (-5 to 5)",
+      "0.5"  = "Mildly protective (5 to 10)",
+      "1"    = "Highly protective (> 10)"
+    ),
+    name = "Policy Climate",
+    na.value = "grey80"
+  ) +
+  theme_minimal() +
+  labs(
+    title = "State-Level Structural Stigma Against Immigrants, 2014\u20132016",
+    subtitle = "Concrete policies (287g agreements + legislation)",
+    caption = "Note: Scores based on 287g agreements and state legislation (2014\u20132016),\nweighted by 2012\u20132016 ACS 5-year Latino population estimates."
+  ) +
+  theme(
+    axis.text  = element_blank(),
+    axis.ticks = element_blank(),
+    panel.grid = element_blank(),
+    legend.position = "bottom",
+    legend.title = element_text(size = 10, face = "bold"),
+    legend.text  = element_text(size = 9),
+    legend.key.width = unit(0.8, "cm"),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
+    plot.title.position = "plot",
+    plot.subtitle = element_text(hjust = 0),
+    plot.caption = element_text(size = 8, color = "grey40", hjust = 0)
+  ) +
+  guides(fill = guide_legend(nrow = 2))
+
+conc_16_map
+
+ggsave(
+  filename = "state_climate_2016_Conc_new.png",
+  plot = conc_16_map,
+  width = 10,
+  height = 7,
+  dpi = 300
 )
 
 sym_16_map <- ggplot(data = states) +

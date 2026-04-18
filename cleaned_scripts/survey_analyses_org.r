@@ -120,7 +120,7 @@ survey_emotions   <- c("Emotions_Anger", "Emotions_Fear", "Emotions_Shame",
 survey_stigma     <- c("StigmaImm_mean", "StigmaLatino_mean")
 
 survey_controls   <- c("Age", "Sex", "Education", "Income",
-                       "PartyID_5pt", "Acculturation")
+                       "PartyID_5pt", "Acculturation", "Span_Acc")
 
 belonging_dvs     <- c("BelongingPost_state", "BelongingPost_US",
                        "BelongExternal_state", "BelongExternal_US")
@@ -544,7 +544,7 @@ belong_em <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income + Emotions_Anger + 
                            Emotions_Fear + Emotions_Shame + 
                        Emotions_Relief + Emotions_Pride + Emotions_Joy + 
-                           PartyID_5pt + Acculturation"))
+                           PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 })
 names(belong_em) <- belonging_dvs
@@ -557,7 +557,7 @@ belong_em_app <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income + Emotions_Anger + 
                            Emotions_Fear + Emotions_Shame + 
                        Emotions_Relief + Emotions_Pride + Emotions_Joy + 
-                           PartyID_5pt + Acculturation"))
+                           PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 })
 names(belong_em_app) <- belonging_dvs
@@ -598,7 +598,7 @@ belong_int_imm <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income + Emotions_Anger + 
                            Emotions_Fear + Emotions_Shame + 
                        Emotions_Relief + Emotions_Pride + Emotions_Joy + 
-                           PartyID_5pt + Acculturation"))
+                           PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 })
 names(belong_int_imm) <- belonging_dvs
@@ -609,7 +609,7 @@ belong_int_lat <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income + Emotions_Anger + 
                            Emotions_Fear + Emotions_Shame + 
                        Emotions_Relief + Emotions_Pride + Emotions_Joy + 
-                           PartyID_5pt + Acculturation"))
+                           PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 })
 names(belong_int_lat) <- belonging_dvs
@@ -842,13 +842,13 @@ stigma_c <-med_ch2_results$stigma_models$IV_Treatment_Stigma_StigmaImm_mean
 # Stigma model
 stigma_cc <- lm(StigmaImm_mean ~ Treatment + latino_conc_24 +
                   Age + Sex + Education + Income +
-                  PartyID_5pt + Acculturation,
+                  PartyID_5pt + Acculturation + Span_Acc,
                 data = df_clean %>% filter(!is.na(Treatment)))
 
 mlm_stigma <- lmer(StigmaImm_mean ~ Treatment +
                      latino_conc_24 +  # start linear, see if it holds
                      Age + Sex + Education + Income +
-                     PartyID_5pt + Acculturation +
+                     PartyID_5pt + Acculturation + Span_Acc + 
                      (1 | State_char),
                    data = df_clean %>% filter(!is.na(Treatment)))
 
@@ -859,19 +859,20 @@ model_data <- model.frame(mlm_stigma)
 # CR2 is the recommended type for small numbers of clusters
 mlm <- coef_test(mlm_stigma, vcov = "CR2", cluster = model_data$State_char)
 
-# state_level <- df_clean %>%
-#   group_by(State_char) %>%
-#   summarize(
-#     mean_stigma = mean(StigmaImm_mean, na.rm = TRUE),
-#     exposure = mean(latino_conc_24, na.rm = TRUE),
-#     n = n()
-#   )
+state_level <- df_clean %>%
+  group_by(State_char) %>%
+  summarize(
+    mean_stigma = mean(StigmaImm_mean, na.rm = TRUE),
+    exposure = mean(latino_conc_24, na.rm = TRUE),
+    n = n()
+  )
 
 lm_state <- lm(mean_stigma ~ exposure, data = state_level)
 summary(lm_state)
 
 library(modelsummary)
 robust_vcov <- vcovCR(mlm_stigma, cluster = model_data$State_char, type = "CR2")
+sqrt(diag(robust_vcov))
 modelsummary(
   list("Basic" = stigma_c,
     "OLS" = stigma_cc,
@@ -901,7 +902,7 @@ modelsummary(
 emotions_cc <- lapply(survey_emotions, function(em) {
   form <- as.formula(paste(em, "~ StigmaImm_mean + Treatment + latino_conc_24 +",
                            "Age + Sex + Education + Income +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(survey_emotions)
 
@@ -924,7 +925,7 @@ stargazer(imm_med_mods_interleaved[3:8], type = "latex",
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Constant"),
+                               "Acculturation", "Spanish Use","Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_neg_cc.tex")
 
@@ -938,7 +939,7 @@ stargazer(imm_med_mods_interleaved[9:14], type = "latex",
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Constant"),
+                               "Acculturation", "Spanish Use","Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_pos_cc.tex")
 
@@ -951,7 +952,7 @@ belong_em_cc <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(belonging_dvs)
 
@@ -980,6 +981,7 @@ stargazer(re_belong_em_interleaved,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Spanish Use",
                                "Constant"),
           out = "main_em_cc.tex")
 
@@ -992,7 +994,7 @@ belong_int_imm_cc <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(belonging_dvs)
 
@@ -1015,6 +1017,7 @@ stargazer(belong_int_imm_interleaved,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)", "Acculturation",
+                               "Spanish Use",
                                "Anti x Stigma",
                                "Pro x Stigma",
                                "Constant"),
@@ -1028,24 +1031,24 @@ stargazer(belong_int_imm_interleaved,
 # ============================================================
 
 survey_controls_lf <- c("Age", "Sex", "Education", "Income",
-                        "PartyID_5pt", "Acculturation", "LinkedFate_r")
+                        "PartyID_5pt", "Acculturation", "Span_Acc", "LinkedFate_r")
 
 # --- 1. STIGMA MODELS WITH LINKED FATE ---
 
 stigma_c_app <- lm(StigmaImm_mean ~ Treatment +
                      Age + Sex + Education + Income +
-                     PartyID_5pt + Acculturation + LinkedFate_r,
+                     PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r,
                    data = df_clean %>% filter(!is.na(Treatment)))
 
 stigma_cc_app <- lm(StigmaImm_mean ~ Treatment + latino_conc_24 +
                       Age + Sex + Education + Income +
-                      PartyID_5pt + Acculturation + LinkedFate_r,
+                      PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r,
                     data = df_clean %>% filter(!is.na(Treatment)))
 
 mlm_stigma_app <- lmer(StigmaImm_mean ~ Treatment +
                          latino_conc_24 +
                          Age + Sex + Education + Income +
-                         PartyID_5pt + Acculturation + LinkedFate_r +
+                         PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r +
                          (1 | State_char),
                        data = df_clean %>% filter(!is.na(Treatment)))
 
@@ -1122,7 +1125,7 @@ imm_med_mods_app <- list(
 emotions_cc_app <- lapply(survey_emotions, function(em) {
   form <- as.formula(paste(em, "~ StigmaImm_mean + Treatment + latino_conc_24 +",
                            "Age + Sex + Education + Income +",
-                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+                           "PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(survey_emotions)
 
@@ -1146,7 +1149,7 @@ stargazer(imm_med_mods_interleaved_app[3:8],
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Linked Fate", "Constant"),
+                               "Acculturation", "Spanish Use", "Linked Fate", "Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_neg_cc_app.tex")
 
@@ -1158,7 +1161,7 @@ stargazer(imm_med_mods_interleaved_app[9:14],
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Linked Fate", "Constant"),
+                               "Acculturation", "Spanish Use", "Linked Fate", "Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_pos_cc_app.tex")
 
@@ -1169,7 +1172,7 @@ belong_em_app_lf <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+                           "PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(belonging_dvs)
 
@@ -1178,7 +1181,7 @@ belong_em_cc_app_lf <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+                           "PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(belonging_dvs)
 
@@ -1205,7 +1208,7 @@ stargazer(re_belong_em_interleaved_app,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Linked Fate", "Constant"),
+                               "Acculturation",  "Spanish Use","Linked Fate", "Constant"),
           out = "main_em_cc_app.tex")
 
 # --- 4. INTERACTION MODELS WITH LINKED FATE ---
@@ -1215,7 +1218,7 @@ belong_int_imm_app_lf <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation + LinkedFate_r"))
+                           "PartyID_5pt + Acculturation + Span_Acc + LinkedFate_r"))
   lm(form, data = df_clean %>% filter(!is.na(Treatment)))
 }) %>% setNames(belonging_dvs)
 
@@ -1242,7 +1245,7 @@ stargazer(belong_int_imm_interleaved_app,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Linked Fate",
+                               "Acculturation", "Spanish Use","Linked Fate",
                                "Anti x Stigma", "Pro x Stigma",
                                "Constant"),
           label = "belong.int.imm.cc.app",
@@ -1261,18 +1264,18 @@ df_pass$Treatment <- relevel(factor(df_pass$Treatment), ref = "Control")
 
 stigma_c_pass <- lm(StigmaImm_mean ~ Treatment +
                       Age + Sex + Education + Income +
-                      PartyID_5pt + Acculturation,
+                      PartyID_5pt + Acculturation + Span_Acc,
                     data = df_pass)
 
 stigma_cc_pass <- lm(StigmaImm_mean ~ Treatment + latino_conc_24 +
                        Age + Sex + Education + Income +
-                       PartyID_5pt + Acculturation,
+                       PartyID_5pt + Acculturation + Span_Acc,
                      data = df_pass)
 
 mlm_stigma_pass <- lmer(StigmaImm_mean ~ Treatment +
                           latino_conc_24 +
                           Age + Sex + Education + Income +
-                          PartyID_5pt + Acculturation +
+                          PartyID_5pt + Acculturation +Span_Acc +
                           (1 | State_char),
                         data = df_pass)
 
@@ -1345,7 +1348,7 @@ imm_med_mods_pass <- list(
 emotions_cc_pass <- lapply(survey_emotions, function(em) {
   form <- as.formula(paste(em, "~ StigmaImm_mean + Treatment + latino_conc_24 +",
                            "Age + Sex + Education + Income +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_pass)
 }) %>% setNames(survey_emotions)
 
@@ -1370,7 +1373,7 @@ stargazer(imm_med_mods_interleaved_pass[3:8],
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Constant"),
+                               "Acculturation", "Spanish Use", "Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_neg_cc_pass.tex")
 
@@ -1382,7 +1385,7 @@ stargazer(imm_med_mods_interleaved_pass[9:14],
                                "Treatment - Pro", "Concrete Imm. Index",
                                "Age", "Sex", "Education", "Income",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Constant"),
+                               "Acculturation", "Spanish Use", "Constant"),
           longtable = TRUE, float = FALSE,
           out = "main_med_pos_cc_pass.tex")
 
@@ -1393,7 +1396,7 @@ belong_em_pass <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_pass)
 }) %>% setNames(belonging_dvs)
 
@@ -1402,7 +1405,7 @@ belong_em_cc_pass <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_pass)
 }) %>% setNames(belonging_dvs)
 
@@ -1429,7 +1432,7 @@ stargazer(re_belong_em_interleaved_pass,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation", "Constant"),
+                               "Acculturation", "Spanish Use", "Constant"),
           out = "main_em_cc_pass.tex")
 
 # --- 4. INTERACTION MODELS ---
@@ -1439,7 +1442,7 @@ belong_int_imm_pass <- lapply(belonging_dvs, function(dv) {
                            "Age + Sex + Education + Income +",
                            "Emotions_Anger + Emotions_Fear + Emotions_Shame +",
                            "Emotions_Relief + Emotions_Pride + Emotions_Joy +",
-                           "PartyID_5pt + Acculturation"))
+                           "PartyID_5pt + Acculturation + Span_Acc"))
   lm(form, data = df_pass)
 }) %>% setNames(belonging_dvs)
 
@@ -1461,7 +1464,7 @@ stargazer(belong_int_imm_interleaved_pass,
                                "Anger", "Fear", "Shame",
                                "Relief", "Pride", "Joy",
                                "Party (D $\\longrightarrow$ R)",
-                               "Acculturation",
+                               "Acculturation", "Spanish Use",
                                "Anti x Stigma", "Pro x Stigma",
                                "Constant"),
           label = "belong.int.imm.pass",

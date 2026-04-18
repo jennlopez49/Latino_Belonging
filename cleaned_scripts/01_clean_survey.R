@@ -608,7 +608,7 @@ df_clean <- left_join(df_clean, scores_2025, by= c("State_char" = "State"))
 
 # index check --- 
 psych::alpha(df_clean[, c("StigmaImmMatrix_1", "StigmaImmMatrix_2", "StigmaImmMatrix_3")])
-
+psych::alpha(df_clean[, c("Parents_Birth", "Grandparents_Birth", "Span_Acc")])
 
 ### map fig 
 
@@ -710,7 +710,7 @@ policy_dvs        <- c("ImmAttitudeHyp_r",
                        "InteriorPolicyIndex")
 
 vars_org <- df_clean %>% dplyr::select(Age, Education, Income, PartyID_5pt, 
-                                       Acculturation, StigmaImm_mean, 
+                                       Acculturation, Span_Acc, StigmaImm_mean, 
                                        StigmaLatino_mean, Emotions_Anger, 
                                        Emotions_Fear, Emotions_Shame,
                                        Emotions_Relief, Emotions_Pride, 
@@ -719,4 +719,98 @@ vars_org <- df_clean %>% dplyr::select(Age, Education, Income, PartyID_5pt,
                                        BelongExternal_US, Treatment_cont)
 datasummary_balance(~ Treatment_cont, data = vars_org, output = "balance_table.tex")
 
+
+# --- Full subset with key variables ---
+belong_text <- df_clean %>%
+  filter(!is.na(Treatment)) %>%
+  dplyr::select(
+    Treatment,
+    State_char,
+    Age, Sex,
+    PartyID_5pt,
+    StigmaImm_mean,
+    BelongText1,   # state belonging open-ended
+    BelongText     # US belonging open-ended
+  ) %>%
+  arrange(Treatment, State_char)
+
+belong_text <- belong_text %>% mutate(
+  Gender = case_when(Sex == 1 ~ "Male",
+                          Sex == 2 ~ "Female"),
+  Party_char = case_when(PartyID_5pt == 1 ~ "Dem",
+                         PartyID_5pt == 2 ~ "Lean Dem",
+                         PartyID_5pt == 3 ~ "Ind",
+                         PartyID_5pt == 4 ~ "Lean Rep",
+                         PartyID_5pt == 5 ~ "Rep")
+)
+
+library(stringr)
+
+belong_text <- belong_text %>%
+  mutate(
+    len_state = str_length(BelongText1),
+    len_us    = str_length(BelongText),
+    
+    # optional: word counts (sometimes more intuitive)
+    words_state = str_count(BelongText1, "\\S+"),
+    words_us    = str_count(BelongText, "\\S+")
+  )
+
+# overall summary 
+belong_text %>%
+  summarise(
+    state_min = min(len_state, na.rm = TRUE),
+    state_max = max(len_state, na.rm = TRUE),
+    state_mean = mean(len_state, na.rm = TRUE),
+    
+    us_min = min(len_us, na.rm = TRUE),
+    us_max = max(len_us, na.rm = TRUE),
+    us_mean = mean(len_us, na.rm = TRUE),
+  )
+belong_text %>%
+  group_by(Treatment) %>%
+  summarise(
+    state_min = min(len_state, na.rm = TRUE),
+    state_max = max(len_state, na.rm = TRUE),
+    state_mean = mean(len_state, na.rm = TRUE),
+    
+    us_min = min(len_us, na.rm = TRUE),
+    us_max = max(len_us, na.rm = TRUE),
+    us_mean = mean(len_us, na.rm = TRUE),
+    
+    n = n()
+  )
+anova(lm(len_state ~ Treatment, data = belong_text))
+anova(lm(len_us ~ Treatment, data = belong_text))
+# --- Split by condition ---
+belong_text_anti <- belong_text %>%
+  filter(Treatment == "Anti") %>%
+  filter(!is.na(BelongText1) | !is.na(BelongText))
+
+belong_text_pro <- belong_text %>%
+  filter(Treatment == "Pro") %>%
+  filter(!is.na(BelongText1) | !is.na(BelongText))
+
+belong_text_control <- belong_text %>%
+  filter(Treatment == "Control") %>%
+  filter(!is.na(BelongText1) | !is.na(BelongText))
+
+# --- Quick look at how many responded ---
+cat("Anti responses:", nrow(belong_text_anti), "\n")
+cat("Pro responses:", nrow(belong_text_pro), "\n")
+cat("Control responses:", nrow(belong_text_control), "\n")
+
+# --- View responses ---
+# State belonging
+View(belong_text_anti %>% dplyr::select(State_char, Age, Gender, Party_char, 
+                                 StigmaImm_mean, BelongText1))
+View(belong_text_pro %>% dplyr::select(State_char, Age, Gender, Party_char, 
+                                StigmaImm_mean, BelongText1))
+View(belong_text_control %>% dplyr::select(State_char, Age, Gender, Party_char, 
+                                    StigmaImm_mean, BelongText1))
+
+# --- Export to CSV for easier reading ---
+write.csv(belong_text_anti, "belong_text_anti.csv", row.names = FALSE)
+write.csv(belong_text_pro, "belong_text_pro.csv", row.names = FALSE)
+write.csv(belong_text_control, "belong_text_control.csv", row.names = FALSE)
 

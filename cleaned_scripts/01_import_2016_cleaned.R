@@ -331,13 +331,13 @@ library(psych)
 alpha_internal <- psych::alpha(
   cmps_clean_2016 %>%
     filter(!is.na(Belong_US), !is.na(Outsider_US)) %>%
-    select(Belong_US, Outsider_US)
+    dplyr::select(Belong_US, Outsider_US)
 )
 
 alpha_external <- psych::alpha(
   cmps_clean_2016 %>%
     filter(!is.na(Valued_Respected_US), !is.na(Excluded_US_Soc)) %>%
-    select(Valued_Respected_US, Excluded_US_Soc)
+    dplyr::select(Valued_Respected_US, Excluded_US_Soc)
 )
 
 cat("Internal Belonging -- Cronbach's alpha:",
@@ -373,6 +373,8 @@ latinos_data <- cmps_clean_2016 %>%
 # Chosen over longer windows (conc_lat_index_16, latino_conc_16) for
 # defensibility -- captures the policy climate directly preceding the survey
 # See workshop feedback [date] for justification
+
+scores <- read.csv("scores_final_subperiods.csv")
 latinos_data <- latinos_data %>%
   drop_na(class.conc_lat_14_16)          # drops Alaska (no index value)
 
@@ -414,7 +416,7 @@ latinos_data <- latinos_data %>%
   )
 
 # --- Save cleaned Latino dataset ----------------------------------------------
-write.csv(latinos_data, "latinos_cmps_2016.csv", row.names = FALSE)
+#write.csv(latinos_data, "latinos_cmps_2016.csv", row.names = FALSE)
 
 # --- Survey design objects ----------------------------------------------------
 # Primary: all Latino respondents, weighted
