@@ -361,12 +361,11 @@ cs_hier <- function(dvs, ivs, controls, dat, cluster_var, weight_var = NULL,
         cores = cores,
         seed = 123
       )
-      
-      mod_cs <-cs_sampling_brms(
+      mod_cs <- cs_sampling_brms(
         svydes = survey_design,
-        brmsmod = mod_brms,   # <--- changed from mod_stan
-        data = dat,           # <--- changed from data_stan
-        family = family,
+        brmsmod = mod_brms,
+        data = model.frame(mod_brms),
+        family = "gaussian",
         ctrl_stan = list(chains = chains, iter = iter)
       )
       
@@ -383,3 +382,210 @@ cs_hier <- function(dvs, ivs, controls, dat, cluster_var, weight_var = NULL,
   }
 }
 
+### for the org survey
+
+mediation_function_survey <- function(dvs, ivs, stigma_measures, 
+                                      emotions, controls, dat, out = NULL) {
+  
+  mediation_results <- list()
+  
+  ## Step 1: Treatment --> Stigma (IV --> Stigma)
+  stigma_models <- list()
+  for (S in stigma_measures) {
+    for (X in ivs) {
+      form_stigma <- as.formula(paste(S, "~", X, "+", 
+                                      paste(controls, collapse = " + ")))
+      stigma_models[[paste0("IV_", X, "_Stigma_", S)]] <- 
+        lm(form_stigma, data = dat)
+    }
+  }
+  
+  ## Step 2: Stigma --> Emotion (Stigma + IV --> Emotion)
+  emotion_models <- list()
+  for (M in emotions) {
+    for (S in stigma_measures) {
+      for (X in ivs) {
+        form_emotion <- as.formula(paste(M, "~", S, "+", X, "+",
+                                         paste(controls, collapse = " + ")))
+        emotion_models[[paste0("IV_", X, "_Stigma_", S, "_Em_", M)]] <- 
+          lm(form_emotion, data = dat)
+      }
+    }
+  }
+  
+  ## Step 3: Emotion --> DV (Emotion + Stigma + IV --> DV)
+  outcome_models <- list()
+  for (Y in dvs) {
+    for (M in emotions) {
+      for (S in stigma_measures) {
+        for (X in ivs) {
+          form_outcome <- as.formula(paste(Y, "~", M, "+", S, "+", X, "+",
+                                           paste(controls, collapse = " + ")))
+          outcome_models[[paste0("DV_", Y, "_IV_", X, 
+                                 "_Stigma_", S, "_Em_", M)]] <- 
+            lm(form_outcome, data = dat)
+        }
+      }
+    }
+  }
+  
+  mediation_results$stigma_models  <- stigma_models
+  mediation_results$emotion_models <- emotion_models
+  mediation_results$outcome_models <- outcome_models
+  
+  if (!is.null(out)) {
+    if (!is.character(out)) stop("Argument 'out' must be a character string")
+    assign(out, mediation_results, envir = .GlobalEnv)
+  } else {
+    return(mediation_results)
+  }
+}
+
+
+#### new fixed function
+# cs_hier <- function(dvs, ivs, controls, dat,
+#                     cluster_var, weight_var = NULL,
+#                     random_slopes = FALSE,
+#                     family = gaussian(),
+#                     chains = 4, iter = 2000, cores = 4,
+#                     out = NULL) {
+#   
+#   library(brms)
+#   library(survey)
+#   library(csSampling)
+#   
+#   results <- list()
+#   
+#   survey_design <- if (is.null(weight_var)) {
+#     svydesign(ids = ~1, data = dat)
+#   } else {
+#     svydesign(ids = ~1,
+#               data = dat,
+#               weights = as.formula(paste0("~", weight_var)))
+#   }
+#   
+#   for (Y in dvs) {
+#     for (X in ivs) {
+#       
+#       rand <- if (random_slopes) {
+#         paste0("(", X, " | ", cluster_var, ")")
+#       } else {
+#         paste0("(1 | ", cluster_var, ")")
+#       }
+#       
+#       fml <- bf(
+#         as.formula(
+#           paste(Y, "~", X, "+",
+#                 paste(controls, collapse = " + "),
+#                 "+", rand)
+#         )
+#       )
+#       
+#       mod_brms <- brm(
+#         formula = fml,
+#         data = dat,
+#         family = family,
+#         chains = chains,
+#         iter = iter,
+#         cores = cores,
+#         seed = 123
+#       )
+#       
+#       # IMPORTANT FIX: no raw data passed here
+#       mod_cs <- cs_sampling_brms(
+#         svydes = survey_design,
+#         brmsmod = mod_brms,
+#         data = brms::get_data(mod_brms),
+#         family = "gaussian",
+#         ctrl_stan = list(chains = chains, iter = iter)
+#       )
+#       
+#       results[[paste0("DV_", Y, "_IV_", X)]] <- mod_cs
+#     }
+#   }
+#   
+#   if (!is.null(out)) {
+#     assign(out, results, envir = .GlobalEnv)
+#   } else {
+#     return(results)
+#   }
+# }
+
+### rewrite
+cs_hier <- function(dvs, ivs, controls, dat,
+                    cluster_var,
+                    weight_var = "Weight",
+                    random_slopes = FALSE,
+                    chains = 4, iter = 2000, cores = 4,
+                    out = NULL) {
+  
+  library(brms)
+  library(survey)
+  library(csSampling)
+  
+  results <- list()
+  rhs_controls <- paste(controls, collapse = " + ")
+  
+  # Drop NAs across all relevant variables first
+  all_vars <- c(dvs, ivs, controls, cluster_var, weight_var)
+  all_vars <- all_vars[all_vars %in% names(dat)]
+  dat_clean <- dat[complete.cases(dat[, all_vars]), ]
+  
+  # Normalize weights to sum to n on clean data
+  dat_clean$cs_weight <- dat_clean[[weight_var]] / 
+    mean(dat_clean[[weight_var]], na.rm = TRUE)
+  
+  # Survey design on clean data with normalized weights
+  svy_design <- svydesign(
+    ids = ~1,
+    weights = ~cs_weight,
+    data = dat_clean
+  )
+  
+  for (Y in dvs) {
+    for (X in ivs) {
+      
+      rand <- if (random_slopes) {
+        paste0("(1 + ", X, " | ", cluster_var, ")")
+      } else {
+        paste0("(1 | ", cluster_var, ")")
+      }
+      
+      # Use same normalized weight variable in formula
+      formula_str <- paste0(
+        Y, " | weights(cs_weight) ~ ",
+        X, " + ", rhs_controls, " + ", rand
+      )
+      
+      brms_formula <- brmsformula(as.formula(formula_str), center = FALSE)
+      
+      key <- paste0("DV_", Y, "_IV_", X)
+      cat("\nFitting model:", key, "\n")
+      
+      mod_cs <- tryCatch({
+        cs_sampling_brms(
+          svydes = svy_design,
+          brmsmod = brms_formula,
+          data = dat_clean,
+          family = gaussian(),
+          ctrl_stan = list(
+            chains = chains, 
+            iter = iter,
+            warmup = iter / 2,
+            thin = 1
+          )
+        )
+      }, error = function(e) {
+        message("cs_sampling_brms failed for ", key, ": ", e$message)
+        NULL
+      })
+      results[[key]] <- mod_cs
+    }
+  }
+  
+  if (!is.null(out)) {
+    assign(out, results, envir = .GlobalEnv)
+  } else {
+    return(results)
+  }
+}

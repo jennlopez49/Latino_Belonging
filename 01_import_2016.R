@@ -32,7 +32,7 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   age_sqd = Age^2,
   Native = as.character(S7),
   NativeBorn = case_when(S7 == "(1) United States" ~ 1,
-                      S7 == "(3) Puerto Rico" ~ .5,
+                      S7 == "(3) Puerto Rico" ~ 1,
                       S7 == "(2) Another country" ~ 0),
   Origin = S10,
   Voted = case_when(S10 == "(1) Yes, I voted" ~ 1,

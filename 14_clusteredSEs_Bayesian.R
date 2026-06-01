@@ -3,13 +3,13 @@
 
 # Vars
 dvs <- c("External_Belonging", "Internal_Belonging")  # List of DVs (Y)
-# ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR
-ivs <- list("conc_lat_index_16","latino_conc_16", "class.conc_lat_14_16")
+# ivs <- list("ICI_Reverse", "Imm_Con_Index", "ICI_Reverse_Fac")  # List of IVs (X) ### OLD INDICATOR "conc_lat_index_16","latino_conc_16", 
+ivs <- list("class.conc_lat_14_16")
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election","Discrimination_Scale",
                   "Latino_Disc")  # List of Mediators (M)
-simp_controls <- c("Age", "Gender", "Party",
-              "More_Than_SecondGen", "BorderState")
+simp_controls <- c("Age", "Gender", "Party", "Income",
+              "Parents", "BorderState")
 
 
 ###
@@ -24,7 +24,7 @@ res <- cluster_svyglm(
           ),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Education","Income", "Party",
-               "More_Than_SecondGen", "Imm_Disc"),
+               "Parents", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -33,7 +33,7 @@ res_int <- cluster_svyglm(
   dvs = c("Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Education","Income", "Party",
-               "More_Than_SecondGen", "Fear_Election", "Angry_Election", 
+               "Parents","Fear_Election", "Angry_Election", 
                "Pride_Election", "Hope_Election",
                "Sad_Election","Imm_Disc"),
   dat = cmps_lat_16$variables,
@@ -45,7 +45,7 @@ res_ext <- cluster_svyglm(
   dvs = c("Valued_Respected_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Education","Income", "Party",
-               "More_Than_SecondGen", "Fear_Election", "Angry_Election", 
+               "Parents", "Fear_Election", "Angry_Election", 
                "Pride_Election", "Hope_Election",
                "Sad_Election","Imm_Disc"),
   dat = cmps_lat_16$variables,
@@ -58,7 +58,7 @@ res_stig <- cluster_svyglm(
   ),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender","Education", "Income", "Party",
-               "More_Than_SecondGen"),
+               "Parents"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -67,7 +67,7 @@ res_stig_basic <- cluster_svyglm(
   dvs = c("Imm_Disc"),
   ivs = c("Age"),
   controls = c("Gender", "Education","Income", "Party",
-               "More_Than_SecondGen"),
+               "Parents"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -77,7 +77,7 @@ res_sb_fear <- cluster_svyglm(
   dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender","Education","Income",  "Party",
-               "More_Than_SecondGen", "Fear_Election", "Imm_Disc"),
+               "Parents", "Fear_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -87,7 +87,7 @@ res_sb_angry <- cluster_svyglm(
   dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender","Education","Income",  "Party",
-               "More_Than_SecondGen", "Angry_Election", "Imm_Disc"),
+               "Parents","Angry_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -97,7 +97,7 @@ res_sb_sad <- cluster_svyglm(
   dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender","Education","Income",  "Party",
-               "More_Than_SecondGen", "Sad_Election", "Imm_Disc"),
+               "Parents", "Sad_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -106,7 +106,7 @@ res_sb_pride<- cluster_svyglm(
   dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender", "Education","Income", "Party",
-               "More_Than_SecondGen", "Pride_Election", "Imm_Disc"),
+               "Parents", "Pride_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -116,7 +116,7 @@ res_sb_hope <- cluster_svyglm(
   dvs = c("Valued_Respected_US", "Belong_US"),
   ivs = c("class.conc_lat_14_16"),
   controls = c("Age", "Gender","Education","Income",  "Party",
-               "More_Than_SecondGen", "Hope_Election", "Imm_Disc"),
+               "Parents", "Hope_Election", "Imm_Disc"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",       # your clustering variable
   weight_var = "Weight" # your survey weight variable
@@ -194,25 +194,28 @@ stargazer(listmods_stig, type = "latex", dep.var.labels = c("Imm. Stigma Percept
                                "Age", "Gender",
                                "Education", "Income", 
                                "Party (R $\\longrightarrow$ D)",
-                               "Generation",
+                               "Parents' Birthplace",
                                "Constant"),
-          label = "clustered_stig", out = "cmps.stig.cl.tex")
+          label = "clustered_stig", out = "cmps.stig.cl.tex"
+          )
 
 stargazer(listmods_neg, type = "latex", dep.var.labels = c("Fear", "Anger", "Sadness"),
           covariate.labels = c("Concrete Imm. Index",
                                "Age", "Gender",
                                "Education", "Income", 
                                "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Imm. Discrimination Percep.",
+                               "Parents' Birhtplace", "Imm. Disc. Percep.",
                                "Constant"),
-          label = "clustered_neg", out = "cmps.neg.cl.tex")
+          label = "clustered_neg",
+          out = "cmps.neg.cl.tex"
+          )
 
 stargazer(listmods_pos, type = "latex", dep.var.labels = c("Hope", "Pride"),
           covariate.labels = c("Concrete Imm. Index",
                                "Age", "Gender",
                                "Education", "Income", 
                                "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Imm. Discrimination Percep.",
+                               "Parents' Birthplace", "Imm. Disc. Percep.",
                                "Constant"),
           label = "clustered_pos", out = "cmps.pos.cl.tex")
 stargazer(listmods_sb_int, type = "latex", dep.var.labels = c("Internal Belonging"),
@@ -220,9 +223,9 @@ stargazer(listmods_sb_int, type = "latex", dep.var.labels = c("Internal Belongin
                                "Age", "Gender",
                                "Education", "Income", 
                                "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Fear", "Anger", "Sadness", "Hope",
+                               "Parents' Birthplace", "Fear", "Anger", "Sadness", "Hope",
                                "Pride",
-                               "Imm. Discrimination Percep.",
+                               "Imm. Disc. Percep.",
                                "Constant"),
           label = "clustered_int", out = "cmps.int.cl.tex")
 stargazer(listmods_sb_ext, type = "latex", dep.var.labels = c("Internal Belonging"),
@@ -230,25 +233,130 @@ stargazer(listmods_sb_ext, type = "latex", dep.var.labels = c("Internal Belongin
                                "Age", "Gender",
                                "Education", "Income", 
                                "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Fear", "Anger", "Sadness", "Hope",
+                               "Parents' Birthplace", "Fear", "Anger", "Sadness", "Hope",
                                "Pride",
-                               "Imm. Discrimination Percep.",
+                               "Imm. Disc. Percep.",
                                "Constant"),
           label = "clustered_ext", out = "cmps.ext.cl.tex")
 ##################### Running Bayesian Mods ------------------------------------
-res_cs <- cs_hier(
+res_cs_emo <- cs_hier(
   dvs = c("Imm_Disc", "Latino_Disc"),
-  ivs = c("conc_lat_index_16"),
-  controls = c("Age", "Gender", "Income","Party", "More_Than_SecondGen"),
+  ivs = c("class.conc_lat_14_16"),
+  controls = c("Age", "Gender", "Income","Party", "Parents",
+               "Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
+               "Sad_Election"),
   dat = cmps_lat_16$variables,
   cluster_var = "State",
   weight_var = "Weight",
   random_slopes = FALSE,
-  family = gaussian(),
+  #family = gaussian(),
   chains = 4,
   iter = 2000,
   cores = 4
 )
+
+## view output
+var_names <- c("Intercept", "Structural Stigma", "Age", 
+               "Gender", "Income", "Party", "Parents",  "Fear", "Angry", "Pride", "Hope",
+               "Sad")
+lapply(names(res_cs_emo), function(nm) {
+  
+  cat("\n====", nm, "====\n")
+  
+  draws <- res_cs_emo[[nm]]$adjusted_parms
+  
+  # extract all fixed-effect coefficients
+  b_cols <- grep("^b[0-9]+$", colnames(draws), value = TRUE)
+  
+  b_draws <- draws[, b_cols]
+  
+  result <- data.frame(
+    Variable = var_names,
+    Mean = round(colMeans(b_draws), 3),
+    SD = round(apply(b_draws, 2, sd), 3),
+    Lower95 = round(apply(b_draws, 2, quantile, 0.025), 3),
+    Upper95 = round(apply(b_draws, 2, quantile, 0.975), 3)
+  )
+  
+  print(result)
+})
+
+
+# latex tab --> 
+library(dplyr)
+library(knitr)
+library(kableExtra)
+
+# Extract summaries from your models
+extract_brms_summary <- function(draws, var_names) {
+  
+  b_cols <- grep("^b[0-9]+$", colnames(draws), value = TRUE)
+  
+  b_draws <- draws[, b_cols]
+  
+  tibble(
+    Variable = var_names,
+    Estimate = round(colMeans(b_draws), 3),
+    Lower95 = round(apply(b_draws, 2, quantile, 0.025), 3),
+    Upper95 = round(apply(b_draws, 2, quantile, 0.975), 3)
+  ) %>%
+    mutate(
+      CI = paste0("[", Lower95, ", ", Upper95, "]"),
+      Estimate_CI = paste0(Estimate, " \\\\newline ", CI)
+    ) %>%
+    dplyr::select(Variable, Estimate_CI)
+}
+
+# Variable labels
+var_names <- c(
+  "Intercept",
+  "Structural Stigma",
+  "Age",
+  "Gender",
+  "Income",
+  "Party",
+  "Parents",
+  "Fear",
+  "Angry",
+  "Pride",
+  "Hope",
+  "Sad"
+)
+
+# Extract model summaries
+mod1 <- extract_brms_summary(
+  res_cs_emo[["DV_Imm_Disc_IV_class.conc_lat_14_16"]]$adjusted_parms,
+  var_names
+)
+
+mod2 <- extract_brms_summary(
+  res_cs_emo[["DV_Latino_Disc_IV_class.conc_lat_14_16"]]$adjusted_parms,
+  var_names
+)
+
+# Merge tables
+final_table <- mod1 %>%
+  rename(`Immigrant Discrimination` = Estimate_CI) %>%
+  left_join(
+    mod2 %>%
+      rename(`Latino Discrimination` = Estimate_CI),
+    by = "Variable"
+  )
+
+# Produce LaTeX table
+ch2_final_bays <- kbl(
+  final_table,
+  format = "latex",
+  booktabs = TRUE,
+  escape = FALSE,
+  caption = "Weighted Bayesian Multilevel Models",
+  align = c("l", "c", "c")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "scale_down")
+  )
+
+save_kable(ch2_final_bays, file = "bays_table_ch2.tex")
 
 # find_csv_creator <- function(csv_name) {
 #   for (f in list.files(".", pattern = "\\.R$", recursive = TRUE)) {
@@ -263,106 +371,106 @@ res_cs <- cs_hier(
 # find_csv_creator("scores_final.csv")
 
 
-#### Table ---> basic, basic with clustered SEs, full 
-# stargazer(med_basic_ols$mediator_models, type = "text")
-neg_basic <- med_basic_ols$mediator_models[c(1,2,5)]
-pos_basic <- med_basic_ols$mediator_models[c(3,4)]
-neg_full <- med_full_ols$mediator_models[c(1,2,5)]
-pos_full <- med_full_ols$mediator_models[c(3,4)]
-neg_cl <- res[c(1,2,5)]
-pos_cl <- res[c(3,4)]
-# stargazer(res, type = "text")
-# stargazer(med_full_ols$mediator_models, type = "text")
-
-stargazer(med_basic_ols$mediator_models,res, med_full_ols$mediator_models,
-          type = "text", font.size = "footnotesize")
-
-
-stargazer(neg_basic, neg_full, neg_cl,
-          type = "latex",
-          dep.var.labels = c("Fear", "Anger", "Sadness",
-                             "Fear", "Anger", "Sadness", 
-                             "Fear", "Anger", "Sadness"),
-          covariate.labels = c("Concrete Imm. Index",
-                                 "Age", "Gender",
-                                 "Education", "Income", "Political Interest",
-                                 "Mexican", "Cuban", "Linked Fate",
-                               "Party (R $\\longrightarrow$ D)",
-                                 "Generation", "Discrimination Exp.",
-                                 "Group Discrimination Percep.",
-                                 "Constant"),
-          # column.labels = c("Basic", "Full", "Basic + Clustered SEs"),
-          add.lines = list(
-            c("Clustered SEs", "No", "No", "No",
-              "No", "No", "No", "Yes", "Yes", "Yes")
-          ),
-          label = "neg.med", out = "neg.med.tex")
-
-stargazer(pos_basic, pos_full, pos_cl,
-          type = "latex",
-          dep.var.labels = c("Pride", "Hope",
-                             "Pride", "Hope",
-                             "Pride", "Hope"),
-          # column.labels = c("Basic", "Full", "Basic + Clustered SEs"),
-          covariate.labels = c("Concrete Imm. Index",
-                               "Age", "Gender",
-                               "Education", "Income", "Political Interest",
-                               "Mexican", "Cuban", "Linked Fate",
-                               "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Discrimination Exp.",
-                               "Group Discrimination Percep.",
-                               "Constant"),
-          add.lines = list(
-            c("Clustered SEs", "No", "No", "No",
-              "No", "Yes", "Yes")
-          ),
-          label = "pos.med", out = "pos.med.tex")
-
-
-int_basic <- med_basic_ols$outcome_models[c(1:5)]
-# ext_basic <- med_basic_ols$outcome_models[c(6,7,10)]
-ext_basic <- med_basic_ols$outcome_models[c(6:10)]
-# ext_basic <- med_basic_ols$outcome_models[c()]
-
-int_full <- med_full_ols$outcome_models[c(1:5)]
-ext_full <- med_full_ols$outcome_models[c(6:10)]
-
-stargazer(int_basic, listmods_sb_int, int_full, type = "latex",
-          covariate.labels = c("Concrete Imm. Index",
-                               "Fear", "Angry", "Pride", "Hope",
-                               "Sad",
-                               "Age", "Gender",
-                               "Education", "Income", "Political Interest",
-                               "Mexican", "Cuban", "Linked Fate",
-                               "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Discrimination Exp.",
-                               "Group Discrimination Percep.",
-                               "Constant"),
-          add.lines = list(
-            c("Clustered SEs", "No", "No", "No",
-              "No", "No", "Yes", "Yes", "Yes", "Yes", "Yes",
-              "No", "No", "No", "No", "No")
-          ),
-          label = "int.cl", out = "int.cl.tex"
-          )
-stargazer(ext_basic, listmods_sb_ext, ext_full, type = "latex",
-          covariate.labels = c("Concrete Imm. Index",
-                               "Fear", "Angry", "Pride", "Hope",
-                               "Sad",
-                               "Age", "Gender",
-                               "Education", "Income", "Political Interest",
-                               "Mexican", "Cuban", "Linked Fate",
-                               "Party (R $\\longrightarrow$ D)",
-                               "Generation", "Discrimination Exp.",
-                               "Group Discrimination Percep.",
-                               "Constant"),
-          add.lines = list(
-            c("Clustered SEs", "No", "No", "No",
-              "No", "No", "Yes", "Yes", "Yes", "Yes", "Yes",
-              "No", "No", "No", "No", "No")
-          ),
-          label = "ext.cl", out = "ext.cl.tex"
-)
+# #### Table ---> basic, basic with clustered SEs, full 
+# # stargazer(med_basic_ols$mediator_models, type = "text")
+# neg_basic <- med_basic_ols$mediator_models[c(1,2,5)]
+# pos_basic <- med_basic_ols$mediator_models[c(3,4)]
+# neg_full <- med_full_ols$mediator_models[c(1,2,5)]
+# pos_full <- med_full_ols$mediator_models[c(3,4)]
+# neg_cl <- res[c(1,2,5)]
+# pos_cl <- res[c(3,4)]
+# # stargazer(res, type = "text")
+# # stargazer(med_full_ols$mediator_models, type = "text")
+# 
+# stargazer(med_basic_ols$mediator_models,res, med_full_ols$mediator_models,
+#           type = "text", font.size = "footnotesize")
+# 
+# 
+# stargazer(neg_basic, neg_full, neg_cl,
+#           type = "latex",
+#           dep.var.labels = c("Fear", "Anger", "Sadness",
+#                              "Fear", "Anger", "Sadness", 
+#                              "Fear", "Anger", "Sadness"),
+#           covariate.labels = c("Concrete Imm. Index",
+#                                  "Age", "Gender",
+#                                  "Education", "Income", "Political Interest",
+#                                  "Mexican", "Cuban", "Linked Fate",
+#                                "Party (R $\\longrightarrow$ D)",
+#                                  "Generation", "Discrimination Exp.",
+#                                  "Group Discrimination Percep.",
+#                                  "Constant"),
+#           # column.labels = c("Basic", "Full", "Basic + Clustered SEs"),
+#           add.lines = list(
+#             c("Clustered SEs", "No", "No", "No",
+#               "No", "No", "No", "Yes", "Yes", "Yes")
+#           ),
+#           label = "neg.med", out = "neg.med.tex")
+# 
+# stargazer(pos_basic, pos_full, pos_cl,
+#           type = "latex",
+#           dep.var.labels = c("Pride", "Hope",
+#                              "Pride", "Hope",
+#                              "Pride", "Hope"),
+#           # column.labels = c("Basic", "Full", "Basic + Clustered SEs"),
+#           covariate.labels = c("Concrete Imm. Index",
+#                                "Age", "Gender",
+#                                "Education", "Income", "Political Interest",
+#                                "Mexican", "Cuban", "Linked Fate",
+#                                "Party (R $\\longrightarrow$ D)",
+#                                "Generation", "Discrimination Exp.",
+#                                "Group Discrimination Percep.",
+#                                "Constant"),
+#           add.lines = list(
+#             c("Clustered SEs", "No", "No", "No",
+#               "No", "Yes", "Yes")
+#           ),
+#           label = "pos.med", out = "pos.med.tex")
+# 
+# 
+# int_basic <- med_basic_ols$outcome_models[c(1:5)]
+# # ext_basic <- med_basic_ols$outcome_models[c(6,7,10)]
+# ext_basic <- med_basic_ols$outcome_models[c(6:10)]
+# # ext_basic <- med_basic_ols$outcome_models[c()]
+# 
+# int_full <- med_full_ols$outcome_models[c(1:5)]
+# ext_full <- med_full_ols$outcome_models[c(6:10)]
+# 
+# stargazer(int_basic, listmods_sb_int, int_full, type = "latex",
+#           covariate.labels = c("Concrete Imm. Index",
+#                                "Fear", "Angry", "Pride", "Hope",
+#                                "Sad",
+#                                "Age", "Gender",
+#                                "Education", "Income", "Political Interest",
+#                                "Mexican", "Cuban", "Linked Fate",
+#                                "Party (R $\\longrightarrow$ D)",
+#                                "Generation", "Discrimination Exp.",
+#                                "Group Discrimination Percep.",
+#                                "Constant"),
+#           add.lines = list(
+#             c("Clustered SEs", "No", "No", "No",
+#               "No", "No", "Yes", "Yes", "Yes", "Yes", "Yes",
+#               "No", "No", "No", "No", "No")
+#           ),
+#           label = "int.cl", out = "int.cl.tex"
+#           )
+# stargazer(ext_basic, listmods_sb_ext, ext_full, type = "latex",
+#           covariate.labels = c("Concrete Imm. Index",
+#                                "Fear", "Angry", "Pride", "Hope",
+#                                "Sad",
+#                                "Age", "Gender",
+#                                "Education", "Income", "Political Interest",
+#                                "Mexican", "Cuban", "Linked Fate",
+#                                "Party (R $\\longrightarrow$ D)",
+#                                "Generation", "Discrimination Exp.",
+#                                "Group Discrimination Percep.",
+#                                "Constant"),
+#           add.lines = list(
+#             c("Clustered SEs", "No", "No", "No",
+#               "No", "No", "Yes", "Yes", "Yes", "Yes", "Yes",
+#               "No", "No", "No", "No", "No")
+#           ),
+#           label = "ext.cl", out = "ext.cl.tex"
+# )
 
 
 ######### Ch. 3 Models ---------------

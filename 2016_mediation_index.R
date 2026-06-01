@@ -7,11 +7,11 @@ state_ses <- svydesign(ids = ~State,
 # mod 1 ---> M ~ X ( X-->M)
 persdisc <- svyglm(Discrimination_Scale ~ class.conc_lat_14_16 + age_sqd + Gender + 
                      Education + Income + 
-                     More_Than_SecondGen, 
+                     Parents, 
                    design = state_ses, family = "gaussian")
 groupdisc <- svyglm(Latino_Disc ~ class.conc_lat_14_16 + age_sqd + Gender + 
                      Education + Income + 
-                     More_Than_SecondGen, 
+                     Parents, 
                    design = state_ses, family = "gaussian")
 
 # mod 2 ---> Y ~ M + X 
@@ -19,23 +19,23 @@ groupdisc <- svyglm(Latino_Disc ~ class.conc_lat_14_16 + age_sqd + Gender +
 sb_int_pers <- svyglm(Internal_Belonging ~ class.conc_lat_14_16 + Discrimination_Scale
                  + age_sqd + Gender + 
                       Education + Income + 
-                      More_Than_SecondGen, 
+                      Parents, 
                     design = state_ses, family = "gaussian")
 sb_int_group <- svyglm(Internal_Belonging ~ class.conc_lat_14_16 + Latino_Disc
                       + age_sqd + Gender + 
                         Education + Income + 
-                        More_Than_SecondGen, 
+                        Parents, 
                       design = state_ses, family = "gaussian")
 
 sb_ext_pers <- svyglm(External_Belonging ~ class.conc_lat_14_16 + Discrimination_Scale
                       + age_sqd + Gender + 
                         Education + Income + 
-                        More_Than_SecondGen, 
+                        Parents, 
                       design = state_ses, family = "gaussian")
 sb_ext_group <- svyglm(External_Belonging ~ class.conc_lat_14_16 + Latino_Disc
                        + age_sqd + Gender + 
                          Education + Income + 
-                         More_Than_SecondGen, 
+                         Parents, 
                        design = state_ses, family = "gaussian")
 
 # pers 
@@ -65,22 +65,22 @@ state_ses <- svydesign(ids = ~State,
 # 1. Define your mediation model
 model_emotion_chain_int <- '
   # Paths from context to discrimination
-  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen
+  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + Parents
   
   # Define interaction terms
   
   # Discrimination + interactions → belonging
   Internal_Belonging ~ d1*Discrimination_Scale + d2*Latino_Disc +
-                       f1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen +
+                       f1*class.conc_lat_14_16 + Age + Gender + Party + Parents +
                        Fear_Election + Angry_Election + Sad_Election + Hope_Election + 
                        Pride_Election
 '
 model_emotion_chain_ext <- '
   # Paths from context to discrimination
-  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen
+  Disc_Index ~ a1*class.conc_lat_14_16 + Age + Gender + Party + Parents
   # Discrimination + interactions → belonging
   External_Belonging ~ d1*Discrimination_Scale + d2*Latino_Disc + 
-                       f1*class.conc_lat_14_16 + Age + Gender + Party + More_Than_SecondGen +
+                       f1*class.conc_lat_14_16 + Age + Gender + Party + Parents +
                        Fear_Election + Angry_Election + Sad_Election + Hope_Election + 
                        Pride_Election
 '
@@ -162,32 +162,32 @@ sink()
 # Fit the mediator model (Model 1: M ~ X + controls)
 lf_mediator <- svyglm(Linked_Fate ~ latino_conc_16 + age_sqd + Gender + 
                         Education + Income + Discrimination_Scale
-                      + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                      + Mexican + Cuban + Parents + percent.latino.2016, 
                       design = cmps_lat_16, family = "gaussian")
 fear_mediator <- svyglm(Fear_Election ~ latino_sym_16 + age_sqd + Gender + 
                            Education + Income + Linked_Fate + 
                           Discrimination_Scale + Discrimination_National_Perc
-                        + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                        + Mexican + Cuban + Parents + percent.latino.2016, 
                          design = cmps_lat_16, family = "gaussian")
 
 # Fit the outcome model (Model 2: Y ~ X + M + controls)
 model_outcome.fear <- svyglm(Inclusion_Index ~ latino_conc_16 + Fear_Election + 
                           age_sqd + Gender + Education + Income + Linked_Fate +
                             Discrimination_Scale + Discrimination_National_Perc
-                          + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                          + Mexican + Cuban + Parents + percent.latino.2016, 
                         design = cmps_lat_16, family = "gaussian")
 
 model_ext.fear <- svyglm(Inclusion_External ~ latino_sym_16 + Fear_Election  + 
                             age_sqd + Gender + 
                             Education + Income + Linked_Fate + 
                             Discrimination_Scale +
-                            + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                            + Mexican + Cuban + Parents + percent.latino.2016, 
                           design = cmps_lat_16, family = "gaussian")
 model_int.fear <- svyglm(Inclusion_Internal ~ latino_sym_16 + Fear_Election +
                             age_sqd + Gender + 
                             Education + Income + Linked_Fate + 
                             Discrimination_Scale +
-                            + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                            + Mexican + Cuban + Parents + percent.latino.2016, 
                           design = cmps_lat_16, family = "gaussian")
 
 # Run the mediation analysis
@@ -210,11 +210,11 @@ summary(mediation_result.fear)
 # Fit the mediator model (Model 1: M ~ X + controls)
 # #lf_mediator <- svyglm(Linked_Fate ~ ICI_Reverse + age_sqd + Gender + 
 #                         Education + Income + Discrimination_Scale + Discrimination_National_Perc
-#                       + Mexican + Cuban + More_Than_SecondGen, 
+#                       + Mexican + Cuban + Parents, 
 #                       design = cmps_lat_16, family = "gaussian")
 anger_mediator <- svyglm(Angry_Election ~ latino_conc_16 + age_sqd + Gender + 
                            Education + Income + Discrimination_Scale +
-                         + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                         + Mexican + Cuban + Parents + percent.latino.2016, 
                          design = cmps_lat_16, family = "gaussian")
 
 # Fit the outcome model (Model 2: Y ~ X + M + controls)
@@ -222,13 +222,13 @@ model_ext.anger <- svyglm(Inclusion_External ~ latino_conc_16 + Angry_Election  
                             age_sqd + Gender + 
                                 Education + Income + Linked_Fate + 
                                 Discrimination_Scale +
-                              + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                              + Mexican + Cuban + Parents + percent.latino.2016, 
                               design = cmps_lat_16, family = "gaussian")
 model_int.anger <- svyglm(Inclusion_Internal ~ latino_conc_16 + Angry_Election +
                             age_sqd + Gender + 
                             Education + Income + Linked_Fate + 
                             Discrimination_Scale +
-                          + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016, 
+                          + Mexican + Cuban + Parents + percent.latino.2016, 
                           design = cmps_lat_16, family = "gaussian")
 # Run the mediation analysis
 mediation_result.anger <- mediate(anger_mediator, model_ext.anger, treat = "latino_conc_16", mediator = "Angry_Election")
@@ -304,7 +304,7 @@ ivs <- list("Imm_Con_Index", "ICI_Reverse")  # List of IVs (X)
 mediators <- list("Fear_Election", "Angry_Election", "Pride_Election", "Hope_Election",
                   "Sad_Election")  # List of Mediators (M)
 controls <- c("age_sqd", "Gender", "Education", "Income", "Linked_Fate", "Party",
-              "More_Than_SecondGen", "Discrimination_Scale", "Discrimination_National_Perc") 
+              "Parents", "Discrimination_Scale", "Discrimination_National_Perc") 
 
 # Run Mediation Analysis
 med_results <- mediation_function(dvs, ivs, mediators, controls, des = cmps_lat_16, dat = cmps_lat_16)
@@ -455,8 +455,8 @@ mod1 <- med_results$Inclusion_External$IV_Imm_Con_Index_Med_Fear_Election$mediat
 # writing the model
 sem_model_fear <- '
   # Mediation paths
-  Fear_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016
-  Inclusion_Internal ~ b*Fear_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + percent.latino.2016
+  Fear_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + percent.latino.2016
+  Inclusion_Internal ~ b*Fear_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + percent.latino.2016
 
   # Define indirect and total effects
   indirect := a*b
@@ -475,8 +475,8 @@ summary(fit_w_fear, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
 ### 
 sem_model_anger <- '
   # Mediation paths
-  Angry_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Inclusion_External ~ b*Angry_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Angry_Election ~ a*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
+  Inclusion_External ~ b*Angry_Election + cprime*foreign_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
 
   # Define indirect and total effects
   indirect := a*b
@@ -493,15 +493,15 @@ summary(fit_w_anger, standardized = TRUE, fit.measures = TRUE, rsquare = TRUE)
 
 serial_model <- '
   # Regressions -- X --> Z
-  Linked_Fate ~ a1*latino_conc_16 + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Linked_Fate ~ a1*latino_conc_16 + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
    # Z -> emotions (M)
-  Fear_Election ~ a2*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Sad_Election ~ a3*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Angry_Election ~ a4*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Pride_Election ~ a5*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Hope_Election ~ a6*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Fear_Election ~ a2*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
+  Sad_Election ~ a3*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
+  Angry_Election ~ a4*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
+  Pride_Election ~ a5*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
+  Hope_Election ~ a6*Linked_Fate + age_sqd + Gender + Education + Income + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
   ## Outcoem -- M --> Y
-  Inclusion_Internal ~ b1*Fear_Election + b2*Sad_Election + b3*Angry_Election + b4*Pride_Election + b5*Hope_Election + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Inclusion_Internal ~ b1*Fear_Election + b2*Sad_Election + b3*Angry_Election + b4*Pride_Election + b5*Hope_Election + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Discrimination_National_Perc + Mexican + Cuban + Parents + Skin_Tone
 
   # defined serial indirects X -> Z -> Emotion -> Y
   ind_fear_serial  := a1 * a2 * b1
@@ -525,8 +525,8 @@ summary(fit_serial_svy, standardized = TRUE, fit.measures = TRUE)
 
 sem_model_disc <- '
   # Mediation paths
-  Discrimination_National_Perc ~ a*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
-  Inclusion_Internal ~ b*Discrimination_National_Perc + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + More_Than_SecondGen + Skin_Tone
+  Discrimination_National_Perc ~ a*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + Parents + Skin_Tone
+  Inclusion_Internal ~ b*Discrimination_National_Perc + cprime*latino_conc_16 + age_sqd + Gender + Education + Income + Linked_Fate + Discrimination_Scale + Mexican + Cuban + Parents + Skin_Tone
 
   # Define indirect and total effects
   indirect := a*b

@@ -11,7 +11,7 @@ states <- states[!states$STUSPS %in% c("HI", "AK", "GU", "PR", "VI"), ]
 states$state 
 
 # merge 
-states <- merge(states, scores_final_subperiods, 
+states <- merge(states, scores_2025, 
                 by.x="STUSPS", by.y="State")
 # states$ICI_Score_2016 <- as.numeric(states$ICI_Score_2016) 
 # states$ICI_2016_col <- ifelse(states$ICI_Score_2016 < -86, 0, 
