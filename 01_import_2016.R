@@ -15,7 +15,8 @@ cmps.sub.2016 <- da38040.0001 %>% dplyr::select(S2_1, S2_2, S2_3, S2_4,S2_5, S2_
                                     C377, C379, C381, C383, C384, C150, C151, C393, C394,
                                     S3, C390, C23, A134, NAT_WEIGHT,ETHNIC_QUOTA,
                                     C253, LA202_6, S1, L24, C262, C245, SPLITC337,
-                                    C337, BLA205, C141, SPLITC141, SPLITC38, C27)
+                                    C337, BLA205, C141, SPLITC141, SPLITC38, C27,
+                                    C58, C59, C60, C66, C67, C68, C106, C121)
 
 cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   Latino = S2_2, 
@@ -35,8 +36,20 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                       S7 == "(3) Puerto Rico" ~ 1,
                       S7 == "(2) Another country" ~ 0),
   Origin = S10,
-  Voted = case_when(S10 == "(1) Yes, I voted" ~ 1,
-                    S10 == "(2) No, I did NOT vote"  ~ 0),
+  Voted = case_when(C12== "(1) Yes, I voted" ~ 1,
+                    C12 == "(2) No, I did NOT vote"  ~ 0),
+  DonatedMoney = case_when(C58 == "(1) Yes" ~ 1,
+                           C58 == "(2) No" ~ 0),
+  Buttons = case_when(C59 == "(1) Yes" ~ 1,
+                      C59 == "(2) No" ~ 0),
+  ContactedGovOff = case_when(C60 == "(1) Yes" ~ 1,
+                              C60 == "(2) No" ~ 0),
+  Protested = case_when(C66 == "(1) Yes" ~ 1,
+                        C66 == "(2) No" ~ 0),
+  Petiton = case_when(C67 == "(1) Yes" ~ 1,
+                      C67 == "(2) No" ~ 0),
+  Boycott = case_when(C68 == "(1) Yes" ~ 1,
+                      C68 == "(2) No" ~ 0),
   Party3pt = case_when(C25 == "(1) Republican" ~ 3,                                ## RECODED SO DEM - 1, IND - 2, REP - 3
                     C25 == "(2) Democrat" ~ 1,
                     C25 == "(3) Independent" ~ 2,
@@ -282,7 +295,18 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
                                   C39 == "(2) Agree" ~ 4,
                                   C39 == "(1) Strongly agree" ~ 5),
   BorderState =   case_when(State %in% c("TX", "CA", "NM", "AZ") ~ 1,
-  TRUE ~ 0)
+  TRUE ~ 0),
+  InternalEfficacy = case_when(C121 == "(1) Strongly agree" ~ 1,                # Statement: Sometimes politics and government seem so complicated that a person like me can't really understand what's going on.
+                               C121 == "(2) Agree" ~ 2,                         # higher numbers = higher eff 
+                               C121 == "(3) Neither agree nor disagree" ~ 3,
+                               C121 == "(4) Disagree" ~ 4,
+                               C121 == "(5) Strongly disagree" ~ 5), 
+  
+  ExternalEfficacy = case_when(C106 == "(1) Strongly agree" ~ 1,                # Statement: public officials don't care much what people like me think?
+                               C106 == "(2) Agree" ~ 2,                         # higher numbers = higher eff
+                               C106 == "(3) Neither agree nor disagree" ~ 3,
+                               C106 == "(4) Disagree" ~ 4,
+                               C106 == "(5) Strongly disagree" ~ 5)
   )
   
 ######## Belonging Index ------------------------------------------------------
@@ -300,6 +324,13 @@ cmps.clean.2016 <- cmps.sub.2016 %>% mutate(
   cmps.add.2016$External_Belonging <- cmps.add.2016$Valued_Respected_US + cmps.add.2016$Excluded_US_Soc
   # Check the index
   summary(cmps.add.2016$Inclusion_Index)
+
+###### Making Parents ---------------------------------------------------------
+  cmps.add.2016$Parents <- factor(cmps.add.2016$Parents,
+  levels = c(0, 1, 2, 3),   # drop the 9
+  labels = c("BothForeign", "PuertoRico", "Mixed", "BothUS")
+  )
+
   
 #### CHECKING NAs IN GENERATION VAR ------
   # na_immigrants <- cmps.add.2016 %>%

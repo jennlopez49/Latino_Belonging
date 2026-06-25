@@ -722,20 +722,6 @@ stargazer(belext_state_int_em, belext_US_int_em, type = "latex",
                                "Pro x Stigma",
                                "Constant"), out = "exter_em_int_imm.tex")
 
-################### CHAPTER 3 ANALYSES #########################################
-survey_controls_pol <- c("Age", "Sex", "Education", "Income",
-                        "PartyID_5pt", "Acculturation", 
-                        "BorderState")
-mediation_function_survey(
-  dvs             = policy_dvs,
-  ivs             = "Treatment",
-  stigma_measures = survey_stigma,
-  emotions        = survey_emotions,
-  controls        = survey_controls_pol,
-  dat             = df_clean %>% filter(!is.na(Treatment)),
-  out             = "ch3_results"
-)
-
 
 ## all emotions in one model 
 
@@ -1470,3 +1456,199 @@ stargazer(belong_int_imm_interleaved_pass,
           label = "belong.int.imm.pass",
           out = "belong_inter_imm_pass.tex")
 
+
+### 2 sls test
+library(ivreg)
+
+# Define compliance -- received treatment as immigration
+df_clean <- df_clean %>%
+  mutate(
+    # Complier = correctly identified as immigration
+    complied = case_when(
+      Treatment == "Control" ~ NA_real_,  # exclude control
+      ManipCheck1_result == 1 ~ 1,        # immigration pass
+      TRUE ~ 0                            # healthcare or fail
+    )
+  )
+
+# 2SLS -- treatment assignment instruments compliance
+# Stage 1: Treatment assignment --> compliance
+# Stage 2: Effect among compliers on outcome
+
+# For a single outcome
+# Check first stage F for emotions
+# Define compliance for full sample
+df_clean <- df_clean %>%
+  mutate(
+    complied_full = case_when(
+      Treatment == "Control" & ManipCheck1_result == 1 ~ 1,  # passed control check
+      Treatment == "Control" & ManipCheck1_result != 1 ~ 0,  # failed control check
+      Treatment %in% c("Anti", "Pro") & ManipCheck1_result == 1 ~ 1,  # immigration pass
+      Treatment %in% c("Anti", "Pro") & ManipCheck1_result != 1 ~ 0,  # healthcare or fail
+      TRUE ~ NA_real_
+    )
+  )
+
+
+# First stage with full treatment factor
+first_stage_full <- lm(complied_full ~ Treatment + latino_conc_24 + Age +Sex + Education + 
+                         Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms,
+                       data = df_clean %>% filter(!is.na(Treatment) & 
+                                                    Treatment != "Control"))
+
+summary(first_stage_full)
+ibel_us_iv <- ivreg(BelongingPost_US ~ complied_full + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc | 
+                     Treatment + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms,
+                   data = df_clean %>% filter(!is.na(Treatment)))
+summary(ibel_us_iv)
+ibel_state_iv <- ivreg(BelongingPost_state~ complied_full + latino_conc_24 + Age + Sex + Education + 
+                        Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms | 
+                        Treatment + latino_conc_24 + Age + Sex + Education + 
+                        Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms,
+                      data = df_clean %>% filter(!is.na(Treatment)))
+summary(ibel_state_iv)
+bel_us_iv <- ivreg(BelongExternal_US ~ complied_full + latino_conc_24 + Age + Sex + Education + 
+                    Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms | 
+                    Treatment + latino_conc_24 + Age + Sex + Education + 
+                    Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms,
+                  data = df_clean %>% filter(!is.na(Treatment)))
+summary(bel_us_iv)
+bel_state_iv <- ivreg(BelongExternal_state~ complied_full +  latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms | 
+                     Treatment + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms,
+                   data = df_clean %>% filter(!is.na(Treatment)))
+summary(bel_state_iv)
+
+# Run all emotion IV models
+emotion_ivs <- list()
+for (em in emotions) {
+  emotion_ivs[[em]] <- ivreg(
+    as.formula(paste(em, "~ complied_full + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms | 
+                     Treatment + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms")),
+    data = df_clean %>% filter(!is.na(Treatment))
+  )
+}
+
+# Run all belonging IV models
+belonging_ivs <- list()
+for (bel in belonging_dvs) {
+  belonging_ivs[[bel]] <- ivreg(
+    as.formula(paste(bel, "~ complied_full + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms | 
+                     Treatment + latino_conc_24 + Age + Sex + Education + 
+                     Income + PartyID_5pt + Acculturation + Span_Acc + GroupDiscImms")),
+    data = df_clean %>% filter(!is.na(Treatment))
+  )
+}
+# 
+# Main coefficient table
+stargazer(emotion_ivs, type = "latex",
+          dep.var.labels.include = FALSE,
+          column.labels = c("Anger", "Fear", "Shame", 
+                            "Relief", "Pride", "Joy"),
+          covariate.labels = c("Complied (Immigration)", "Str. Stigma Index", "Age", "Sex",
+                               "Education", "Income", "Party ID",
+                               "Acculturation", "English Dom.", "Imm. Disc."),
+          omit.stat = c("f", "adj.rsq"),
+          title = "2SLS Estimates: Treatment Compliance on Emotions", out = "em_2sls.tex")
+
+# Separate diagnostics table
+diag_table <- lapply(names(emotion_ivs), function(nm) {
+  diag <- summary(emotion_ivs[[nm]])$diagnostics
+  data.frame(
+    Model = nm,
+    `Weak Instruments F` = round(diag["Weak instruments", "statistic"], 3),
+    `Weak Instruments p` = round(diag["Weak instruments", "p-value"], 3),
+    `Wu-Hausman p` = round(diag["Wu-Hausman", "p-value"], 3),
+    `Sargan p` = round(diag["Sargan", "p-value"], 3),
+    check.names = FALSE
+  )
+}) %>% bind_rows()
+
+print(diag_table)
+
+diag_table <- lapply(names(emotion_ivs), function(nm) {
+  diag <- summary(emotion_ivs[[nm]])$diagnostics
+  data.frame(
+    Model = nm,
+    `Weak Instruments F` = round(diag["Weak instruments", "statistic"], 3),
+    `Weak Instruments p` = format(diag["Weak instruments", "p-value"], 
+                                  scientific = TRUE, digits = 3),
+    `Wu-Hausman p` = format(diag["Wu-Hausman", "p-value"], 
+                            scientific = TRUE, digits = 3),
+    `Sargan p` = format(diag["Sargan", "p-value"], 
+                        scientific = TRUE, digits = 3),
+    check.names = FALSE
+  )
+}) %>% bind_rows()
+
+print(diag_table)
+
+diag_table %>%
+  mutate(Model = c("Anger", "Fear", "Shame", 
+                   "Relief", "Pride", "Joy")) %>%
+  kable(format = "latex",
+        booktabs = TRUE,
+        caption = "2SLS Diagnostic Tests: Emotion Outcomes",
+        col.names = c("Outcome", "Weak Instruments (F)",
+                      "Weak Instruments (p)", "Wu-Hausman (p)",
+                      "Sargan (p)"),
+        digits = 3) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  kableExtra::footnote(
+    general = "Significant Sargan for emotion outcomes indicates violation 
+               of exclusion restriction — treatment affects emotions through 
+               multiple pathways beyond compliance alone.",
+    general_title = "Note:")  %>%
+  save_kable("em_diag_2sls.tex")
+
+# Same for belonging
+stargazer(belonging_ivs, type = "latex",
+          dep.var.labels.include = FALSE,
+          column.labels = c("Int. Belong (State)", "Int. Belong (US)",
+                            "Ext. Belong (State)", "Ext. Belong (US)"),
+          covariate.labels = c("Complied (Immigration)", "Str. Stigma Index", "Age", "Sex",
+                                                         "Education", "Income", "Party ID",
+                                                         "Generation",
+                               "English Dom.", "Imm. Disc.","Constant"),
+          omit.stat = c("f", "adj.rsq"),
+          title = "2SLS Estimates: Treatment Compliance on Belonging", out = "bel_2sls.tex")
+
+diag_table_bel <- lapply(names(belonging_ivs), function(nm) {
+  diag <- summary(belonging_ivs[[nm]])$diagnostics
+  data.frame(
+    Model = nm,
+    `Weak Instruments F` = round(diag["Weak instruments", "statistic"], 3),
+    `Weak Instruments p` = round(diag["Weak instruments", "p-value"], 3),
+    `Wu-Hausman p` = round(diag["Wu-Hausman", "p-value"], 3),
+    `Sargan p` = round(diag["Sargan", "p-value"], 3),
+    check.names = FALSE
+  )
+}) %>% bind_rows()
+
+print(diag_table_bel)
+
+library(knitr)
+library(kableExtra)
+
+diag_table_bel %>%
+  mutate(Model = c("Belonging Post State", "Belonging Post US",
+                   "Belonging External State", "Belonging External US")) %>%
+  kable(format = "latex", 
+        booktabs = TRUE,
+        caption = "2SLS Diagnostic Tests: Belonging Outcomes",
+        col.names = c("Outcome", "Weak Instruments (F)", 
+                      "Weak Instruments (p)", "Wu-Hausman (p)", 
+                      "Sargan (p)"),
+        digits = 3) %>%
+  kable_styling(latex_options = c("hold_position")) %>%
+  footnote(general = "Weak instruments F > 10 indicates relevant instrument. 
+                       Non-significant Wu-Hausman indicates OLS is consistent. 
+                       Non-significant Sargan indicates valid exclusion restriction.",
+           general_title = "Note:")  %>%
+  save_kable("bel_diag_2sls.tex")

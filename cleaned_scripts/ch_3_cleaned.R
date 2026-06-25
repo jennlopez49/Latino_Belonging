@@ -11,7 +11,7 @@ source("01_import_2016.R")
 ch3_dvs <- c("BorderSecurity", "Pathway_Citizenship")
 
 # Chapter 3 controls (adds BorderState to basic controls)
-ch3_controls <- c(basic.controls, "BorderState")
+ch3_controls <- c(controls, "BorderState")
 
 # State-clustered survey design (used for lavaan.survey)
 state_ses <- svydesign(
@@ -77,6 +77,16 @@ res_ch3_hope <- cluster_svyglm(
   dvs         = ch3_dvs,
   iv          = "class.conc_lat_14_16",
   controls    = c(ch3_controls, "Hope_Election"),
+  dat         = latinos_data,
+  cluster_var = "State",
+  weight_var  = "Weight"
+)
+
+res_ch3_all <- cluster_svyglm(
+  dvs         = ch3_dvs,
+  iv          = "class.conc_lat_14_16",
+  controls    = c(ch3_controls, "Fear_Election", "Angry_Election", "Sad_Election", 
+                  "Pride_Election", "Hope_Election"),
   dat         = latinos_data,
   cluster_var = "State",
   weight_var  = "Weight"
@@ -384,14 +394,13 @@ emm_basic <- emmeans(int_path_basic, ~ Discrimination_Scale | class.conc_lat_14_
 contrast(emm_cl,    method = "pairwise")
 contrast(emm_basic, method = "pairwise")
 
-# Interaction plot
-int_plot <- plot_model(int_path_cl, type = "int") +
-  labs(x     = "Concrete Imm. Index",
-       color = "Personal Discrimination",
-       title = "Interaction: Stigma Context x Personal Discrimination")
 
-ggsave(filename = "figures/int_plot_ch3.png",
-       plot     = int_plot,
+path_plot <- plot_model(ols_all_dvs[[2]], type = "pred", terms = "class.conc_lat_14_16") +
+  labs(x     = "Str. Imm. Index",
+       title = "Support for Pathway for Citizenship by Str. Stigma Context")
+
+ggsave(filename = "path_plot.png",
+       plot     = path_plot,
        width    = 10,
        height   = 8,
        dpi      = 300)

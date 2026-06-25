@@ -37,7 +37,7 @@ df_short <- df_short %>% mutate(
   
   # --- State (numeric 1-52, keep as-is or as factor) ---
   State = as.integer(State),
-  BorderState = as.integer(State %in% c(3, 5, 32, 44)),            ### AZ, CA, NM, TX
+  BorderState = as.integer(State %in% c(3, 5, 32, 45)),            ### AZ, CA, NM, TX
   
   # --- Birth Year (numeric) ---
   BirthYear = as.integer(BirthYear),
@@ -277,7 +277,14 @@ df_short <- df_short %>% mutate(
   
   # --- Group Discrimination: Immigrants (1-5) ---
   # 1=A lot, 2=Some, 3=A little, 4=None at all, 5=Don't know
-  GroupDiscImms = as.numeric(GroupDiscImms),
+  GroupDiscImms_num = as.numeric(GroupDiscImms),
+  GroupDiscImms_clean = case_when(
+    GroupDiscImms_num == 1 ~ 4, # A lot
+    GroupDiscImms_num == 2 ~ 3, # Some
+    GroupDiscImms_num == 3 ~ 2, # A little
+    GroupDiscImms_num == 4 ~ 1, # None at all
+    TRUE ~ NA_real_             # Don't know becomes NA
+  ),
   
   # --- Group Discrimination: Latinos (1-5) ---
   GroupDiscLatinos = as.numeric(GroupDiscLatinos),
@@ -305,13 +312,15 @@ df_short <- df_short %>% mutate(
   #        2=govt responsive (external), 6=good understanding (internal)
   IntExtEffPost_1 = as.integer(IntExtEffPost__1),
   IntExtEffPost_2 = as.integer(IntExtEffPost__2),
-  IntExtEffPost_5 = as.integer(IntExtEffPost__3),
-  IntExtEffPost_6 = as.integer(IntExtEffPost__4),
+  IntExtEffPost_3 = as.integer(IntExtEffPost__3),
+  IntExtEffPost_4 = as.integer(IntExtEffPost__4),
   # Reverse code negative items (1 and 5): 1->5, 5->1
   IntExtEffPost_1_r = (6L - as.integer(IntExtEffPost_1)),
-  IntExtEffPost_5_r = (6L - as.integer(IntExtEffPost_5)),
-  ExtEfficacy_mean = rowMeans(cbind(IntExtEffPost_1_r, IntExtEffPost_2), na.rm = TRUE),
-  IntEfficacy_mean = rowMeans(cbind(IntExtEffPost_5_r, IntExtEffPost_6), na.rm = TRUE),
+  IntExtEffPost_2_r = (6L - as.integer(IntExtEffPost_2)),
+  ExtEfficacy_mean = rowMeans(cbind(IntExtEffPost_1_r, IntExtEffPost_3), na.rm = TRUE),
+  IntEfficacy_mean = rowMeans(cbind(IntExtEffPost_2_r, IntExtEffPost_4), na.rm = TRUE),
+  ExtEff = IntExtEffPost_1_r + IntExtEffPost_3,
+  IntEff = IntExtEffPost_2_r + IntExtEffPost_4,
   
   # --- Belonging: Internal (0-10 sliders) ---
   BelongingPost_state = as.numeric(BelongingPost_1),
@@ -343,16 +352,8 @@ df_short <- df_short %>% mutate(
                                  BorderPoliciesMatrix_5 == 3 ~ 3,
                                  BorderPoliciesMatrix_5 == 4 ~ 2,
                                  BorderPoliciesMatrix_5 == 5 ~ 1),
-  UseForceICE = case_when(BorderPoliciesMatrix_6 == 1 ~ 5,               ## Recoding --- 5 --> more restrictive
-                          BorderPoliciesMatrix_6 == 2 ~ 4,
-                          BorderPoliciesMatrix_6 == 3 ~ 3,
-                          BorderPoliciesMatrix_6 == 4 ~ 2,
-                          BorderPoliciesMatrix_6 == 5 ~ 1),
-  ThirdCountryDept = case_when(BorderPoliciesMatrix_7 == 1 ~ 5,               ## Recoding --- 5 --> more restrictive
-                               BorderPoliciesMatrix_7 == 2 ~ 4,
-                               BorderPoliciesMatrix_7 == 3 ~ 3,
-                               BorderPoliciesMatrix_7 == 4 ~ 2,
-                               BorderPoliciesMatrix_7 == 5 ~ 1),
+  UseForceICE = BorderPoliciesMatrix_6,
+  ThirdCountryDept = BorderPoliciesMatrix_7,
   DetainUSCits = case_when(BorderPoliciesMatrix_8 == 1 ~ 5,               ## Recoding --- 5 --> more restrictive
                            BorderPoliciesMatrix_8 == 2 ~ 4,
                            BorderPoliciesMatrix_8 == 3 ~ 3,
@@ -364,7 +365,19 @@ df_short <- df_short %>% mutate(
   InteriorPolicyIndex = Prohibit_Raids + ProlongedDetention + UseForceICE + DetainUSCits,
   # --- Participation: CHIRLA (multi-select) ---
   # _1=donate, _2=volunteer, _3=protest, _4=all, _5=none
-  across(starts_with("ParticipationAlt1_"), ~ as.integer(!is.na(.) & . != 0)),
+  ParticipationAlt1_any = as.integer(ParticipationAlt1 != "5" & !is.na(ParticipationAlt1)),
+  
+  # Donate: selected 1, or was part of a multi-select including 1, or selected "all"
+  ParticipationAlt1_donate    = as.integer(str_detect(ParticipationAlt1, "1") & ParticipationAlt1 != "5"),
+  ParticipationAlt1_volunteer = as.integer(str_detect(ParticipationAlt1, "2") & ParticipationAlt1 != "5"),
+  ParticipationAlt1_protest   = as.integer(str_detect(ParticipationAlt1, "3") & ParticipationAlt1 != "5"),
+  
+  # "All of these" (4) = donate + volunteer + protest
+  # Already captured above since 4 appears alongside 1,2,3 in "1,2,3,4"
+  # but standalone "4" responses need to be captured too
+  ParticipationAlt1_donate    = as.integer(ParticipationAlt1_donate    | str_detect(ParticipationAlt1, "\\b4\\b")),
+  ParticipationAlt1_volunteer = as.integer(ParticipationAlt1_volunteer | str_detect(ParticipationAlt1, "\\b4\\b")),
+  ParticipationAlt1_protest   = as.integer(ParticipationAlt1_protest   | str_detect(ParticipationAlt1, "\\b4\\b")),
   
   # --- Income ---
   # 1=<$25k, 2=$25-49k, 3=$50-74k, 4=$75-99k, 5=$100-149k, 6=$150k+, 7=PrefNotSay
@@ -609,7 +622,10 @@ df_clean <- left_join(df_clean, scores_2025, by= c("State_char" = "State"))
 # index check --- 
 psych::alpha(df_clean[, c("StigmaImmMatrix_1", "StigmaImmMatrix_2", "StigmaImmMatrix_3")])
 psych::alpha(df_clean[, c("Parents_Birth", "Grandparents_Birth", "Span_Acc")])
-
+psych::alpha(df_clean[, c("BorderWall", "BorderSecurity", "ThirdCountryDept")])
+psych::alpha(df_clean[, c("BorderWall", "BorderSecurity")])
+psych::alpha(df_clean[, c("Prohibit_Raids", "ProlongedDetention", "UseForceICE", 
+                          "DetainUSCits")])
 ### map fig 
 
 library(tidyverse)
@@ -680,7 +696,14 @@ conc_24_map <- ggplot(data = states_sf) +
   guides(fill = guide_legend(nrow = 2))
 
 conc_24_map
+conc_16_map
 
+library(patchwork)
+
+conc_16_map + conc_24_map +
+  plot_annotation(title = "Structural Stigma Index, 2016-2026")
+
+conc_24_map
 # --- Save ---
 ggsave(
   filename = "state_climate_2024_Conc.png",
@@ -814,3 +837,91 @@ write.csv(belong_text_anti, "belong_text_anti.csv", row.names = FALSE)
 write.csv(belong_text_pro, "belong_text_pro.csv", row.names = FALSE)
 write.csv(belong_text_control, "belong_text_control.csv", row.names = FALSE)
 
+
+### correlation between birthright lawsuit and new data
+
+lawsuit_states <- c("CA", "CO", "CT", "DE", "HI", "IL", "ME", "MD", 
+                    "MA", "MI", "MN", "NV", "NJ", "NM", "NY", "NC", 
+                    "OR", "RI", "VT", "WA", "WI", "AZ")
+
+
+test_scores <- scores_2025 %>%
+  mutate(joined_lawsuit = as.integer(State %in% lawsuit_states))
+
+# Correlation
+cor.test(test_scores$latino_conc_24, test_scores$joined_lawsuit)
+
+# Or point-biserial since one variable is binary
+cor.test(test_scores$latino_conc_24, test_scores$joined_lawsuit, 
+         method = "pearson")
+
+
+### ICI Scores -- Pham and Van 2011
+library(readxl)
+incl_scores <- read_xlsx("inclusivity_scores_2009_16.xlsx")
+
+test_scores <- test_scores %>% left_join(incl_scores, by = "State")
+
+test_scores$ICI_Score_2011 <- as.numeric(test_scores$ICI_Score_2011)
+
+cor.test(test_scores$latino_conc_24, test_scores$ICI_Score_2011)
+
+# Or point-biserial since one variable is binary
+cor.test(test_scores$latino_conc_24, test_scores$ICI_Score_2011, 
+         method = "pearson")
+
+## using pres vote share -- 2020 
+
+data_president <- read_csv("dataverse_files/1976-2020-president.csv")
+data_votes <- data_president %>% filter(year == 2020 | year == 2016)
+
+# data_2016_votes <- data_votes %>% filter(party_detailed == "REPUBLICAN" | 
+#                                            party_detailed == "DEMOCRAT") %>%
+#   filter(year == 2016) %>% filter(writein == FALSE)
+data_2020_votes <- data_votes %>% filter(party_detailed == "REPUBLICAN" | 
+                                           party_detailed == "DEMOCRAT") %>% 
+  filter(year == 2020) %>% filter(writein == FALSE)
+
+## switching to wide format 
+data_2020_votes <- data_2020_votes %>%
+  dplyr::select(year, state, party_detailed, candidatevotes, totalvotes) %>%  # Keep relevant columns
+  pivot_wider(names_from = party_detailed, values_from = candidatevotes)
+
+data_2020_votes <- data_2020_votes %>% mutate(
+  vote_margin = ((REPUBLICAN - DEMOCRAT)/totalvotes)*100,
+  vote_pp_d = (DEMOCRAT/totalvotes)*100,
+  vote_pp_r = (REPUBLICAN/totalvotes)*100,
+  vote_diff_pp = vote_pp_d - vote_pp_r 
+)
+  
+# Convert abbreviations to full state names in all caps
+pres_votes <- data_2020_votes %>%
+  filter(year == 2020) %>%
+  mutate(state = str_to_upper(state)) %>%
+  dplyr::select(state, vote_pp_r)
+
+# Merge using state_full
+test_scores <- test_scores %>%
+  mutate(state_full = str_to_upper(state.name[match(State, state.abb)]))
+
+test_scores <- left_join(test_scores, pres_votes,
+                         by = c("state_full" = "state"))
+
+cor.test(test_scores$latino_conc_24, test_scores$vote_pp_r.y)
+
+## 
+presvote24 <- read.csv("pres_vote_24.csv", 
+                       skip = 2,           # skip the title and blank row
+                       header = TRUE) %>%
+  filter(Office == "President") %>%
+  dplyr::select(Area, RepVotesTotalPercent) %>%
+  mutate(state_full = str_to_upper(Area))
+
+# Merge and correlate
+test_scores <- left_join(test_scores, presvote24,
+                         by = c("state_full" = "state_full"))
+
+cor.test(test_scores$latino_conc_24, test_scores$RepVotesTotalPercent)
+
+  
+  
